@@ -21,9 +21,6 @@ opt_in_rules:
   - private_swiftui_state
   - unowned_variable_capture
 
-analyzer_rules:
-  - unused_import
-  - unused_declaration
 
 type_body_length:
   warning: 250

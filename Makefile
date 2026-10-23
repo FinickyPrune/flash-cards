@@ -10,7 +10,7 @@ SCREENSHOTS := build/screenshots
 APP_PATH    := $(DERIVED)/Build/Products/Debug-iphonesimulator/$(SCHEME).app
 
 # Resolved once per make invocation. Override with SIM_NAME="iPhone 17" or SIM_UDID=<udid>.
-SIM_UDID = $(eval SIM_UDID := $$(shell scripts/sim.sh))$(SIM_UDID)
+SIM_UDID ?= $(eval SIM_UDID := $$(or $$(shell scripts/sim.sh),$$(error No simulator found, see scripts/sim.sh)))$(SIM_UDID)
 
 # Compact output: only warnings, errors and test results. CI overrides with --renderer github-actions.
 XCBEAUTIFY_FLAGS ?= --quiet --is-ci --disable-colored-output --disable-logging

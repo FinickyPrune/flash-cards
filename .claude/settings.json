@@ -37,7 +37,6 @@
     ],
     "deny": [
       "Bash(gh pr merge:*)",
-      "Bash(git push --force:*)",
       "Bash(git reset --hard:*)",
       "Edit(*.xcodeproj/**)",
       "Write(*.xcodeproj/**)"

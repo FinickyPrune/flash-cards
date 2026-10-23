@@ -17,13 +17,13 @@ fi
 
 for file in "$@"; do
     name=$(basename "$file")
-    path="pr-$pr/$name"
+    path="pr-$pr/$(jq -rn --arg n "$name" '$n | @uri')"
     # Overwrite if it already exists (re-uploading after a fix).
     sha=$(gh api "repos/$repo/contents/$path?ref=$branch" -q .sha 2>/dev/null || true)
-    gh api -X PUT "repos/$repo/contents/$path" \
-        -f message="PR #$pr: $name" \
-        -f branch="$branch" \
-        -f content="$(base64 < "$file")" \
-        ${sha:+-f sha="$sha"} >/dev/null
+    # Body goes through stdin: a base64 PNG can exceed the argv size limit.
+    base64 < "$file" | tr -d '\n' \
+        | jq -Rs --arg msg "PR #$pr: $name" --arg branch "$branch" --arg sha "$sha" \
+            '{message: $msg, branch: $branch, content: .} + (if $sha == "" then {} else {sha: $sha} end)' \
+        | gh api -X PUT "repos/$repo/contents/$path" --input - >/dev/null
     echo "![${name%.*}](https://github.com/$repo/blob/$branch/$path?raw=true)"
 done

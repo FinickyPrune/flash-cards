@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: xcode-27
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install swiftlint swiftformat
+      - run: make lint
+
+  test:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    env:
+      XCBEAUTIFY_FLAGS: --quiet --is-ci --renderer github-actions
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          echo "Simulator: $(scripts/sim.sh)"
+      - name: Unit tests
+        run: make test
+      - name: UI tests
+        run: make test-ui
+      - name: Upload results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/results
+          retention-days: 7

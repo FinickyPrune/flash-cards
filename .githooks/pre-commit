@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Lint staged Swift files. Installed by `make bootstrap` (git config core.hooksPath .githooks).
+set -euo pipefail
+
+files=()
+while IFS= read -r -d '' f; do files+=("$f"); done < <(git diff --cached --name-only --diff-filter=ACMR -z -- '*.swift')
+[[ ${#files[@]} -eq 0 ]] && exit 0
+
+swiftformat --lint --quiet "${files[@]}" || { echo "pre-commit: run 'make format'" >&2; exit 1; }
+swiftlint lint --strict --quiet "${files[@]}"

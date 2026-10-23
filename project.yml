@@ -3,7 +3,7 @@ name: FlashCards
 options:
   bundleIdPrefix: dev.finickyprune
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "26.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
 

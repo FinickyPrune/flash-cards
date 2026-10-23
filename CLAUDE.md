@@ -1,7 +1,7 @@
 # FlashCards
 
-Native iOS flash-card app. SwiftUI, iOS 18+, Swift 6 strict concurrency, warnings are errors.
-Claude does most of the work (code, tests, review, push); the user sets direction, reviews PRs and merges.
+Native iOS flash-card app. SwiftUI, iOS 26+, Swift 6 strict concurrency, warnings are errors.
+Claude does most of the work (code, tests, review, push, routine merges); the user sets direction and reviews flagged PRs.
 
 ## Language
 - Talk to the user in Russian.
@@ -19,16 +19,21 @@ Claude does most of the work (code, tests, review, push); the user sets directio
 - `App/Sources`, `Tests/UnitTests`, `Tests/UITests` are synced folders: new files are picked up without regenerating.
 
 ## Workflow
-Issue → branch → plan → code + tests → `make check` → screenshots (UI) → `/code-review` + `pr-reviewer` subagent → push → PR → user merges.
+Issue → branch → plan → code + tests → `make check` → screenshots (UI) → `/code-review` + `pr-reviewer` subagent → push → PR → merge (self or user, see below).
 - New idea without an issue → `write-spec` skill. Implementing an issue → `work-issue` skill.
 - Branches: `<type>/<issue>-<slug>`. Commits: Conventional Commits with `Refs #<issue>`.
 - Show evidence (test summary, screenshot), not "it works".
 
-## Ask the user first
-- Merging anything (never run `gh pr merge`; a hook blocks it), pushing to `main`.
-- Adding an SPM dependency.
-- Changing CI, signing, bundle ID or deployment target.
-- Architecture that deviates from the issue's spec.
+## Who merges
+IMPORTANT: fill the PR template's **Review flags** honestly. If the PR does or touches any of these, check it, explain where, add the `needs-review` label, and leave the merge to the user:
+- **Spec / plan** — ambiguous requirements I interpreted, or a plan that deviates from the spec (solving the wrong problem is the most expensive mistake)
+- **Tests** — existing tests changed/removed, or assertions encode non-obvious logic (green tests on wrong logic prove nothing)
+- **Sensitive** — auth, payments, secrets, permissions/access rights, other people's data, privacy entitlements
+- **Irreversible** — data migrations / persisted schema changes, deleting user data, releases
+- **Architecture** — new dependencies, new or changed public interfaces, CI / hooks / `.claude/` / `project.yml` config
+- **Scope** — the diff touches anything outside the issue
+
+When in doubt, flag it. Otherwise check "None of the above" and merge with `scripts/merge-pr.sh <n>` (waits for green CI, refuses flagged PRs; squash + delete branch). Never `gh pr merge` directly; never push to `main`.
 
 ## Gotchas
 - Hooks in `.claude/settings.json` auto-format and lint every Swift edit and block unsafe git commands. If a hook blocks you, fix the cause; don't work around it.

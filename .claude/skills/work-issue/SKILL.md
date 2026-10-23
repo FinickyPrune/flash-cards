@@ -8,7 +8,7 @@ argument-hint: <issue-number>
 
 ## 1. Understand
 - `gh issue view $ARGUMENTS --comments`. If acceptance criteria are missing or ambiguous, ask the user (or run `write-spec`) before coding.
-- Read the code it touches. Load `swift-conventions` and `ios-testing`.
+- Read the code it touches. Load `swift-conventions`, `pragmatic-testing` and `ios-testing`.
 
 ## 2. Branch
 ```bash
@@ -20,7 +20,7 @@ git switch main && git pull --ff-only && git switch -c <type>/$ARGUMENTS-<short-
 If the diff can't be described in one sentence, write a short plan first: files to add/change, types and their responsibilities, tests per acceptance criterion. Show it to the user only if it changes architecture, adds a dependency, or deviates from the spec; otherwise proceed.
 
 ## 4. Implement in small verified steps
-For each step: write/adjust tests → code → `make test ONLY=...` for the touched suite → commit.
+For each step: code + the tests `pragmatic-testing` says it earns (usually 1–3; break the production line once to see each go red) → `make test ONLY=...` for the touched suite → commit.
 - Commits: Conventional Commits, English, imperative (`feat(deck): add card editing`), with `Refs #$ARGUMENTS`.
 - Keep each commit building. The PostToolUse hook formats and lints every Swift edit — fix what it reports immediately.
 - Stay in scope. Unrelated problems you notice → note them for the PR description, don't fix them here.

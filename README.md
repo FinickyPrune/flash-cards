@@ -1,6 +1,6 @@
 # FlashCards
 
-Native iOS flash-card app (SwiftUI, iOS 18+, Swift 6).
+Native iOS flash-card app (SwiftUI, iOS 26+, Swift 6).
 
 ## Setup
 ```bash

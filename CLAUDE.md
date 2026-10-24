@@ -3,6 +3,9 @@
 Native iOS flash-card app. SwiftUI, iOS 26+, Swift 6 strict concurrency, warnings are errors.
 Claude does most of the work (code, tests, review, push, routine merges); the user sets direction and reviews flagged PRs.
 
+## Product
+Flash-card app; vision not written yet. Product knowledge lives in `docs/product/` and is read on demand: start at `docs/product/README.md`, open only what the task touches. Where facts go and when to update them: `product-docs` skill.
+
 ## Language
 - Talk to the user in Russian.
 - Code, comments, commits, PRs, issues, docs: English.

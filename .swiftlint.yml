@@ -1,0 +1,36 @@
+included:
+  - App
+  - Tests
+excluded:
+  - build
+  - DerivedData
+
+# Formatting rules are owned by SwiftFormat.
+disabled_rules:
+  - trailing_comma
+  - opening_brace
+  - line_length
+
+opt_in_rules:
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - weak_delegate
+  - empty_count
+  - first_where
+  - contains_over_first_not_nil
+  - private_swiftui_state
+  - unowned_variable_capture
+
+
+type_body_length:
+  warning: 250
+  error: 400
+file_length:
+  warning: 400
+  error: 600
+function_body_length:
+  warning: 50
+  error: 80
+identifier_name:
+  min_length: 2
+  excluded: [x, y, z, i, j, id, to]

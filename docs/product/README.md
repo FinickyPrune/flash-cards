@@ -15,7 +15,7 @@ All planned; nothing shipped yet.
 - [card-editor.md](features/card-editor.md): add/edit screen, four back tiles, folder chip, duplicate check.
 - [review.md](features/review.md): review flow, four ratings, session queue, summary.
 - [screenshot-import.md](features/screenshot-import.md): entry points, share extension, batch flow, OCR, storage.
-- [hints.md](features/hints.md): offline sources for definition, translation and lemma; spikes.
+- [hints.md](features/hints.md): where the definition, synonyms, translation and lemma come from, offline; coverage; translation options.
 - [csv.md](features/csv.md): CSV import with preview, folder export.
 
 ## Decisions
@@ -24,3 +24,5 @@ All planned; nothing shipped yet.
 - [0003](decisions/0003-store-screenshot-copies.md): cards store a compressed screenshot copy.
 - [0004](decisions/0004-share-extension-inbox.md): share extension only drops files into a shared inbox.
 - [0005](decisions/0005-ocr-api-and-settings.md): OCR with `RecognizeTextRequest`, accurate, correction on; no Serbian screenshots.
+- [0006](decisions/0006-dictionary-source.md) (proposed): English hints from a trimmed Wiktionary SQLite; CC BY-SA, DRM-free copy per release.
+- [0007](decisions/0007-lemma-candidates.md) (proposed): hint entry and lemma from part of speech in context plus dictionary forms; hyphenated tokens joined.

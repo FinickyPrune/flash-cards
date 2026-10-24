@@ -21,6 +21,7 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Batch | The screenshots processed in one run of the import flow, all into one folder. | — | Пачка |
 | Token | A word from OCR'd text after tokenisation; a phrase is a run of tokens on one line. | — | — |
 | Lemma | Dictionary form of a token (`running` → `run`). | `Lemmatizer` | Начальная форма |
+| Sense | One meaning of a dictionary entry; the Definition tile shows one sense. | — | Значение |
 | Review | Playing cards and rating each answer. "Game" in early notes = review. | — | Игра |
 | Play | The action that starts a review session for a folder's subtree. | — | Играть |
 | Session | One review run: a queue of at most 20 cards. | `SessionBuilder` builds it | Сессия |

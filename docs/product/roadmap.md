@@ -2,18 +2,19 @@
 MVP milestones in order, and what comes after. Actionable work for the current milestone is in GitHub Issues.
 
 ## MVP
-0. **Spikes** (`features/hints.md` → Spikes): OCR (#3, done: decision 0005), Translation
-   framework pairs (#4), lemma tagging (#5), English dictionary source (#6).
+0. **Spikes**: OCR (#3, decision 0005), English dictionary (#6, decision 0006) and lemma
+   (#5, decision 0007, English only) done; Translation (#4) parked, its tile ships as a stub.
 1. **Foundation**: models, catalog (folder tree), card editor add/edit, manual cards.
 2. **Review**: scheduler, session builder, review screen, session summary, folder progress.
    After this the app is usable with manual cards.
 3. **CSV**: import with preview, folder export. Comes before screenshots because it is how
    Serbian cards enter the app.
-4. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, hint tiles, duplicate check.
+4. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, dictionary build script and
+   bundled file, hint tiles, duplicate check.
    Translation hint stays a stub until #4 resumes.
 5. **Share extension**: extension, App Group, inbox banner.
 6. **Release**: en + ru localisation, icon, one-screen onboarding, tip jar (StoreKit 2
-   consumables), dictionary attribution, App Store.
+   consumables), dictionary attribution and DRM-free dictionary file in the GitHub release (#11), App Store.
 
 ## After MVP
 - Cards from a website, document or query (direction to be designed).

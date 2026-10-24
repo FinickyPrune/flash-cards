@@ -12,8 +12,9 @@ Targets, layers, invariants and the initial data model. Read when planning struc
 
 ## Layers
 View → `@Observable` view model → services → SwiftData.
-Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService`, `CSVImporter`,
-`SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
+Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only
+SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
+`CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
 
 Hint sources are protocols, swappable per language pair. `TranslationProvider` ships as a
 stub until spike #4 resumes (on #4: `TranslationSession(installedSource:target:)` with
@@ -24,6 +25,9 @@ protocol SynonymProvider { func synonyms(for term: String, language: String) asy
 protocol TranslationProvider { func translation(for term: String, from: String, to: String) async -> String? }
 protocol Lemmatizer { func lemma(for token: String, language: String) -> String? }
 ```
+Decision 0007 needs more than these signatures: the hint sources take the token with its line
+(part of speech in context) and the synonym source the sense the definition used. Reshape
+them in milestone 4.
 
 ## Frameworks
 SwiftUI, Observation, SwiftData, Vision (OCR: `RecognizeTextRequest`, settings in decision 0005), NaturalLanguage (`NLTokenizer`, lemma tagging), Translation

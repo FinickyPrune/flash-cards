@@ -21,9 +21,9 @@ Status: planned (milestone 1; hints in milestone 4)
   warn and ask "Create anyway?". The front key ignores case, diacritics and surrounding
   spaces, so `kuća` = `Kuca `.
 - When the front came from a token whose lemma differs (`running` → `run`, `saw` → `see`), a
-  toggle switches the front between the form in the text and the lemma. The front starts as
-  the form in the text. (assumption) Lemma rules: decision 0007. The toggle changes only the
-  front: tiles keep their hints and the user's edits.
+  toggle switches the front between the lemma and the form in the text. The front starts as
+  the lemma. Lemma rules: decision 0007. The toggle changes only the front: tiles keep their
+  hints and the user's edits.
 
 ## States and edge cases
 - Front empty → can't save.

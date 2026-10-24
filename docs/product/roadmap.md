@@ -14,7 +14,7 @@ MVP milestones in order, and what comes after. Actionable work for the current m
    Translation hint stays a stub until #4 resumes.
 5. **Share extension**: extension, App Group, inbox banner.
 6. **Release**: en + ru localisation, icon, one-screen onboarding, tip jar (StoreKit 2
-   consumables), dictionary attribution and DRM-free dictionary file in the GitHub release, App Store.
+   consumables), dictionary attribution and DRM-free dictionary file in the GitHub release (#11), App Store.
 
 ## After MVP
 - Cards from a website, document or query (direction to be designed).

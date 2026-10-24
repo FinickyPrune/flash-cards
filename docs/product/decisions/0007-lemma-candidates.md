@@ -14,8 +14,9 @@ picked the expected entry for 39 of 85 tokens.
   the line (`saw` verb → `see`); else the token's entry with that part of speech; else the
   system lemma; else any entry of the token; else an alias (`tv` → `television`).
   83 of 85 right (`entry_choice.py`); misses: `left` in "turn left" tagged as a verb, `humiliated`.
-- The lemma toggle offers that entry's headword when it differs from the token. Toggling
-  changes only the front; hints are not recomputed.
+- When that entry's headword differs from the token, the front starts as the headword
+  (owner's choice, 2026-10-24) and a toggle switches it to the form in the text; a wrong
+  lemma costs one tap. Toggling changes only the front; hints are not recomputed.
 - The picker joins hyphenated tokens without spaces (`well-known`); they get a lemma only
   from inflection rows.
 

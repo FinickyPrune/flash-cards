@@ -20,11 +20,17 @@ sense-mismatched ones ("hangover" → katzenjammer) and no informal senses.
 - License: the file is an adaptation under CC BY-SA 4.0; app code is unaffected. In the app:
   "Wiktionary contributors", kaikki.org, FrequencyWords, license link, "modified". The file is
   also published DRM-free per release (CC FAQ: parallel distribution). Not legal advice.
+  Release checklist: #11.
+- Updates: rebuilt from a pinned kaikki dump (sha256 kept with the script) only when there is
+  a reason (coverage gaps, build-rule fixes), at most a few times a year, and shipped with an
+  app release. (assumption) Cards store the back as text, so an update never changes existing cards.
 
 ## Alternatives
 - Open English WordNet (CC BY 4.0, 32 MB) — misses 7–12% of common words and most idioms.
 - WordNet as a synonym fallback — senses don't line up with Wiktionary's; maybe later.
 - System dictionary — no API for definition text on iOS.
+- Online Wiktionary API — breaks "on-device, no network" and offline use, sends the user's
+  words out; the same CC BY-SA attribution would still apply (only the DRM issue goes away).
 
 ## Consequences
 18–28% of common words are headwords and also forms of another (`saw`): the entry is picked

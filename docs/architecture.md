@@ -16,9 +16,9 @@ Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bund
 SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
 `CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
 
-Hint sources are protocols, swappable per language pair. `TranslationProvider` ships as a
-stub until spike #4 resumes (on #4: `TranslationSession(installedSource:target:)` with
-`.lowLatency`; doesn't run in the Simulator).
+Hint sources are protocols, swappable per language pair. `TranslationProvider` is backed by
+`DictionaryService` (Russian translations, decision 0006). Apple's Translation framework is a
+possible later fallback (notes on #4: `TranslationSession(installedSource:target:)`, device only).
 ```swift
 protocol DefinitionProvider { func definition(for term: String, language: String) async -> String? }
 protocol SynonymProvider { func synonyms(for term: String, language: String) async -> [String] }
@@ -30,8 +30,8 @@ Decision 0007 needs more than these signatures: the hint sources take the token 
 them in milestone 4.
 
 ## Frameworks
-SwiftUI, Observation, SwiftData, Vision (OCR: `RecognizeTextRequest`, settings in decision 0005), NaturalLanguage (`NLTokenizer`, lemma tagging), Translation
-(on-device), PhotosUI (`PhotosPicker`), StoreKit 2 (tip jar only).
+SwiftUI, Observation, SwiftData, Vision (OCR: `RecognizeTextRequest`, settings in decision 0005), NaturalLanguage (`NLTokenizer`, lemma tagging),
+PhotosUI (`PhotosPicker`), StoreKit 2 (tip jar only).
 
 ## Invariants
 - No network calls except StoreKit (vision principle 1).

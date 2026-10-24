@@ -1,5 +1,5 @@
 # 0006. English hints from a trimmed Wiktionary SQLite bundled with the app
-Status: proposed (2026-10-24), owner to accept
+Status: accepted (2026-10-24)
 
 ## Context
 Spike #6 built Open English WordNet 2025 and the English Wiktionary (kaikki.org, 2026-10-21)
@@ -15,8 +15,9 @@ sense-mismatched ones ("hangover" → katzenjammer) and no informal senses.
   rare / dated. Without translations 56 MB on disk, ~24 MB compressed; with Russian 60 / ~25 MB.
 - Synonyms: entry-written first, thesaurus ones by frequency; tagged vulgar, offensive,
   derogatory or obsolete dropped; at most 6.
-- Definitions stay English for `en → ru`: English Wiktionary has no Russian definitions;
-  Russian comes from the Translation tile.
+- Definitions stay English for `en → ru`: English Wiktionary has no Russian definitions.
+- The Translation tile uses the Russian translations in the same data (72–89% of the top 20k
+  words, +~1.5 MB compressed), not Apple's Translation framework (owner, 2026-10-24).
 - License: the file is an adaptation under CC BY-SA 4.0; app code is unaffected. In the app:
   "Wiktionary contributors", kaikki.org, FrequencyWords, license link, "modified". The file is
   also published DRM-free per release (CC FAQ: parallel distribution). Not legal advice.
@@ -34,4 +35,4 @@ sense-mismatched ones ("hangover" → katzenjammer) and no informal senses.
 
 ## Consequences
 18–28% of common words are headwords and also forms of another (`saw`): the entry is picked
-by part of speech (decision 0007). Wiktionary's Russian translations (72–89%) are an option on #4.
+by part of speech (decision 0007). Translations into other back languages need a rebuild with them.

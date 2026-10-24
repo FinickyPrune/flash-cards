@@ -1,5 +1,5 @@
 # 0007. Lemma and hint entry from NLTagger in context plus the dictionary's forms
-Status: proposed (2026-10-24), owner to accept
+Status: accepted (2026-10-24)
 
 ## Context
 Spike #5 (`tools/spikes/lemma/lemma.swift`, macOS 26.6; ru/es not checked, English only in

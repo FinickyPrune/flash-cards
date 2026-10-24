@@ -15,9 +15,12 @@ View → `@Observable` view model → services → SwiftData.
 Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService`, `CSVImporter`,
 `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
 
-Hint sources are protocols, swappable per language pair:
+Hint sources are protocols, swappable per language pair. `TranslationProvider` ships as a
+stub until spike #4 resumes (on #4: `TranslationSession(installedSource:target:)` with
+`.lowLatency`; doesn't run in the Simulator).
 ```swift
 protocol DefinitionProvider { func definition(for term: String, language: String) async -> String? }
+protocol SynonymProvider { func synonyms(for term: String, language: String) async -> [String] }
 protocol TranslationProvider { func translation(for term: String, from: String, to: String) async -> String? }
 protocol Lemmatizer { func lemma(for token: String, language: String) -> String? }
 ```
@@ -56,7 +59,7 @@ Card
   context: String?
   screenshot: Data?          // compressed JPEG, @Attribute(.externalStorage)
   back: String
-  backSource: String         // "definition" | "translation" | "custom"
+  backSource: String         // "definition" | "synonyms" | "translation" | "custom"
   createdAt, updatedAt: Date
 
 ReviewState                  // per card and direction, separate from Card

@@ -1,14 +1,14 @@
 # Card editor
-One screen to add or edit a card: front, screenshot, context, the back chosen from three tiles, and the folder.
+One screen to add or edit a card: front, screenshot, context, the back chosen from four tiles, and the folder.
 Status: planned (milestone 1; hints in milestone 4)
 
 ## Rules
 - Modes: **add** and **edit**, same screen.
 - Top to bottom: front (editable text field), screenshot if present, context (editable),
-  three tiles, folder chip.
-- Tiles: **Definition**, **Translation**, **Custom text** (a text field). The user selects
+  four tiles, folder chip.
+- Tiles: **Definition**, **Synonyms**, **Translation**, **Custom text** (a text field). The user selects
   exactly one; its text is saved as the back and stays editable. Review shows that text.
-- Definition and Translation tiles are prefilled with hints when a source has one (see `hints.md`).
+- Definition, Synonyms and Translation tiles are prefilled with hints when a source has one (see `hints.md`).
   An empty hint leaves the tile empty and editable.
 - The selected tile by default is the back source last used in this root folder; for a new
   root folder it is Translation. (assumption)
@@ -29,4 +29,4 @@ Status: planned (milestone 1; hints in milestone 4)
 - No screenshot (manual card or CSV) → the screenshot area is hidden.
 
 ## Not supported
-- Several back variants per card; synonyms as a fourth tile.
+- Several back variants per card.

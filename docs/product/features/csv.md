@@ -11,7 +11,7 @@ Status: planned (milestone 5)
   folder), then **Import**.
 
 ## Export
-- Exports one folder to CSV in the same column format, without screenshots. (assumption: in MVP)
+- Exports one folder to CSV in the same column format, without screenshots.
 
 ## States and edge cases
 - (to be defined) Rows with an empty front or back; what happens to duplicates on import

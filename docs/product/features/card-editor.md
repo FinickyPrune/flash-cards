@@ -18,8 +18,8 @@ Status: planned (milestone 1; hints in milestone 3)
 - In edit mode both sides and the folder can change.
 - In add mode inside the import flow the primary action is **Save and next**.
 - Duplicate check on save: another card with the same front key in the same root folder →
-  warn and ask "Create anyway?". (assumption: scope = root folder; key ignores case and
-  diacritics, so `kuća` = `kuca`)
+  warn and ask "Create anyway?". The front key ignores case, diacritics and surrounding
+  spaces, so `kuća` = `Kuca `.
 - When the front came from a token whose lemma differs (`running` → `run`), a toggle switches
   the front between the form in the text and the lemma. (spike: lemma quality per language)
 

@@ -26,7 +26,7 @@ Both feed the same inbox and the same flow; the flow only sees images.
 5. Duplicate check by front key within the root folder; warn and ask "Create anyway?".
 6. Save returns to the word picker of the same screenshot; words already made into cards are
    marked. Pick another word or go to **Next screenshot**.
-7. Always available: **Skip screenshot** (removes it from the inbox), **Back**, editing the
+7. Always available: **Skip screenshot**, **Back**, editing the
    front by hand.
 8. OCR found nothing → a message and **Create card manually** with this screenshot.
 9. End of batch: "Created N cards" and an offer to play.
@@ -35,9 +35,9 @@ Both feed the same inbox and the same flow; the flow only sees images.
 - On save the card stores a compressed copy of the screenshot: long side ~1280 px, JPEG
   quality ~0.7, at most ~300 KB. No reference to the photo library; the card survives deletion
   of the original. The original in Photos is never touched.
-- The inbox file is deleted once a card from it is saved, or when it is skipped.
-  (to be defined: delete after the first saved card, or when leaving the screenshot, so more
-  words can still be picked after an app restart)
+- The inbox file is deleted when the user leaves the screenshot: **Next screenshot**, **Skip
+  screenshot**, or the end of the batch. Until then it stays in the inbox, so after an app
+  restart the screenshot is still there and words already made into cards are marked.
 
 ## States and edge cases
 - Serbian Latin diacritics (č ć š ž đ) are expected to be misread; manual editing of the

@@ -11,13 +11,15 @@ Status: planned (milestone 2)
 - Intervals are whole days. No notifications.
 - Scheduling: SM-2-like, behind a replaceable scheduler (decision 0002). Exact parameters are
   set when the scheduler is built.
-- Session queue: due cards first, then new cards; at most **20** cards in total (one constant). (assumption)
-- A card rated Again comes back later in the same session, after a few other cards. (assumption)
+- Session queue: due cards first, then new cards; at most **20** cards in total (one constant).
+- A card rated Again comes back later in the same session, after a few other cards (exact gap set
+  when the session builder is built).
 - No due cards → the user can still play: **20** random cards from the subtree. These
-  ratings go to the review log but don't change the schedule. (assumption)
+  ratings go to the review log but don't change the schedule.
 - Every rating is written to the review log.
 - Session summary: number of cards reviewed, and how many were rated Good or Easy.
-- A card counts as **learned** for folder progress when: (to be defined)
+- A card counts as **learned** for folder progress when its forward interval is ≥ **21 days**.
+  A lapse that resets the interval makes it not learned again.
 
 ## States and edge cases
 - Empty subtree: Play shows that there is nothing to review.

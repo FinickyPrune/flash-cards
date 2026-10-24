@@ -5,7 +5,7 @@ Status: planned (milestone 1; progress and Play in milestone 2)
 ## Rules
 - Folders nest to any depth. Design and test the UI at 2–3 levels.
 - Folders can be created, renamed, moved and deleted.
-- Deleting a folder deletes its whole subtree (subfolders and cards) after a confirmation. (assumption)
+- Deleting a folder deletes its whole subtree (subfolders and cards) after a confirmation.
 - Creating a root folder asks for the learning language and the back language; both default
   to the system language. Subfolders inherit the pair from their root folder and don't store one.
 - A folder screen lists its subfolders, then its cards.
@@ -16,7 +16,8 @@ Status: planned (milestone 1; progress and Play in milestone 2)
 ## States and edge cases
 - Empty folder: no subfolders and no cards; offer New card and screenshot import. (assumption)
 - Moving a folder under one of its own descendants is not allowed.
-- Moving a folder to another root folder: (to be defined) its cards take on the new root's language pair, or the move is limited to the same pair.
+- Moving a folder to another root folder is allowed; its cards take on the new root's language
+  pair. If the pairs differ, a warning is shown before the move.
 
 ## Not supported
 - Tags.

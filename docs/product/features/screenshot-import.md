@@ -1,6 +1,6 @@
 # Screenshot import
 Turn one or many screenshots into cards: OCR the text, tap a word or phrase, confirm the card.
-Status: planned (milestone 3 in-app; milestone 4 share extension)
+Status: planned (milestone 4 in-app; milestone 5 share extension)
 
 ## Entry points
 Both feed the same inbox and the same flow; the flow only sees images.

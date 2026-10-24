@@ -1,6 +1,6 @@
 # Hints
 Where the card editor's suggested definition, translation and lemma come from — all offline.
-Status: planned (milestone 3); sources pending spikes (milestone 0)
+Status: planned (milestone 4); sources pending spikes (milestone 0)
 
 ## Rules
 - Three replaceable sources per language pair: definition, translation, lemma (glossary: Hint).

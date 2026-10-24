@@ -7,9 +7,10 @@ MVP milestones in order, and what comes after. Actionable work for the current m
 1. **Foundation**: models, catalog (folder tree), card editor add/edit, manual cards.
 2. **Review**: scheduler, session builder, review screen, session summary, folder progress.
    After this the app is usable with manual cards.
-3. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, hint tiles, duplicate check.
-4. **Share extension**: extension, App Group, inbox banner.
-5. **CSV**: import with preview, folder export.
+3. **CSV**: import with preview, folder export. Comes before screenshots because it is how
+   Serbian cards enter the app.
+4. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, hint tiles, duplicate check.
+5. **Share extension**: extension, App Group, inbox banner.
 6. **Release**: en + ru localisation, icon, one-screen onboarding, tip jar (StoreKit 2
    consumables), dictionary attribution, App Store.
 

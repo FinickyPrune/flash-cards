@@ -1,6 +1,6 @@
 # Card editor
 One screen to add or edit a card: front, screenshot, context, the back chosen from three tiles, and the folder.
-Status: planned (milestone 1; hints in milestone 3)
+Status: planned (milestone 1; hints in milestone 4)
 
 ## Rules
 - Modes: **add** and **edit**, same screen.

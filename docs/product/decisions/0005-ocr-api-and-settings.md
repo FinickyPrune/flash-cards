@@ -26,4 +26,4 @@ on, on synthetic and real screenshots. Serbian cards come from CSV in the MVP.
 
 ## Consequences
 English screenshot cards need no OCR fixes in practice. Serbian OCR would need its own work
-(post-MVP). Timing measured on a Mac (50–200 ms per screenshot); check on a device in milestone 3.
+(post-MVP). Timing measured on a Mac (50–200 ms per screenshot); check on a device in milestone 4.

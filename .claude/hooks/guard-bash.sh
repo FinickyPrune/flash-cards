@@ -18,7 +18,7 @@ cmd=$(jq -r '.tool_input.command // empty')
 has() { grep -qE "$1" <<<"$cmd"; }
 
 if has 'gh[[:space:]]+pr[[:space:]]+merge'; then
-    block "the user merges PRs. Report that the PR is ready instead."
+    block "merge only via scripts/merge-pr.sh <n> (refuses flagged PRs, waits for CI). Flagged PRs: report them, the user merges."
 fi
 
 if has 'git[[:space:]]+push'; then

@@ -18,7 +18,7 @@ XCBEAUTIFY_FLAGS ?= --quiet --is-ci --disable-colored-output --disable-logging
 # (set inline: macOS ships GNU Make 3.81, which ignores .SHELLFLAGS).
 XCODEBUILD = set -o pipefail && xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
 	-destination "platform=iOS Simulator,id=$(SIM_UDID)" \
-	-derivedDataPath $(DERIVED) -skipPackagePluginValidation
+	-derivedDataPath $(DERIVED) -skipPackagePluginValidation -skipMacroValidation
 
 # ONLY=FlashCardsTests/SmokeTests runs a single suite or test (xcodebuild -only-testing syntax).
 ONLY ?=

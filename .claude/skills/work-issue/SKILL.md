@@ -42,5 +42,10 @@ gh pr create --title "<conventional title>" --body-file <tmp file>   # follows .
 ```
 Upload screenshots with `scripts/upload-screenshot.sh <pr> <png>...` and put them in the body. Then `gh pr checks <pr> --watch` and fix CI failures.
 
-## 8. Report (in Russian)
-PR link, what was done, how it was verified, anything left out of scope or worth a follow-up issue. Never merge — the user merges.
+## 8. Merge or hand over
+Fill the PR's **Review flags** per CLAUDE.md → "Who merges" (take the `pr-reviewer` verdict into account).
+- Any flag → add the `needs-review` label and leave the PR to the user.
+- None → `scripts/merge-pr.sh <pr>`.
+
+## 9. Report (in Russian)
+PR link, merged or waiting for review (and which flags, why), what was done, how it was verified, anything left out of scope or worth a follow-up issue.

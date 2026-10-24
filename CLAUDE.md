@@ -34,6 +34,7 @@ IMPORTANT: fill the PR template's **Review flags** honestly. If the PR does or t
 - **Scope** — the diff touches anything outside the issue
 
 When in doubt, flag it. Otherwise check "None of the above" and merge with `scripts/merge-pr.sh <n>` (waits for green CI, refuses flagged PRs; squash + delete branch). Never `gh pr merge` directly; never push to `main`.
+`main` is protected on GitHub (PR required, `lint` + `test` must pass, no force-push; applies to admins too), so a red PR can't merge even by mistake.
 
 ## Gotchas
 - Hooks in `.claude/settings.json` auto-format and lint every Swift edit and block unsafe git commands. If a hook blocks you, fix the cause; don't work around it.

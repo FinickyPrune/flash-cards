@@ -7,6 +7,13 @@ options:
   createIntermediateGroups: true
   generateEmptyDirectories: true
 
+packages:
+  # Generated test mocks (`@Mockable` protocols). Mock code is compiled only under the
+  # MOCKING condition, which only the app's Debug config defines.
+  Mockable:
+    url: https://github.com/Kolos65/Mockable
+    exactVersion: 0.6.4
+
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -28,7 +35,12 @@ targets:
         type: syncedFolder
       - path: App/Resources
         type: syncedFolder
+    dependencies:
+      - package: Mockable
     settings:
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: $(inherited) MOCKING
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.finickyprune.FlashCards
         GENERATE_INFOPLIST_FILE: YES

@@ -215,9 +215,20 @@ xcrun xccov view --report --json Test.xcresult
 
 ## In this repo
 
-- **Mockable is not installed.** It is an SPM dependency, so it needs the user's approval
-  (CLAUDE.md). Until then, "generated mock" rows mean a small hand-written stub, and shared
-  fakes live in `Tests/UnitTests/Support/`, one per protocol, named `Fake<Protocol>`.
+- **Generated mocks are Mockable** (0.6.4, pinned in `project.yml`). Mark the protocol in
+  `App/Sources` with `@Mockable` (`import Mockable`). The macro emits `Mock<Protocol>`
+  under the `MOCKING` condition, which only the app's Debug config sets, so mocks never ship.
+  In tests: `import Mockable`, then `given(mock).fetch(id: .any).willReturn(x)` and
+  `verify(mock).delete(id: .value(id)).called(.once)`. Shared fakes for stateful behaviour
+  live in `Tests/UnitTests/Support/`, one per protocol, named `Fake<Protocol>`.
+- **Known issue (Xcode 27):** Mockable 0.6.4 caps swift-issue-reporting below 1.10, and that
+  version segfaults when it reports an issue under Swift Testing. A failing
+  `verify`/`given` or an unmocked call therefore crashes the test process instead of
+  recording a failure. The test still shows as failed (`Crash: FlashCards …`) and `make`
+  exits non-zero, but Mockable's message is lost. Read the failing line from the crash
+  report: `xcrun xcresulttool export diagnostics --path build/results/unit.xcresult
+  --output-path build/results/logs` → `…/DiagnosticReports/FlashCards-*.ips`. Upstream fix:
+  Kolos65/Mockable#152; bump the pin once it is released.
 - **Coverage is always on.** The scheme sets `gatherCoverageData`, so `make test` already
   writes coverage into `build/results/unit.xcresult`. No `-enableCodeCoverage` flag needed.
   Per-function numbers for the app target:

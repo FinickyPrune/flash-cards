@@ -4,7 +4,7 @@ Index of what FlashCards is and how it behaves. Read this, then only the docs yo
 Formats and update rules: `product-docs` skill. Actionable work: GitHub Issues.
 
 ## Foundation
-- [vision.md](vision.md): who it's for, principles (private, on-device, no AI), platform, MVP scope, non-goals.
+- [vision.md](vision.md): who it's for, principles (private, on-device, no AI), platform, languages (English via screenshots, Serbian via CSV), MVP scope, non-goals.
 - [glossary.md](glossary.md): domain terms with code names and ru UI labels.
 - [roadmap.md](roadmap.md): MVP milestones 0–6 and the post-MVP list.
 - [../architecture.md](../architecture.md): targets, layers, invariants, initial data model (engineering).
@@ -23,3 +23,4 @@ All planned; nothing shipped yet.
 - [0002](decisions/0002-replaceable-scheduler-and-review-log.md): SM-2-like scheduler behind a protocol, full review log, direction.
 - [0003](decisions/0003-store-screenshot-copies.md): cards store a compressed screenshot copy.
 - [0004](decisions/0004-share-extension-inbox.md): share extension only drops files into a shared inbox.
+- [0005](decisions/0005-ocr-api-and-settings.md): OCR with `RecognizeTextRequest`, accurate, correction on; no Serbian screenshots.

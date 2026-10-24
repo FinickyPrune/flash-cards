@@ -23,8 +23,7 @@ protocol Lemmatizer { func lemma(for token: String, language: String) -> String?
 ```
 
 ## Frameworks
-SwiftUI, Observation, SwiftData, Vision (OCR, accurate mode, `recognitionLanguages` from the
-folder's learning language), NaturalLanguage (`NLTokenizer`, lemma tagging), Translation
+SwiftUI, Observation, SwiftData, Vision (OCR: `RecognizeTextRequest`, settings in decision 0005), NaturalLanguage (`NLTokenizer`, lemma tagging), Translation
 (on-device), PhotosUI (`PhotosPicker`), StoreKit 2 (tip jar only).
 
 ## Invariants

@@ -22,6 +22,7 @@ func engines() -> [Engine] {
         for languages in [["en-US"], ["cs-CZ"], ["cs-CZ", "pl-PL"]] {
             list.append(Engine(api: api, languages: languages, correction: false))
         }
+        list.append(Engine(api: api, languages: ["en-US"], correction: true))
     }
     for languages in [["en-US"], ["cs-CZ"], []] {
         list.append(Engine(api: .liveText, languages: languages, correction: true))

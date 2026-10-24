@@ -2,8 +2,8 @@
 MVP milestones in order, and what comes after. Actionable work for the current milestone is in GitHub Issues.
 
 ## MVP
-0. **Spikes**: Vision OCR on Serbian and English, Translation framework pairs, lemma tagging,
-   dictionary source (`features/hints.md` → Spikes). Output: decision records + a short note.
+0. **Spikes** (`features/hints.md` → Spikes): OCR (#3, done: decision 0005), Translation
+   framework pairs (#4), lemma tagging (#5), English dictionary source (#6).
 1. **Foundation**: models, catalog (folder tree), card editor add/edit, manual cards.
 2. **Review**: scheduler, session builder, review screen, session summary, folder progress.
    After this the app is usable with manual cards.
@@ -19,6 +19,7 @@ MVP milestones in order, and what comes after. Actionable work for the current m
 - iCloud sync (CloudKit) and iPad.
 - Hiding obvious words by frequency and level; an "I know this word" list.
 - Several back variants per card; synonyms tile; tags; Serbian Cyrillic; Spanish UI.
+- Serbian screenshots (OCR via a nearby language + dictionary diacritic restoration) and Serbian hints.
 - Online dictionary for expressions behind a switch; notifications; widget.
 - Highlighting the picked word on the screenshot (OCR coordinates); full backup with images;
   folder choice in the share extension.

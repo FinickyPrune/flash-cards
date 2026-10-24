@@ -1,5 +1,6 @@
 # CSV import and export
 Import cards from a CSV file into a folder, and export a folder to CSV as a simple backup.
+CSV is the main way Serbian cards enter the app (vision).
 Status: planned (milestone 5)
 
 ## Import

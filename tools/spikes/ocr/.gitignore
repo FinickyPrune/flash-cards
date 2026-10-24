@@ -1,0 +1,4 @@
+.build/
+out/
+# Real screenshots from shows are copyrighted: keep them local.
+real/

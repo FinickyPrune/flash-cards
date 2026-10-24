@@ -1,14 +1,25 @@
 # Product docs
 
 Index of what FlashCards is and how it behaves. Read this, then only the docs your task touches.
-Formats and update rules are in the `product-docs` skill. The backlog lives in GitHub Issues.
+Formats and update rules: `product-docs` skill. Actionable work: GitHub Issues.
 
 ## Foundation
-- vision.md: not written yet; filled from the product interview.
-- glossary.md: not written yet; created with the first domain terms.
+- [vision.md](vision.md): who it's for, principles (private, on-device, no AI), platform, MVP scope, non-goals.
+- [glossary.md](glossary.md): domain terms with code names and ru UI labels.
+- [roadmap.md](roadmap.md): MVP milestones 0–6 and the post-MVP list.
+- [../architecture.md](../architecture.md): targets, layers, invariants, initial data model (engineering).
 
-## Features (current behaviour)
-_None shipped yet._ One file per area, `features/<area>.md`, created by the PR that ships the area.
+## Features
+All planned; nothing shipped yet.
+- [catalog.md](features/catalog.md): folder tree, progress, Play on any folder.
+- [card-editor.md](features/card-editor.md): add/edit screen, three back tiles, folder chip, duplicate check.
+- [review.md](features/review.md): review flow, four ratings, session queue, summary.
+- [screenshot-import.md](features/screenshot-import.md): entry points, share extension, batch flow, OCR, storage.
+- [hints.md](features/hints.md): offline sources for definition, translation and lemma; spikes.
+- [csv.md](features/csv.md): CSV import with preview, folder export.
 
 ## Decisions
-_None yet._ `decisions/NNNN-<slug>.md`.
+- [0001](decisions/0001-swiftdata-cloudkit-compatible.md): SwiftData, CloudKit-compatible model, local container.
+- [0002](decisions/0002-replaceable-scheduler-and-review-log.md): SM-2-like scheduler behind a protocol, full review log, direction.
+- [0003](decisions/0003-store-screenshot-copies.md): cards store a compressed screenshot copy.
+- [0004](decisions/0004-share-extension-inbox.md): share extension only drops files into a shared inbox.

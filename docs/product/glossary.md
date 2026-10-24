@@ -9,10 +9,10 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Language pair | Learning language → back language, e.g. `sr → ru`, `en → en` (definitions in English). | `learningLanguage`, `backLanguage` | — |
 | Card | One item to learn: front and back. | `Card` | Карточка |
 | Front | Word or phrase on top, screenshot below it if present. | `front` | Лицо |
-| Back | One text the user picked from the three tiles when creating the card. Shown in review. | `back` | Оборот |
-| Back source | Which tile the back came from: definition, translation or custom. | `backSource`: `definition` / `translation` / `custom` | Определение / Перевод / Свой текст |
-| Tile | One of the three back options on the card editor, prefilled with a hint where available. | — | Плитка |
-| Hint | Text the app suggests for a tile (definition, translation, lemma). | `DefinitionProvider`, `TranslationProvider`, `Lemmatizer` | — |
+| Back | One text the user picked from the four tiles when creating the card. Shown in review. | `back` | Оборот |
+| Back source | Which tile the back came from: definition, synonyms, translation or custom. | `backSource`: `definition` / `synonyms` / `translation` / `custom` | Определение / Синонимы / Перевод / Свой текст |
+| Tile | One of the four back options on the card editor, prefilled with a hint where available. | — | Плитка |
+| Hint | Text the app suggests for a tile (definition, synonyms, translation) or the front (lemma). | `DefinitionProvider`, `SynonymProvider`, `TranslationProvider`, `Lemmatizer` | — |
 | Context | The subtitle line (ideally sentence) where the word appeared. | `context` | Контекст |
 | Screenshot | Compressed copy of the source image stored with the card. | `screenshot` | Скриншот |
 | Front key | Normalised front used to detect duplicates: trimmed, case- and diacritics-insensitive. | `frontKey` | — |

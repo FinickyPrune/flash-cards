@@ -10,6 +10,7 @@ MVP milestones in order, and what comes after. Actionable work for the current m
 3. **CSV**: import with preview, folder export. Comes before screenshots because it is how
    Serbian cards enter the app.
 4. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, hint tiles, duplicate check.
+   Translation hint stays a stub until #4 resumes.
 5. **Share extension**: extension, App Group, inbox banner.
 6. **Release**: en + ru localisation, icon, one-screen onboarding, tip jar (StoreKit 2
    consumables), dictionary attribution, App Store.
@@ -19,7 +20,7 @@ MVP milestones in order, and what comes after. Actionable work for the current m
 - Reverse-direction review UI; review of hard words; FSRS.
 - iCloud sync (CloudKit) and iPad.
 - Hiding obvious words by frequency and level; an "I know this word" list.
-- Several back variants per card; synonyms tile; tags; Serbian Cyrillic; Spanish UI.
+- Several back variants per card; tags; Serbian Cyrillic; Spanish UI.
 - Serbian screenshots (OCR via a nearby language + dictionary diacritic restoration) and Serbian hints.
 - Online dictionary for expressions behind a switch; notifications; widget.
 - Highlighting the picked word on the screenshot (OCR coordinates); full backup with images;

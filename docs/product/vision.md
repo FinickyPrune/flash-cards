@@ -34,7 +34,7 @@ Catalog of nested folders, card editor, review game with spaced repetition, scre
 Milestones and the post-MVP list: `roadmap.md`.
 
 ## Non-goals (MVP)
-- Several back variants per card; synonyms; tags.
+- Several back variants per card; tags.
 - Reverse-direction review UI (the model allows it, decision 0002).
 - Notifications, widgets, iCloud sync, iPad.
 - Serbian Cyrillic; Serbian screenshots and Serbian hints; online dictionaries.

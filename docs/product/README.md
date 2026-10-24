@@ -12,7 +12,7 @@ Formats and update rules: `product-docs` skill. Actionable work: GitHub Issues.
 ## Features
 All planned; nothing shipped yet.
 - [catalog.md](features/catalog.md): folder tree, progress, Play on any folder.
-- [card-editor.md](features/card-editor.md): add/edit screen, three back tiles, folder chip, duplicate check.
+- [card-editor.md](features/card-editor.md): add/edit screen, four back tiles, folder chip, duplicate check.
 - [review.md](features/review.md): review flow, four ratings, session queue, summary.
 - [screenshot-import.md](features/screenshot-import.md): entry points, share extension, batch flow, OCR, storage.
 - [hints.md](features/hints.md): offline sources for definition, translation and lemma; spikes.

@@ -23,7 +23,10 @@ step people skip, so the product's main value is **minimum effort to create a ca
 - UI languages: en and ru in the first release, es maybe later.
 - iCloud sync is not in the MVP, but the data model stays CloudKit-compatible
   (decision 0001).
-- First learning pair in focus: Serbian (Latin script only) → Russian; English is also expected.
+- Two ways cards come in for the MVP's languages:
+  - **English** (and other languages Apple's OCR reads): screenshots, with hints.
+  - **Serbian** (Latin script only) → Russian: CSV import and manual entry, no hints. Apple's
+    OCR has no Serbian (decision 0005).
 
 ## MVP scope
 Catalog of nested folders, card editor, review game with spaced repetition, screenshot import
@@ -34,5 +37,5 @@ Milestones and the post-MVP list: `roadmap.md`.
 - Several back variants per card; synonyms; tags.
 - Reverse-direction review UI (the model allows it, decision 0002).
 - Notifications, widgets, iCloud sync, iPad.
-- Serbian Cyrillic; online dictionaries.
+- Serbian Cyrillic; Serbian screenshots and Serbian hints; online dictionaries.
 - Hiding "obvious" words (the, и, je) — accepted idea, depends on the learner's level, later.

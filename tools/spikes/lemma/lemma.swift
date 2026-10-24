@@ -92,6 +92,24 @@ func lemmas(of line: String, inContext: Bool) -> [String: String?] {
     return result
 }
 
+// --gold: every gold token as "token<TAB>lemma in context<TAB>lexical class<TAB>expected", for the
+// dictionary spike's entry-choice check (`tools/spikes/dictionary/entry_choice.py`).
+if CommandLine.arguments.contains("--gold") {
+    for item in cases {
+        let context = lemmas(of: item.line, inContext: true)
+        let tagger = NLTagger(tagSchemes: [.lexicalClass])
+        tagger.string = item.line
+        tagger.setLanguage(.english, range: item.line.startIndex ..< item.line.endIndex)
+        for (token, range) in tokens(of: item.line) {
+            guard let expected = item.gold[token] else { continue }
+            let (lexicalClass, _) = tagger.tag(at: range.lowerBound, unit: .word, scheme: .lexicalClass)
+            let lemma = (context[token] ?? nil) ?? ""
+            print([token, lemma, lexicalClass?.rawValue ?? "", expected].joined(separator: "\t"))
+        }
+    }
+    exit(0)
+}
+
 // --list <file>: lemma of each word (first column) alone, as "word<TAB>lemma", for the dictionary spike.
 if let flag = CommandLine.arguments.firstIndex(of: "--list") {
     let path = CommandLine.arguments[flag + 1]

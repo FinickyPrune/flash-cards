@@ -22,7 +22,8 @@ Status: planned (milestone 1; hints in milestone 4)
   spaces, so `kuća` = `Kuca `.
 - When the front came from a token whose lemma differs (`running` → `run`, `saw` → `see`), a
   toggle switches the front between the form in the text and the lemma. The front starts as
-  the form in the text. Lemma rules: decision 0007. Hints follow the current front.
+  the form in the text. (assumption) Lemma rules: decision 0007. The toggle changes only the
+  front: tiles keep their hints and the user's edits.
 
 ## States and edge cases
 - Front empty → can't save.

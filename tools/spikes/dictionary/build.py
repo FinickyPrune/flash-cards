@@ -1,20 +1,23 @@
 """Spike #6: build comparable read-only SQLite dictionaries from Open English WordNet and Wiktionary.
 
-    python3 -I tools/spikes/dictionary/build.py oewn  <english-wordnet-2025.xml.gz>   out/oewn.sqlite
-    python3 -I tools/spikes/dictionary/build.py kaikki <kaikki.org-dictionary-English.jsonl.gz> out/kaikki.sqlite \
+Run from tools/spikes/dictionary (README.md has the downloads):
+    python3 -I build.py oewn  <english-wordnet-2025.xml.gz>   out/oewn.sqlite
+    python3 -I build.py kaikki <kaikki.org-dictionary-English.jsonl.gz> out/kaikki.sqlite \
         [--trim] [--vocab <en_50k.txt> <en_50k.lemmas.tsv>] [--translations ru]
+    python3 -I build.py names <kaikki.org-dictionary-English.jsonl.gz> data/freq/names.txt
 
 Standard library only. Same schema for both sources, so `measure.py` compares them directly:
   entry(id, word, pos)                     one headword per part of speech, word in lower case
   sense(entry, n, gloss, tags)             in source order (both sources list common senses first)
   synonym(entry, sense, word)              sense is NULL when the source gives synonyms per entry
-  form(form, lemma)                        inflected form -> headword ("saw" -> "see")
+  form(form, lemma, pos)                   inflected form -> headword ("saw" -> "see"); pos of the form
   alias(form, target)                      Wiktionary only: spelling or abbreviation -> headword ("tv" -> "television")
   translation(entry, sense, word)          Wiktionary only, with --translations <code>; stress marks removed
 --trim keeps at most 10 senses per entry and drops obsolete / archaic / rare senses.
 --vocab keeps only headwords a subtitle can lead to: the frequency list's words, their system lemmas
 and the lemmas their forms point to, plus multi-word entries made of the top 20k words. Synonyms are
 then ranked by subtitle frequency, filtered by tag and capped.
+`names` writes the words that are only proper names in Wiktionary, lower case, for `measure.py --names`.
 """
 
 import gzip
@@ -28,7 +31,7 @@ SCHEMA = """
 CREATE TABLE entry(id INTEGER PRIMARY KEY, word TEXT NOT NULL, pos TEXT NOT NULL);
 CREATE TABLE sense(entry INTEGER NOT NULL, n INTEGER NOT NULL, gloss TEXT NOT NULL, tags TEXT);
 CREATE TABLE synonym(entry INTEGER NOT NULL, sense INTEGER, word TEXT NOT NULL);
-CREATE TABLE form(form TEXT NOT NULL, lemma TEXT NOT NULL);
+CREATE TABLE form(form TEXT NOT NULL, lemma TEXT NOT NULL, pos TEXT NOT NULL);
 CREATE TABLE alias(form TEXT NOT NULL, target TEXT NOT NULL);
 CREATE TABLE translation(entry INTEGER NOT NULL, sense INTEGER, word TEXT NOT NULL);
 """
@@ -48,6 +51,7 @@ KAIKKI_POS = {
 }
 DROPPED_TAGS = {"obsolete", "archaic", "rare", "dated"}
 # A "form of" sense counts as an inflection (not an abbreviation or spelling) only with one of these.
+DROPPED_FORM_TAGS = DROPPED_TAGS | {"dialectal", "nonstandard", "misspelling"}
 INFLECTION_TAGS = {"plural", "past", "participle", "present", "third-person", "gerund", "comparative", "superlative"}
 DROPPED_SYNONYM_TAGS = DROPPED_TAGS | {"vulgar", "offensive", "derogatory", "pejorative", "ethnic", "slur"}
 MAX_TRIMMED_SENSES = 10
@@ -103,7 +107,7 @@ def build_oewn(source, db):
                 if member != entry_id:
                     db.execute("INSERT INTO synonym VALUES (?, ?, ?)", (row, n, lemma_of[member]))
         for form in forms:
-            db.execute("INSERT INTO form VALUES (?, ?)", (form.lower(), lemma.lower()))
+            db.execute("INSERT INTO form VALUES (?, ?, ?)", (form.lower(), lemma.lower(), pos))
 
 
 class Vocabulary:
@@ -181,9 +185,9 @@ def build_kaikki(source, db, trim, vocabulary, language=None):
         for sense in data.get("senses", []):
             tags = set(sense.get("tags", []))
             if "form-of" in tags or "alt-of" in tags:
-                if "form-of" in tags and tags & INFLECTION_TAGS and not tags & DROPPED_TAGS:
+                if "form-of" in tags and tags & INFLECTION_TAGS and not tags & DROPPED_FORM_TAGS:
                     for target in sense.get("form_of", []):
-                        db.execute("INSERT INTO form VALUES (?, ?)", (word, target["word"].lower()))
+                        db.execute("INSERT INTO form VALUES (?, ?, ?)", (word, target["word"].lower(), data["pos"]))
                 else:
                     alternatives += [target["word"].lower() for target in sense.get("form_of", []) + sense.get("alt_of", [])]
                 continue
@@ -216,14 +220,27 @@ def build_kaikki(source, db, trim, vocabulary, language=None):
             db.execute("INSERT INTO synonym VALUES (?, NULL, ?)", (row, synonym))
         for form in data.get("forms", []):
             tags = set(form.get("tags", []))
-            if tags & {"table-tags", "inflection-template", "romanization"}:
+            if tags & ({"table-tags", "inflection-template", "romanization"} | DROPPED_FORM_TAGS):
                 continue
             if form["form"].lower() != word:
-                db.execute("INSERT INTO form VALUES (?, ?)", (form["form"].lower(), word))
+                db.execute("INSERT INTO form VALUES (?, ?, ?)", (form["form"].lower(), word, data["pos"]))
+
+
+def write_names(source, target):
+    names, others = set(), set()
+    for line in gzip.open(source, "rt", encoding="utf-8"):
+        data = json.loads(line)
+        if data.get("lang_code") == "en":
+            (names if data.get("pos") == "name" else others).add(data["word"].lower())
+    with open(target, "w", encoding="utf-8") as file:
+        file.write("\n".join(sorted(names - others)))
 
 
 def main():
     kind, source, target = sys.argv[1:4]
+    if kind == "names":
+        write_names(source, target)
+        return
     db = open_db(target)
     if kind == "oewn":
         build_oewn(source, db)

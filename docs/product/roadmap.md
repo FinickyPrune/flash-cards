@@ -2,8 +2,8 @@
 MVP milestones in order, and what comes after. Actionable work for the current milestone is in GitHub Issues.
 
 ## MVP
-0. **Spikes**: OCR (#3, decision 0005), English dictionary (#6, decision 0006), lemma
-   (#5, decision 0007) done; Translation (#4) parked, Translation tile ships as a stub.
+0. **Spikes**: OCR (#3, decision 0005), English dictionary (#6, decision 0006) and lemma
+   (#5, decision 0007, English only) done; Translation (#4) parked, its tile ships as a stub.
 1. **Foundation**: models, catalog (folder tree), card editor add/edit, manual cards.
 2. **Review**: scheduler, session builder, review screen, session summary, folder progress.
    After this the app is usable with manual cards.

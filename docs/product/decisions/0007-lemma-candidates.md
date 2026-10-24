@@ -1,27 +1,27 @@
-# 0007. Lemma from NLTagger in context, checked against the dictionary's forms
-Status: accepted (2026-10-24)
+# 0007. Lemma and hint entry from NLTagger in context plus the dictionary's forms
+Status: proposed (2026-10-24), owner to accept
 
 ## Context
-Spike #5 (`tools/spikes/lemma/lemma.swift`): `NLTagger` `.lemma` on 50 subtitle-like lines got
-81 of 88 tokens right in context (92%), 79 alone. Misses: some irregular past forms
-(`saw`, `felt` unchanged), `better` unchanged, `left` (direction) → `leave`. `NLTokenizer` keeps
-contractions whole (`I'm`, `mother's`) but splits hyphenated words (`well-known` → 2 tokens).
-Wiktionary's inflection rows (decision 0006) map `saw` → `see`, `felt` → `feel`, `better` → `good`.
+Spike #5 (`tools/spikes/lemma/lemma.swift`, macOS 26.6; ru/es not checked, English only in
+the MVP): `NLTagger` `.lemma` on 49 subtitle-like lines got 81 of 88 tokens right in context,
+79 alone. Misses: `saw`, `felt`, `better` unchanged; `left` (direction) → `leave`. `NLTokenizer`
+keeps contractions whole (`I'm`, `mother's`), splits hyphenated words, drops `♪`, `-`, `...`.
+Many inflections are headwords too (`saw`, `running`, `years`): taking the token's own entry
+picked the expected entry for 39 of 85 tokens.
 
 ## Decision
-- Lemma candidates for a token: the system lemma (tagging the whole line), then the
-  dictionary's inflection targets. A candidate is used only if it is a dictionary headword and
-  differs from the token. The first one is the lemma the toggle offers.
-- The front starts as the form in the text; the toggle is never applied automatically, so a
-  wrong lemma (`left` → `leave`) costs one tap at most.
-- The word picker joins tokens written with a hyphen and no spaces (`well-known`) into one token.
-- Spelling and abbreviation aliases (`tv` → `television`) are used only for lookup when the token
-  has no entry, never as a lemma.
+- Hint entry: an inflection row of the token with the part of speech `NLTagger` gives it in
+  the line (`saw` verb → `see`); else the token's entry with that part of speech; else the
+  system lemma; else any entry of the token; else an alias (`tv` → `television`).
+  83 of 85 right (`entry_choice.py`); misses: `left` in "turn left" tagged as a verb, `humiliated`.
+- The lemma toggle offers that entry's headword when it differs from the token. Toggling
+  changes only the front; hints are not recomputed.
+- The picker joins hyphenated tokens without spaces (`well-known`); they get a lemma only
+  from inflection rows.
 
 ## Alternatives
-- System lemma only — misses common irregular forms.
-- Dictionary forms only — no context: `leaves` would be both `leave` and `leaf`.
+- System lemma only — misses irregular forms. Token's own entry first — wrong for half.
 
 ## Consequences
-The Lemmatizer depends on the dictionary. A language without a dictionary falls back to the
-system lemma.
+The hint sources take the token with its line, not a bare word. A language without a
+dictionary falls back to the system lemma.

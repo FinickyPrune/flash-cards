@@ -25,6 +25,9 @@ protocol SynonymProvider { func synonyms(for term: String, language: String) asy
 protocol TranslationProvider { func translation(for term: String, from: String, to: String) async -> String? }
 protocol Lemmatizer { func lemma(for token: String, language: String) -> String? }
 ```
+Decision 0007 needs more than these signatures: the hint sources take the token with its line
+(part of speech in context) and the synonym source the sense the definition used. Reshape
+them in milestone 4.
 
 ## Frameworks
 SwiftUI, Observation, SwiftData, Vision (OCR: `RecognizeTextRequest`, settings in decision 0005), NaturalLanguage (`NLTokenizer`, lemma tagging), Translation

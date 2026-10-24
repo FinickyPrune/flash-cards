@@ -1,13 +1,17 @@
 """Spike #6: coverage of a dictionary built by build.py on subtitle words and phrases.
 
-    python3 -I tools/spikes/dictionary/measure.py <dict.sqlite> <en_50k.txt> <en_50k.lemmas.tsv> \
-        [--names <names.txt>] [--samples]
+Run from tools/spikes/dictionary:
+    python3 -I measure.py <dict.sqlite> <en_50k.txt> <en_50k.lemmas.tsv> [--names <names.txt>] [--samples]
 
 en_50k.txt: OpenSubtitles frequency list (hermitdave/FrequencyWords, 2018/en), "word count" per line.
 en_50k.lemmas.tsv: NLTagger lemma per word, from `tools/spikes/lemma/lemma.swift --list`.
-A word is found when the word, its system lemma, a `form` row or a WordNet-style suffix rule
-leads to an entry, and only then an `alias` row. The same lookup runs for every dictionary.
-names.txt: words that are only proper names in Wiktionary; left out of the word counts.
+A word is found when the word, its system lemma or a `form` row leads to an entry, and only
+then an `alias` row (decision 0007); the same lookup runs for every dictionary.
+"also-a-form": found words that are headwords and also an inflection of another headword
+(`saw` -> `see`), so the entry must be picked by part of speech in context (`entry_choice.py`).
+names.txt (`build.py names`): words that are only proper names in Wiktionary; left out of the
+word counts, so names (and words like "monday" if Wiktionary only has them as names) get no hint.
+"sense-1-or-entry-synonym": a synonym on the first entry's first sense or in its own list.
 """
 
 import os
@@ -30,13 +34,6 @@ PHRASES = [
     "game changer", "heads up", "no big deal", "red flag", "small talk", "wake-up call",
     "long story short", "keep in touch",
 ]
-# Detachment rules in the spirit of WordNet's morphy, tried after the form table.
-SUFFIX_RULES = [
-    ("ies", "y"), ("ves", "f"), ("ves", "fe"), ("ses", "s"), ("xes", "x"), ("zes", "z"),
-    ("ches", "ch"), ("shes", "sh"), ("men", "man"), ("es", "e"), ("es", ""), ("s", ""),
-    ("ied", "y"), ("ed", "e"), ("ed", ""), ("ing", "e"), ("ing", ""),
-    ("ier", "y"), ("iest", "y"), ("er", ""), ("est", ""), ("er", "e"), ("est", "e"),
-]
 BUCKETS = [(0, 1000), (1000, 5000), (5000, 10000), (10000, 20000), (20000, 50000)]
 SAMPLES = [
     "run", "leave", "deal", "mean", "awkward", "grab", "stubborn", "nonsense", "scared",
@@ -50,7 +47,7 @@ class Dictionary:
         self.db = sqlite3.connect(path)
         self.words = {row[0] for row in self.db.execute("SELECT DISTINCT word FROM entry")}
         self.forms, self.aliases = {}, {}
-        for form, lemma in self.db.execute("SELECT form, lemma FROM form"):
+        for form, lemma, _ in self.db.execute("SELECT form, lemma, pos FROM form"):
             self.forms.setdefault(form, set()).add(lemma)
         if self.db.execute("SELECT 1 FROM sqlite_master WHERE name = 'alias'").fetchone():
             for form, target in self.db.execute("SELECT form, target FROM alias"):
@@ -62,7 +59,6 @@ class Dictionary:
         if system_lemma:
             candidates.append(system_lemma.lower())
         candidates += sorted(self.forms.get(word, ()))
-        candidates += [word[: -len(old)] + new for old, new in SUFFIX_RULES if word.endswith(old)]
         candidates += sorted(self.aliases.get(word, ()))
         return next((c for c in candidates if c in self.words), None)
 
@@ -103,10 +99,10 @@ def main():
     if "--names" in sys.argv:
         names = set(open(sys.argv[sys.argv.index("--names") + 1], encoding="utf-8").read().split("\n"))
     print(f"# {os.path.basename(path)}: {os.path.getsize(path) / 1e6:.1f} MB, {len(dictionary.words)} headwords")
-    print("rank          found  any-synonym  first-sense-synonym  translation  misses (sample)")
+    print("rank          found  also-a-form  any-synonym  sense-1-or-entry-synonym  translation  misses (sample)")
     for low, high in BUCKETS:
         bucket = [w for w in words[low:high] if w.isalpha() and len(w) > 1 and w not in names]
-        found = synonym_any = synonym_first = translated = 0
+        found = also_form = synonym_any = synonym_first = translated = 0
         misses = []
         for word in bucket:
             head = dictionary.headword(word, lemmas.get(word))
@@ -114,12 +110,14 @@ def main():
                 misses.append(word)
                 continue
             found += 1
+            also_form += head == word and any(l != word and l in dictionary.words for l in dictionary.forms.get(word, ()))
             synonym_any += bool(dictionary.synonyms(head, first_sense_only=False))
             synonym_first += bool(dictionary.synonyms(head, first_sense_only=True))
             translated += bool(dictionary.translations(head))
         print(
-            f"{low + 1:>5}-{high:<6} {found / len(bucket):6.1%} {synonym_any / len(bucket):12.1%}"
-            f" {synonym_first / len(bucket):20.1%} {translated / len(bucket):12.1%}  {' '.join(misses[:12])}"
+            f"{low + 1:>5}-{high:<6} {found / len(bucket):6.1%} {also_form / len(bucket):12.1%}"
+            f" {synonym_any / len(bucket):12.1%} {synonym_first / len(bucket):25.1%}"
+            f" {translated / len(bucket):12.1%}  {' '.join(misses[:10])}"
         )
     phrases = [p for p in PHRASES if dictionary.headword(p) or dictionary.headword(p.replace("someone's", "one's"))]
     missing = [p for p in PHRASES if p not in phrases and p.replace("someone's", "one's") not in phrases]

@@ -23,7 +23,8 @@ Both feed the same inbox and the same flow; the flow only sees images.
    that look like the subtitle come first: horizontally centred, lowest on the screen, and
    joined into one sentence when they are stacked. All other text (player controls,
    notifications, clock) follows in a separate "Other text" section. Tokens without letters
-   (times, counters) are dropped. Tap a token to pick a word, or a run of adjacent tokens on
+   (times, counters) are dropped. Words joined by a hyphen (`well-known`) are one token; contractions
+   (`I'm`, `mother's`) stay whole (decision 0007). Tap a token to pick a word, or a run of adjacent tokens on
    one line as a phrase. (assumption: subtitle heuristic)
 4. The card editor opens in add mode (`card-editor.md`): front = the pick (with the lemma toggle
    when it differs), context = the line (sentence when possible), screenshot attached, tiles

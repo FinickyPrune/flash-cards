@@ -12,8 +12,9 @@ Targets, layers, invariants and the initial data model. Read when planning struc
 
 ## Layers
 View → `@Observable` view model → services → SwiftData.
-Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService`, `CSVImporter`,
-`SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
+Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only
+SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
+`CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
 
 Hint sources are protocols, swappable per language pair. `TranslationProvider` ships as a
 stub until spike #4 resumes (on #4: `TranslationSession(installedSource:target:)` with

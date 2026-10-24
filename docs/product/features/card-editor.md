@@ -20,8 +20,9 @@ Status: planned (milestone 1; hints in milestone 4)
 - Duplicate check on save: another card with the same front key in the same root folder →
   warn and ask "Create anyway?". The front key ignores case, diacritics and surrounding
   spaces, so `kuća` = `Kuca `.
-- When the front came from a token whose lemma differs (`running` → `run`), a toggle switches
-  the front between the form in the text and the lemma. (spike: lemma quality per language)
+- When the front came from a token whose lemma differs (`running` → `run`, `saw` → `see`), a
+  toggle switches the front between the form in the text and the lemma. The front starts as
+  the form in the text. Lemma rules: decision 0007. Hints follow the current front.
 
 ## States and edge cases
 - Front empty → can't save.

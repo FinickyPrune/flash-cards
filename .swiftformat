@@ -1,5 +1,5 @@
 --swiftversion 6.0
---exclude build,DerivedData,*.xcodeproj
+--exclude build,DerivedData,*.xcodeproj,**/.build
 --indent 4
 --maxwidth 120
 --wraparguments before-first

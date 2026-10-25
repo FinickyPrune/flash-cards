@@ -1,9 +1,11 @@
 included:
   - App
   - Tests
+  - Packages
 excluded:
   - build
   - DerivedData
+  - Packages/FlashCore/.build
 
 # Formatting rules are owned by SwiftFormat.
 disabled_rules:

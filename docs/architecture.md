@@ -7,7 +7,7 @@ Targets, layers, invariants and the initial data model. Read when planning struc
 ## Targets
 - App target + **Share Extension** target, sharing an **App Group** container that holds `inbox/`.
 - The extension never touches SwiftData; it only copies files into `inbox/`.
-- Local Swift package **FlashCore**: pure logic without UI or SwiftData — `Scheduler` (SM-2),
+- Local Swift package **FlashCore** (`Packages/FlashCore`, tests run with `make test`): pure logic without UI or SwiftData — `Scheduler` (SM-2),
   front-key normalisation, CSV parser, tokenisation, session queue building. Unit-tested.
 
 ## Layers
@@ -48,8 +48,8 @@ Folder
   id: UUID
   name: String
   parent: Folder?            // inverse: children
-  children: [Folder]?
-  cards: [Card]?
+  children: [Folder]?        // cascade
+  cards: [Card]?             // cascade
   learningLanguage: String?  // root folder only; subfolders inherit
   backLanguage: String?      // root folder only
   lastBackSource: String?    // last back source used in this root folder
@@ -65,6 +65,8 @@ Card
   back: String
   backSource: String         // "definition" | "synonyms" | "translation" | "custom"
   createdAt, updatedAt: Date
+  reviewStates: [ReviewState]?  // cascade
+  reviewLogs: [ReviewLog]?      // cascade
 
 ReviewState                  // per card and direction, separate from Card
   card: Card?

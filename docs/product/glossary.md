@@ -15,7 +15,7 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Hint | Text the app suggests for a tile (definition, synonyms, translation) or the front (lemma). | `DefinitionProvider`, `SynonymProvider`, `TranslationProvider`, `Lemmatizer` | — |
 | Context | The subtitle line (ideally sentence) where the word appeared. | `context` | Контекст |
 | Screenshot | Compressed copy of the source image stored with the card. | `screenshot` | Скриншот |
-| Front key | Normalised front used to detect duplicates: trimmed, case- and diacritics-insensitive. | `frontKey` | — |
+| Front key | Normalised front used to detect duplicates: trimmed, inner spaces collapsed, case- and diacritics-insensitive. | `frontKey` | — |
 | Duplicate | A card with the same front key in the same root folder. | — | Дубликат |
 | Inbox | Queue of unprocessed screenshots shared by all entry points. | `InboxStore`, `inbox/` in the App Group | Inbox |
 | Batch | The screenshots processed in one run of the import flow, all into one folder. | — | Пачка |

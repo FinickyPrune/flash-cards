@@ -4,7 +4,7 @@ Status: partial (manual cards shipped in milestone 1; screenshot, hints, lemma t
 
 ## Rules
 - Modes: **add** and **edit**, same screen, shown as a full-height sheet with Cancel and Save,
-  from a folder and (later) from the import flow. (assumption)
+  from a folder and (later) from the import flow. (#15)
 - Top to bottom: front (editable text field), screenshot if present, context (editable),
   four tiles, folder chip.
 - Tiles: **Definition**, **Synonyms**, **Translation**, **Custom text** (a text field). The user selects
@@ -15,7 +15,7 @@ Status: partial (manual cards shipped in milestone 1; screenshot, hints, lemma t
   An empty hint leaves the tile empty and editable.
 - The selected tile by default is the back source last used in this root folder; for a new
   root folder it is Translation. (assumption) Creating a card sets it; an edit sets it only when
-  it picks another tile or moves the card to another root folder. (assumption)
+  it picks another tile or moves the card to another root folder. (#15)
 - The back source can be changed only here, never during review.
 - Folder chip: tap opens a folder picker. Default: the folder chosen for the batch, or the
   folder the editor was opened from.
@@ -32,12 +32,12 @@ Status: partial (manual cards shipped in milestone 1; screenshot, hints, lemma t
 
 ## States and edge cases
 - Editing a card that keeps its front key and root folder doesn't ask about a duplicate again;
-  changing the front or moving it to another root folder does. (assumption)
+  changing the front or moving it to another root folder does. (#15)
 - A card is deleted from edit mode with a confirmation, or by swiping its row in the folder
-  list (no confirmation there: assumption). Its review history goes with it. (#15)
-- Unsaved changes: the sheet can't be swiped away, and Cancel asks "Discard changes?". (assumption)
+  list without one. Its review history goes with it; there is no trash yet (#22). (#15)
+- Unsaved changes: the sheet can't be swiped away, and Cancel asks "Discard changes?". (#15)
 - Front empty → can't save.
-- Back empty → can't save. (assumption)
+- Back empty → can't save. (#15)
 - No screenshot (manual card or CSV) → the screenshot area is hidden.
 
 ## Not supported

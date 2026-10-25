@@ -81,16 +81,19 @@ struct MoveFolderSheet: View {
     }
 
     private func destinationButton(to destination: Folder?, label: () -> some View) -> some View {
-        Button {
-            switch service.moveCheck(folder, to: destination) {
+        let check = service.moveCheck(folder, to: destination)
+        return Button {
+            switch check {
             case .allowed: move(to: destination)
             case .allowedAfterWarning: warningDestination = destination
             case .notAllowed: break
             }
         } label: {
+            // Rows read as a list of places, not links; unavailable ones are dimmed.
             label()
+                .foregroundStyle(check == .notAllowed ? Color.secondary : Color.primary)
         }
-        .disabled(service.moveCheck(folder, to: destination) == .notAllowed)
+        .disabled(check == .notAllowed)
     }
 
     private func pair(of folder: Folder) -> String {

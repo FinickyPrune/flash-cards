@@ -20,8 +20,9 @@ struct LanguagePicker: View {
                     dismiss()
                 } label: {
                     HStack {
+                        // `.primary` inside a button resolves to the tint; rows read as plain text.
                         Text(option.name)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(Color.primary)
                         Spacer()
                         if option.id == selection {
                             Image(systemName: "checkmark")
@@ -34,10 +35,8 @@ struct LanguagePicker: View {
             }
             .searchable(text: $query)
             .navigationTitle(title)
-            .onAppear {
-                options = Languages.all()
-                proxy.scrollTo(selection, anchor: .center)
-            }
+            .onAppear { options = Languages.all() }
+            .onChange(of: options) { proxy.scrollTo(selection, anchor: .center) }
         }
     }
 }

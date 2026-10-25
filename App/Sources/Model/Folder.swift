@@ -43,6 +43,11 @@ final class Folder {
         return folder
     }
 
+    /// Subfolders by name, as the catalog lists them.
+    var sortedChildren: [Folder] {
+        (children ?? []).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+    }
+
     var resolvedLearningLanguage: String? {
         root.learningLanguage
     }

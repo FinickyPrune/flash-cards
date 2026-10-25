@@ -4,7 +4,7 @@ import SwiftData
 /// Folder tree changes (`catalog.md` → Rules). Every change is saved right away; a failed save
 /// rolls the context back, so the UI never shows a change that isn't stored.
 @MainActor
-struct CatalogService {
+struct CatalogService: CatalogServicing {
     let context: ModelContext
 
     @discardableResult
@@ -83,8 +83,7 @@ struct CatalogService {
     }
 
     private func validName(_ name: String) throws -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { throw CatalogError.emptyName }
-        return trimmed
+        guard let name = FolderName.normalized(name) else { throw CatalogError.emptyName }
+        return name
     }
 }

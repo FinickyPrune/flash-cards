@@ -2,30 +2,32 @@ import SwiftUI
 
 /// Asks for a folder name: new subfolder or rename.
 struct FolderNameSheet: View {
-    let title: LocalizedStringKey
-    let saveTitle: LocalizedStringKey
-    let onSave: (String) throws -> Void
-    @State private var name: String
-    @State private var saveError: String?
+    @State private var model: FolderNameViewModel
     @FocusState private var isNameFocused: Bool
     @Environment(\.dismiss) private var dismiss
 
-    init(
-        title: LocalizedStringKey,
-        saveTitle: LocalizedStringKey,
-        initialName: String,
-        onSave: @escaping (String) throws -> Void
-    ) {
-        self.title = title
-        self.saveTitle = saveTitle
-        self.onSave = onSave
-        _name = State(initialValue: initialName)
+    init(model: FolderNameViewModel) {
+        _model = State(initialValue: model)
+    }
+
+    private var title: LocalizedStringKey {
+        switch model.mode {
+        case .newSubfolder: "New Subfolder"
+        case .rename: "Rename Folder"
+        }
+    }
+
+    private var saveTitle: LocalizedStringKey {
+        switch model.mode {
+        case .newSubfolder: "Create"
+        case .rename: "Save"
+        }
     }
 
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Name", text: $name)
+                TextField("Name", text: $model.name)
                     .focused($isNameFocused)
                     .submitLabel(.done)
                     .onSubmit(save)
@@ -39,23 +41,19 @@ struct FolderNameSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(saveTitle, action: save)
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(!model.canSave)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.save)
                 }
             }
             .onAppear { isNameFocused = true }
-            .saveErrorAlert($saveError)
+            .saveErrorAlert($model.saveError)
         }
         .presentationDetents([.medium])
     }
 
     private func save() {
-        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        do {
-            try onSave(name)
+        if model.save() {
             dismiss()
-        } catch {
-            saveError = error.localizedDescription
         }
     }
 }

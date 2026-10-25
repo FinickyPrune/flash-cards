@@ -91,3 +91,4 @@ schemes:
       gatherCoverageData: true
       coverageTargets:
         - FlashCards
+        - package: FlashCore/FlashCore

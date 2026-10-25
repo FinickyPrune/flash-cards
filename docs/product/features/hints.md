@@ -1,6 +1,6 @@
 # Hints
 Where the card editor's suggested definition, synonyms, translation and lemma come from — all offline.
-Status: planned (milestone 4); sources proposed (decisions 0006, 0007), translation parked (#4)
+Status: planned (milestone 4); sources: decisions 0006, 0007
 
 ## Rules
 - Replaceable sources per language pair: definition, synonyms, translation, lemma (glossary: Hint).
@@ -12,6 +12,9 @@ Status: planned (milestone 4); sources proposed (decisions 0006, 0007), translat
 - Synonyms tile: comma-separated, at most 6, of the same sense; else the entry's own list;
   else empty. Synonyms tagged vulgar, offensive or obsolete are dropped (tags are incomplete).
   (assumption: format)
+- Translation tile: Russian translations from the same dictionary, comma-separated, at most 6;
+  those of the same sense first, else the entry's own; stress marks removed. Only for folders
+  whose back language is Russian; otherwise empty. (assumption: format) (decision 0006)
 - Hints are computed once, when the editor opens for a token; the lemma toggle doesn't change them.
 - Every source is offline and on-device (vision principle 1).
 - Hints in the MVP cover **English** as the learning language. Serbian gets no hints: its cards
@@ -28,11 +31,7 @@ Status: planned (milestone 4); sources proposed (decisions 0006, 0007), translat
   Russian translations in the same data: 72–89%. Phrasal verbs and idioms: 65 of 70 sampled.
 - Words Wiktionary has only as proper names (people, cities) get no definition.
 
-## Spikes
-- **Translation** (#4, parked). The Translation tile is fed by a stub behind the translation
-  source. Options on #4: Apple's Translation framework (`en → ru` supported, device only,
-  language packs downloaded with the user's permission) or the Russian translations already
-  in the Wiktionary data (72–89% of the top 20k words). Owner decides.
-
 ## Not supported
 - Online dictionary for expressions (later, behind a switch); Serbian hints.
+- Apple's Translation framework: not in the MVP; maybe later as a fallback for words the
+  dictionary has no translation for (findings on #4).

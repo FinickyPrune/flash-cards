@@ -29,10 +29,7 @@ final class CardEditorUITests: XCTestCase {
         let back = app.textFields["cardEditor.backText"]
         back.tap()
         back.typeText("thanks")
-        // Like a user on a short screen: put the keyboard away so Save is on screen again.
-        app.buttons["cardEditor.keyboardDone"].tap()
-        XCTAssertTrue(save.waitForExistence(timeout: 5))
-        save.tap()
+        tapSave(save, in: app)
 
         let row = app.buttons["row.card.hvala"]
         XCTAssertTrue(row.waitForExistence(timeout: 5))
@@ -47,10 +44,7 @@ final class CardEditorUITests: XCTestCase {
         let focused = expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: back)
         wait(for: [focused], timeout: 5)
         back.typeText("thank you")
-        // Like a user on a short screen: put the keyboard away so Save is on screen again.
-        app.buttons["cardEditor.keyboardDone"].tap()
-        XCTAssertTrue(save.waitForExistence(timeout: 5))
-        save.tap()
+        tapSave(save, in: app)
 
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         let predicate = NSPredicate(format: "label CONTAINS %@", "thank you")
@@ -68,5 +62,17 @@ final class CardEditorUITests: XCTestCase {
         delete.tap()
         app.buttons["cardEditor.confirmDelete"].firstMatch.tap()
         XCTAssertTrue(app.descendants(matching: .any)["folder.empty"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// Like a user on a short screen (the CI simulator): put the keyboard away, and if the
+    /// navigation bar is still hidden by the scrolled form, scroll back to the top.
+    @MainActor
+    private func tapSave(_ save: XCUIElement, in app: XCUIApplication) {
+        app.buttons["cardEditor.keyboardDone"].tap()
+        for _ in 0 ..< 3 where !save.waitForExistence(timeout: 2) {
+            app.swipeDown()
+        }
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        save.tap()
     }
 }

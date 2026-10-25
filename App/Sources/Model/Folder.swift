@@ -48,6 +48,12 @@ final class Folder {
         (children ?? []).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
+    /// The tile the card editor selects first: the back source last saved in this root folder,
+    /// or Translation for a root folder without cards yet.
+    var defaultBackSource: BackSource {
+        root.lastBackSource.flatMap(BackSource.init(rawValue:)) ?? .translation
+    }
+
     var resolvedLearningLanguage: String? {
         root.learningLanguage
     }

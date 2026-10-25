@@ -43,6 +43,11 @@ final class Card {
         setFront(front)
     }
 
+    /// `backSource` as a type; an unknown stored value reads as `.custom`.
+    var source: BackSource {
+        BackSource(rawValue: backSource) ?? .custom
+    }
+
     func setFront(_ front: String) {
         self.front = front
         frontKey = FrontKey.make(from: front)

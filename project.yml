@@ -13,6 +13,9 @@ packages:
   Mockable:
     url: https://github.com/Kolos65/Mockable
     exactVersion: 0.6.4
+  # Pure logic without UI or SwiftData (docs/architecture.md → Targets).
+  FlashCore:
+    path: Packages/FlashCore
 
 settings:
   base:
@@ -37,6 +40,7 @@ targets:
         type: syncedFolder
     dependencies:
       - package: Mockable
+      - package: FlashCore
     settings:
       configs:
         Debug:
@@ -83,6 +87,7 @@ schemes:
       targets:
         - FlashCardsTests
         - FlashCardsUITests
+        - package: FlashCore/FlashCoreTests
       gatherCoverageData: true
       coverageTargets:
         - FlashCards

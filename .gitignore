@@ -6,6 +6,8 @@
 # Build output
 build/
 DerivedData/
+.build/
+.swiftpm/
 *.xcresult
 
 # Xcode user state

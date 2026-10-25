@@ -22,6 +22,7 @@ XCODEBUILD = set -o pipefail && xcodebuild -project $(PROJECT) -scheme $(SCHEME)
 
 # ONLY=FlashCardsTests/SmokeTests runs a single suite or test (xcodebuild -only-testing syntax).
 ONLY ?=
+UNIT_TARGETS := FlashCardsTests FlashCoreTests
 
 .PHONY: help
 help: ## Show available targets
@@ -44,9 +45,9 @@ build: generate ## Build the app for the simulator
 	$(XCODEBUILD) build 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
 
 .PHONY: test
-test: generate ## Run unit tests (ONLY=Target/Suite[/test] to narrow)
+test: generate ## Run unit tests, app and FlashCore (ONLY=Target/Suite[/test] to narrow)
 	@rm -rf $(RESULTS)/unit.xcresult
-	$(XCODEBUILD) test -only-testing:$(or $(ONLY),FlashCardsTests) \
+	$(XCODEBUILD) test $(addprefix -only-testing:,$(or $(ONLY),$(UNIT_TARGETS))) \
 		-resultBundlePath $(RESULTS)/unit.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
 
 .PHONY: test-ui

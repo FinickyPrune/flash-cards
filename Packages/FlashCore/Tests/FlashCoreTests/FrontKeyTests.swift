@@ -23,6 +23,8 @@ struct FrontKeyTests {
         arguments: [
             ("kuća", "kuna"),
             ("ice cream", "icecream"),
+            // Product decision: `đ` is its own letter, not `d` with a diacritic.
+            ("đak", "dak"),
         ]
     )
     func differentKey(lhs: String, rhs: String) {

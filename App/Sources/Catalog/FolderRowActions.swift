@@ -39,11 +39,12 @@ private struct FolderActionsPresentation: ViewModifier {
             .confirmationDialog(
                 Text("Delete “\(actions.deleting?.name ?? "")”?"),
                 isPresented: Binding(isPresent: $actions.deleting),
-                titleVisibility: .visible
-            ) {
-                Button("Delete Folder", role: .destructive) { actions.confirmDelete() }
+                titleVisibility: .visible,
+                presenting: actions.deleting
+            ) { folder in
+                Button("Delete Folder", role: .destructive) { actions.confirmDelete(folder) }
                     .accessibilityIdentifier(AccessibilityID.FolderAction.confirmDelete)
-            } message: {
+            } message: { _ in
                 Text("Its subfolders and cards will be deleted too. This can't be undone.")
             }
             .saveErrorAlert($actions.saveError)

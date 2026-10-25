@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct FlashCardsApp: App {
     private let container: ModelContainer
+    private let homeModel: HomeViewModel
 
     init() {
         do {
@@ -15,11 +16,12 @@ struct FlashCardsApp: App {
         if LaunchOptions.seed {
             SampleData.insert(into: container.mainContext)
         }
+        homeModel = HomeViewModel(service: CatalogService(context: container.mainContext))
     }
 
     var body: some Scene {
         WindowGroup {
-            HomeView(model: HomeViewModel(service: CatalogService(context: container.mainContext)))
+            HomeView(model: homeModel)
         }
         .modelContainer(container)
     }

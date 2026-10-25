@@ -83,8 +83,7 @@ struct CatalogService: CatalogServicing {
     }
 
     private func validName(_ name: String) throws -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { throw CatalogError.emptyName }
-        return trimmed
+        guard let name = FolderName.normalized(name) else { throw CatalogError.emptyName }
+        return name
     }
 }

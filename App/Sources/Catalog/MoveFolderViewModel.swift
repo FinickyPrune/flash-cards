@@ -33,9 +33,8 @@ final class MoveFolderViewModel {
         }
     }
 
-    /// Returns whether the sheet can close.
-    func confirmWarning() -> Bool {
-        guard let destination = warningDestination else { return false }
+    /// Moves after the user confirmed the warning for `destination`. Returns whether the sheet can close.
+    func confirmWarning(for destination: Folder) -> Bool {
         warningDestination = nil
         return move(to: destination)
     }

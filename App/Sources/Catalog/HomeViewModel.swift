@@ -17,6 +17,7 @@ final class HomeViewModel {
         NewRootFolderViewModel(service: service)
     }
 
+    /// Every pushed folder screen, at any depth: Home owns the navigation stack.
     func folderModel(for folder: Folder) -> FolderViewModel {
         FolderViewModel(folder: folder, service: service)
     }

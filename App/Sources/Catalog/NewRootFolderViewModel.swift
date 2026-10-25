@@ -16,7 +16,7 @@ final class NewRootFolderViewModel {
     }
 
     var canCreate: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        FolderName.normalized(name) != nil
     }
 
     /// Returns whether the form can close; on failure `saveError` says why.

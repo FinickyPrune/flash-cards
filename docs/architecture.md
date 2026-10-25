@@ -16,8 +16,11 @@ View → `@Observable` view model → services → SwiftData.
 - Every change goes through the screen's view model, which calls a service protocol
   (`@Mockable`, e.g. `CatalogServicing`). The service owns the rules and the save; view models
   own form state, presentation state and error messages.
-- A parent's view model creates its children's (sheets, pushed screens) and passes the service
-  down; the app builds the first one with the real service.
+- A parent's view model creates its children's and passes the service down: a presenter builds
+  its sheets' view models, the view model of the screen that owns a `NavigationStack` builds every
+  pushed screen's. The app builds the first one, once, with the real service.
+- A view model's `init` is cheap and has no side effects: SwiftUI may build and drop it on any
+  parent render. Start work (fetching, lookups) from `.task`.
 Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only
 SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
 `CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.

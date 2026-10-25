@@ -55,9 +55,9 @@ struct MoveFolderSheet: View {
                 "Change Languages?",
                 isPresented: Binding(isPresent: $model.warningDestination),
                 presenting: model.warningDestination
-            ) { _ in
+            ) { destination in
                 Button("Move") {
-                    if model.confirmWarning() {
+                    if model.confirmWarning(for: destination) {
                         dismiss()
                     }
                 }

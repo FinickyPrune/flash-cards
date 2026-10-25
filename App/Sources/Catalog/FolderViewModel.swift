@@ -18,8 +18,4 @@ final class FolderViewModel {
     func newSubfolderModel() -> FolderNameViewModel {
         FolderNameViewModel(mode: .newSubfolder(in: folder), service: service)
     }
-
-    func folderModel(for folder: Folder) -> FolderViewModel {
-        FolderViewModel(folder: folder, service: service)
-    }
 }

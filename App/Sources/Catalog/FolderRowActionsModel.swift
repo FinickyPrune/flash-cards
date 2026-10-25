@@ -22,9 +22,9 @@ final class FolderRowActionsModel {
         MoveFolderViewModel(folder: folder, service: service)
     }
 
-    /// Deletes the folder awaiting confirmation. Clears it first so the dialog never reads a deleted model.
-    func confirmDelete() {
-        guard let folder = deleting else { return }
+    /// Deletes `folder` after the user confirmed. Clears `deleting` first so the dialog never reads
+    /// a deleted model.
+    func confirmDelete(_ folder: Folder) {
         deleting = nil
         do {
             try service.delete(folder)

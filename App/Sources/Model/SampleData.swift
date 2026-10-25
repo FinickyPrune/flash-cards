@@ -33,9 +33,9 @@ enum SampleData {
     }
 }
 
+@MainActor
 extension ModelContainer {
     /// In-memory container with `SampleData`, for previews.
-    @MainActor
     static var preview: ModelContainer {
         do {
             let container = try AppModelContainer.make(inMemory: true)

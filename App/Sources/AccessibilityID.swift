@@ -43,6 +43,7 @@ enum AccessibilityID {
         static let backText = "cardEditor.backText"
         static let folder = "cardEditor.folder"
         static let save = "cardEditor.save"
+        static let keyboardDone = "cardEditor.keyboardDone"
         static let saveAnyway = "cardEditor.saveAnyway"
         static let delete = "cardEditor.delete"
         static let confirmDelete = "cardEditor.confirmDelete"

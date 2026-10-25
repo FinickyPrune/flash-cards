@@ -71,6 +71,9 @@ struct CardEditorSheet: View {
                     }
                 }
             }
+            // On short screens the keyboard pushes the navigation bar (Cancel, Save) off screen;
+            // dragging the form or Done gets it back.
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isEditing ? "Edit Card" : "New Card")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbar }
@@ -114,6 +117,11 @@ struct CardEditorSheet: View {
             .confirmationDialog("Discard Changes?", isPresented: $model.isConfirmingDiscard) {
                 Button("Discard Changes", role: .destructive) { dismiss() }
             }
+        }
+        ToolbarItemGroup(placement: .keyboard) {
+            Spacer()
+            Button("Done") { focus = nil }
+                .accessibilityIdentifier(AccessibilityID.CardEditor.keyboardDone)
         }
         ToolbarItem(placement: .confirmationAction) {
             Button("Save") { close(if: model.save()) }

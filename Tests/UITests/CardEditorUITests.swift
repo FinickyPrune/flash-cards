@@ -28,6 +28,8 @@ final class CardEditorUITests: XCTestCase {
         let back = app.textFields["cardEditor.backText"]
         back.tap()
         back.typeText("thanks")
+        // Like a user on a short screen: put the keyboard away so Save is on screen.
+        app.buttons["cardEditor.keyboardDone"].tap()
         app.buttons["cardEditor.save"].tap()
 
         let row = app.buttons["row.card.hvala"]
@@ -43,6 +45,8 @@ final class CardEditorUITests: XCTestCase {
         let focused = expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: back)
         wait(for: [focused], timeout: 5)
         back.typeText("thank you")
+        // Like a user on a short screen: put the keyboard away so Save is on screen.
+        app.buttons["cardEditor.keyboardDone"].tap()
         app.buttons["cardEditor.save"].tap()
 
         XCTAssertTrue(row.waitForExistence(timeout: 5))
@@ -52,6 +56,11 @@ final class CardEditorUITests: XCTestCase {
         // Delete from the editor.
         row.tap()
         let delete = app.buttons["cardEditor.delete"]
+        XCTAssertTrue(app.buttons["cardEditor.save"].waitForExistence(timeout: 5))
+        // The form is a lazy list: on short screens Delete Card is only built once scrolled to.
+        for _ in 0 ..< 3 where !delete.exists {
+            app.swipeUp()
+        }
         XCTAssertTrue(delete.waitForExistence(timeout: 5))
         delete.tap()
         app.buttons["cardEditor.confirmDelete"].firstMatch.tap()

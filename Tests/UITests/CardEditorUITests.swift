@@ -21,6 +21,7 @@ final class CardEditorUITests: XCTestCase {
         folder.tap()
 
         app.buttons["folder.newCard"].tap()
+        let save = app.buttons["cardEditor.save"]
         let front = app.textFields["cardEditor.front"]
         XCTAssertTrue(front.waitForExistence(timeout: 5))
         front.typeText("hvala")
@@ -28,9 +29,10 @@ final class CardEditorUITests: XCTestCase {
         let back = app.textFields["cardEditor.backText"]
         back.tap()
         back.typeText("thanks")
-        // Like a user on a short screen: put the keyboard away so Save is on screen.
+        // Like a user on a short screen: put the keyboard away so Save is on screen again.
         app.buttons["cardEditor.keyboardDone"].tap()
-        app.buttons["cardEditor.save"].tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        save.tap()
 
         let row = app.buttons["row.card.hvala"]
         XCTAssertTrue(row.waitForExistence(timeout: 5))
@@ -45,9 +47,10 @@ final class CardEditorUITests: XCTestCase {
         let focused = expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: back)
         wait(for: [focused], timeout: 5)
         back.typeText("thank you")
-        // Like a user on a short screen: put the keyboard away so Save is on screen.
+        // Like a user on a short screen: put the keyboard away so Save is on screen again.
         app.buttons["cardEditor.keyboardDone"].tap()
-        app.buttons["cardEditor.save"].tap()
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        save.tap()
 
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         let predicate = NSPredicate(format: "label CONTAINS %@", "thank you")
@@ -56,7 +59,7 @@ final class CardEditorUITests: XCTestCase {
         // Delete from the editor.
         row.tap()
         let delete = app.buttons["cardEditor.delete"]
-        XCTAssertTrue(app.buttons["cardEditor.save"].waitForExistence(timeout: 5))
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
         // The form is a lazy list: on short screens Delete Card is only built once scrolled to.
         for _ in 0 ..< 3 where !delete.exists {
             app.swipeUp()

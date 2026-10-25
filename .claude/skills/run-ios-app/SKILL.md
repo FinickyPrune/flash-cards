@@ -5,7 +5,7 @@ description: Launch the FlashCards app in the iOS Simulator and visually verify 
 
 # Run and visually verify
 
-1. `make run` — builds, boots the simulator (newest iOS runtime, first iPhone; override with `SIM_NAME="iPhone 17"`), installs and launches. The simulator runs headless; no window needed.
+1. `make run` — builds, boots the simulator (iPhone 18 Pro on the newest iOS runtime, as on CI; override with `SIM_NAME="iPhone Duo"`), installs and launches. The simulator runs headless; no window needed.
 2. Wait ~2s for the UI to settle, then `NAME=<short-name> make screenshot`. It prints the path (`build/screenshots/<name>.png`, downscaled to 1000px).
 3. Read the PNG and check it against the acceptance criteria / design. List concrete differences and fix them; repeat.
 

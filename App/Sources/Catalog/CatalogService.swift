@@ -4,7 +4,7 @@ import SwiftData
 /// Folder tree changes (`catalog.md` → Rules). Every change is saved right away; a failed save
 /// rolls the context back, so the UI never shows a change that isn't stored.
 @MainActor
-struct CatalogService {
+struct CatalogService: CatalogServicing {
     let context: ModelContext
 
     @discardableResult

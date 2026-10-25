@@ -1,16 +1,16 @@
-import SwiftData
 import SwiftUI
 
 /// One folder: its subfolders by name, then its cards newest first (`catalog.md`).
 struct FolderView: View {
-    let folder: Folder
-    @Environment(\.modelContext) private var context
-    @State private var actions = FolderActions()
-    @State private var isCreatingSubfolder = false
+    @State private var model: FolderViewModel
+
+    init(model: FolderViewModel) {
+        _model = State(initialValue: model)
+    }
 
     var body: some View {
-        let subfolders = folder.sortedChildren
-        let cards = (folder.cards ?? []).sorted { $0.createdAt > $1.createdAt }
+        let subfolders = model.folder.sortedChildren
+        let cards = (model.folder.cards ?? []).sorted { $0.createdAt > $1.createdAt }
         List {
             if !subfolders.isEmpty {
                 Section("Folders") {
@@ -18,7 +18,7 @@ struct FolderView: View {
                         NavigationLink(value: subfolder) {
                             FolderRow(folder: subfolder)
                         }
-                        .folderRowActions(for: subfolder, actions)
+                        .folderRowActions(for: subfolder, model.rowActions)
                         .accessibilityIdentifier(AccessibilityID.Row.folder(subfolder.name))
                     }
                 }
@@ -36,24 +36,20 @@ struct FolderView: View {
                 } description: {
                     Text("This folder has no subfolders or cards yet.")
                 } actions: {
-                    Button("New Subfolder") { isCreatingSubfolder = true }
+                    Button("New Subfolder") { model.isCreatingSubfolder = true }
                         .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewSubfolder)
                 }
                 .accessibilityIdentifier(AccessibilityID.FolderScreen.empty)
             }
         }
-        .navigationTitle(folder.name)
+        .navigationTitle(model.folder.name)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("New Subfolder", systemImage: "folder.badge.plus") { isCreatingSubfolder = true }
+                Button("New Subfolder", systemImage: "folder.badge.plus") { model.isCreatingSubfolder = true }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newSubfolder)
             }
         }
-        .sheet(isPresented: $isCreatingSubfolder) {
-            FolderNameSheet(title: "New Subfolder", saveTitle: "Create", initialName: "") { name in
-                try CatalogService(context: context).createSubfolder(name: name, in: folder)
-            }
-        }
-        .folderActionsPresentation(actions)
+        .sheet(isPresented: $model.isCreatingSubfolder) { FolderNameSheet(model: model.newSubfolderModel()) }
+        .folderActionsPresentation(model.rowActions)
     }
 }

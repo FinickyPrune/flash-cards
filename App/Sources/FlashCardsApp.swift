@@ -19,7 +19,7 @@ struct FlashCardsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            HomeView(model: HomeViewModel(service: CatalogService(context: container.mainContext)))
         }
         .modelContainer(container)
     }

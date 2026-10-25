@@ -2,28 +2,24 @@ import SwiftUI
 
 /// Creates a root folder: name and language pair, both languages defaulting to the system one.
 struct NewRootFolderSheet: View {
-    @Environment(\.modelContext) private var context
+    @State private var model: NewRootFolderViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var name = ""
-    @State private var learningLanguage = Languages.systemLanguage
-    @State private var backLanguage = Languages.systemLanguage
-    @State private var saveError: String?
     @FocusState private var isNameFocused: Bool
 
-    private var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
+    init(model: NewRootFolderViewModel) {
+        _model = State(initialValue: model)
     }
 
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Name", text: $name)
+                TextField("Name", text: $model.name)
                     .focused($isNameFocused)
                     .accessibilityIdentifier(AccessibilityID.FolderForm.name)
                 Section {
-                    languageLink("Learning language", selection: $learningLanguage)
+                    languageLink("Learning language", selection: $model.learningLanguage)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.learningLanguage)
-                    languageLink("Back language", selection: $backLanguage)
+                    languageLink("Back language", selection: $model.backLanguage)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.backLanguage)
                 } footer: {
                     Text("Subfolders use the same languages. They can't be changed later.")
@@ -37,12 +33,12 @@ struct NewRootFolderSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create", action: create)
-                        .disabled(trimmedName.isEmpty)
+                        .disabled(!model.canCreate)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.save)
                 }
             }
             .onAppear { isNameFocused = true }
-            .saveErrorAlert($saveError)
+            .saveErrorAlert($model.saveError)
         }
     }
 
@@ -55,15 +51,8 @@ struct NewRootFolderSheet: View {
     }
 
     private func create() {
-        do {
-            try CatalogService(context: context).createRootFolder(
-                name: name,
-                learningLanguage: learningLanguage,
-                backLanguage: backLanguage
-            )
+        if model.create() {
             dismiss()
-        } catch {
-            saveError = error.localizedDescription
         }
     }
 }

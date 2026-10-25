@@ -5,14 +5,7 @@ extension View {
     func saveErrorAlert(_ message: Binding<String?>) -> some View {
         alert(
             "Couldn't Save Changes",
-            isPresented: Binding(
-                get: { message.wrappedValue != nil },
-                set: {
-                    if !$0 {
-                        message.wrappedValue = nil
-                    }
-                }
-            ),
+            isPresented: Binding(isPresent: message),
             presenting: message.wrappedValue
         ) { _ in
             Button("OK", role: .cancel) {}

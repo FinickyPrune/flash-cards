@@ -3,14 +3,15 @@ import SwiftUI
 
 /// Picks where a folder moves: the top level or any folder it may go under.
 struct MoveFolderSheet: View {
-    let folder: Folder
+    @State private var model: MoveFolderViewModel
     @Query(sort: [SortDescriptor(\Folder.name, comparator: .localizedStandard)])
     private var folders: [Folder]
-    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-    @State private var warningDestination: Folder?
-    @State private var saveError: String?
     @ScaledMetric private var indent = 20.0
+
+    init(model: MoveFolderViewModel) {
+        _model = State(initialValue: model)
+    }
 
     private struct Entry: Identifiable {
         let folder: Folder
@@ -28,10 +29,6 @@ struct MoveFolderSheet: View {
         return walk(folders.filter { $0.parent == nil }, depth: 0)
     }
 
-    private var service: CatalogService {
-        CatalogService(context: context)
-    }
-
     var body: some View {
         NavigationStack {
             List {
@@ -47,7 +44,7 @@ struct MoveFolderSheet: View {
                     .accessibilityIdentifier(AccessibilityID.Move.destination(entry.folder.name))
                 }
             }
-            .navigationTitle("Move “\(folder.name)”")
+            .navigationTitle("Move “\(model.folder.name)”")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -56,54 +53,36 @@ struct MoveFolderSheet: View {
             }
             .alert(
                 "Change Languages?",
-                isPresented: Binding(
-                    get: { warningDestination != nil },
-                    set: {
-                        if !$0 {
-                            warningDestination = nil
-                        }
+                isPresented: Binding(isPresent: $model.warningDestination),
+                presenting: model.warningDestination
+            ) { _ in
+                Button("Move") {
+                    if model.confirmWarning() {
+                        dismiss()
                     }
-                ),
-                presenting: warningDestination
-            ) { destination in
-                Button("Move") { move(to: destination) }
-                    .accessibilityIdentifier(AccessibilityID.Move.confirmWarning)
+                }
+                .accessibilityIdentifier(AccessibilityID.Move.confirmWarning)
                 Button("Cancel", role: .cancel) {}
             } message: { destination in
-                Text("Cards in “\(folder.name)” will use \(pair(of: destination)) instead of \(pair(of: folder)).")
+                Text(
+                    "Cards in “\(model.folder.name)” will use \(model.pairDescription(of: destination)) instead of \(model.pairDescription(of: model.folder))."
+                )
             }
-            .saveErrorAlert($saveError)
+            .saveErrorAlert($model.saveError)
         }
     }
 
     private func destinationButton(to destination: Folder?, label: () -> some View) -> some View {
-        let check = service.moveCheck(folder, to: destination)
+        let isAllowed = model.isAllowed(destination)
         return Button {
-            switch check {
-            case .allowed: move(to: destination)
-            case .allowedAfterWarning: warningDestination = destination
-            case .notAllowed: break
+            if model.choose(destination) {
+                dismiss()
             }
         } label: {
             // Rows read as a list of places, not links; unavailable ones are dimmed.
             label()
-                .foregroundStyle(check == .notAllowed ? Color.secondary : Color.primary)
+                .foregroundStyle(isAllowed ? Color.primary : Color.secondary)
         }
-        .disabled(check == .notAllowed)
-    }
-
-    private func pair(of folder: Folder) -> String {
-        let learning = folder.resolvedLearningLanguage.map { Languages.name(of: $0) } ?? ""
-        let back = folder.resolvedBackLanguage.map { Languages.name(of: $0) } ?? ""
-        return "\(learning) → \(back)"
-    }
-
-    private func move(to destination: Folder?) {
-        do {
-            try service.move(folder, to: destination)
-            dismiss()
-        } catch {
-            saveError = error.localizedDescription
-        }
+        .disabled(!isAllowed)
     }
 }

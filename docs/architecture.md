@@ -12,6 +12,12 @@ Targets, layers, invariants and the initial data model. Read when planning struc
 
 ## Layers
 View → `@Observable` view model → services → SwiftData.
+- Views read data straight from SwiftData (`@Query`, observing models) and never change it.
+- Every change goes through the screen's view model, which calls a service protocol
+  (`@Mockable`, e.g. `CatalogServicing`). The service owns the rules and the save; view models
+  own form state, presentation state and error messages.
+- A parent's view model creates its children's (sheets, pushed screens) and passes the service
+  down; the app builds the first one with the real service.
 Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only
 SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
 `CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.

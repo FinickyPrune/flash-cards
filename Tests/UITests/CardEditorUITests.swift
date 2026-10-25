@@ -34,10 +34,12 @@ final class CardEditorUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         XCTAssertTrue(row.label.contains("thanks"))
 
+        // Edit: switch the back to the Custom text tile.
         row.tap()
-        XCTAssertTrue(back.waitForExistence(timeout: 5))
-        back.tap()
-        back.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "thanks".count) + "thank you")
+        let custom = app.buttons["cardEditor.tile.custom"]
+        XCTAssertTrue(custom.waitForExistence(timeout: 5))
+        custom.tap()
+        back.typeText("thank you")
         app.buttons["cardEditor.save"].tap()
 
         XCTAssertTrue(row.waitForExistence(timeout: 5))

@@ -58,6 +58,16 @@ struct CardEditorSheet: View {
                     Section {
                         Button("Delete Card", role: .destructive) { model.isConfirmingDelete = true }
                             .accessibilityIdentifier(AccessibilityID.CardEditor.delete)
+                            .confirmationDialog(
+                                "Delete This Card?",
+                                isPresented: $model.isConfirmingDelete,
+                                titleVisibility: .visible
+                            ) {
+                                Button("Delete Card", role: .destructive) { close(if: model.delete()) }
+                                    .accessibilityIdentifier(AccessibilityID.CardEditor.confirmDelete)
+                            } message: {
+                                Text("Its review history will be deleted too. This can't be undone.")
+                            }
                     }
                 }
             }
@@ -68,6 +78,11 @@ struct CardEditorSheet: View {
                 if !isEditing {
                     focus = .front
                 }
+            }
+            // The selected tile's field is inserted by this very update; focusing it in the same
+            // pass is ignored, so focus it on the next main-actor turn.
+            .onChange(of: model.selectedSource) {
+                Task { focus = .back }
             }
             .sheet(isPresented: $isPickingFolder) { FolderPickerSheet(selection: $model.folder) }
             .alert(
@@ -80,19 +95,6 @@ struct CardEditorSheet: View {
                 Button("Cancel", role: .cancel) {}
             } message: { existing in
                 Text("“\(existing.front)” is already a card in “\(existing.folder?.root.name ?? "")”.")
-            }
-            .confirmationDialog(
-                "Delete This Card?",
-                isPresented: $model.isConfirmingDelete,
-                titleVisibility: .visible
-            ) {
-                Button("Delete Card", role: .destructive) { close(if: model.delete()) }
-                    .accessibilityIdentifier(AccessibilityID.CardEditor.confirmDelete)
-            } message: {
-                Text("Its review history will be deleted too. This can't be undone.")
-            }
-            .confirmationDialog("Discard Changes?", isPresented: $model.isConfirmingDiscard) {
-                Button("Discard Changes", role: .destructive) { dismiss() }
             }
             .saveErrorAlert($model.saveError)
         }
@@ -109,6 +111,9 @@ struct CardEditorSheet: View {
                     dismiss()
                 }
             }
+            .confirmationDialog("Discard Changes?", isPresented: $model.isConfirmingDiscard) {
+                Button("Discard Changes", role: .destructive) { dismiss() }
+            }
         }
         ToolbarItem(placement: .confirmationAction) {
             Button("Save") { close(if: model.save()) }
@@ -117,36 +122,45 @@ struct CardEditorSheet: View {
         }
     }
 
-    /// One back option. Only the selected tile is editable; tapping another selects it.
+    /// One back option. Only the selected tile is editable; another one is a button that selects it.
     @ViewBuilder
     private func tile(_ source: BackSource) -> some View {
-        let isSelected = source == model.selectedSource
-        VStack(alignment: .leading, spacing: 6) {
-            Label(source.title, systemImage: isSelected ? "checkmark.circle.fill" : "circle")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
-            if isSelected {
+        if source == model.selectedSource {
+            VStack(alignment: .leading, spacing: 6) {
+                tileTitle(source, isSelected: true)
                 TextField("Back text", text: $model.back, axis: .vertical)
                     .lineLimit(1 ... 6)
                     .focused($focus, equals: .back)
                     .accessibilityIdentifier(AccessibilityID.CardEditor.backText)
-            } else {
-                let text = model.text(of: source)
-                Text(text.isEmpty ? String(localized: "Empty") : text)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
             }
+            .padding(.vertical, 4)
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(.isSelected)
+            .accessibilityIdentifier(AccessibilityID.CardEditor.tile(source.rawValue))
+        } else {
+            Button {
+                model.selectedSource = source
+            } label: {
+                VStack(alignment: .leading, spacing: 6) {
+                    tileTitle(source, isSelected: false)
+                    let text = model.text(of: source)
+                    // Explicit colours: inside a button `.secondary` would take the tint.
+                    Text(text.isEmpty ? String(localized: "Empty") : text)
+                        .foregroundStyle(Color.secondary)
+                        .lineLimit(2)
+                }
+                .padding(.vertical, 4)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .accessibilityIdentifier(AccessibilityID.CardEditor.tile(source.rawValue))
         }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard !isSelected else { return }
-            model.selectedSource = source
-            focus = .back
-        }
-        .accessibilityElement(children: isSelected ? .contain : .combine)
-        .accessibilityAddTraits(isSelected ? .isSelected : .isButton)
-        .accessibilityIdentifier(AccessibilityID.CardEditor.tile(source.rawValue))
+    }
+
+    private func tileTitle(_ source: BackSource, isSelected: Bool) -> some View {
+        Label(source.title, systemImage: isSelected ? "checkmark.circle.fill" : "circle")
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(Color.secondary))
     }
 
     private func close(if done: Bool) {

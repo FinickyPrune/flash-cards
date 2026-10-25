@@ -1,13 +1,16 @@
 # Card editor
 One screen to add or edit a card: front, screenshot, context, the back chosen from four tiles, and the folder.
-Status: planned (milestone 1; hints in milestone 4)
+Status: partial (manual cards shipped in milestone 1; screenshot, hints, lemma toggle and import in milestone 4)
 
 ## Rules
-- Modes: **add** and **edit**, same screen.
+- Modes: **add** and **edit**, same screen, shown as a full-height sheet with Cancel and Save,
+  from a folder and (later) from the import flow. (#15)
 - Top to bottom: front (editable text field), screenshot if present, context (editable),
   four tiles, folder chip.
 - Tiles: **Definition**, **Synonyms**, **Translation**, **Custom text** (a text field). The user selects
-  exactly one; its text is saved as the back and stays editable. Review shows that text.
+  exactly one; its text is saved as the back. Only the selected tile is editable: tapping another
+  tile selects it and puts the cursor in it; the other tiles keep their text. Review shows the
+  selected tile's text. (#15)
 - Definition, Synonyms and Translation tiles are prefilled with hints when a source has one (see `hints.md`).
   An empty hint leaves the tile empty and editable.
 - The selected tile by default is the back source last used in this root folder; for a new
@@ -27,6 +30,11 @@ Status: planned (milestone 1; hints in milestone 4)
   hints and the user's edits.
 
 ## States and edge cases
+- Editing a card that keeps its front key and root folder doesn't ask about a duplicate again;
+  changing the front or moving it to another root folder does. (assumption)
+- A card is deleted from edit mode with a confirmation, or by swiping its row in the folder
+  list without one. Its review history goes with it. (#15)
+- Unsaved changes: the sheet can't be swiped away, and Cancel asks "Discard changes?". (#15)
 - Front empty → can't save.
 - Back empty → can't save. (assumption)
 - No screenshot (manual card or CSV) → the screenshot area is hidden.

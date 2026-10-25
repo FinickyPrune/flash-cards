@@ -13,9 +13,3 @@ struct CardDraft {
         !front.trimmed.isEmpty && !back.trimmed.isEmpty
     }
 }
-
-extension String {
-    var trimmed: String {
-        trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-}

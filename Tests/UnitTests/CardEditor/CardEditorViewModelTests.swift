@@ -57,16 +57,36 @@ struct CardEditorViewModelTests {
             .called(.once)
     }
 
-    // Catches: re-asking about a duplicate the user already accepted every time the card is edited.
-    @Test("Editing the back of a card doesn't ask about duplicates again")
-    func editKeepsAcceptedDuplicate() {
+    // Catches: re-asking on every edit about a duplicate the user already accepted, or never
+    // checking again when the edit gives the card another front key.
+    @Test(
+        "An edit asks about duplicates only when the front key changes",
+        arguments: [("kuća", "house", true), ("kuca ", "дом", true), ("hvala", "дом", false)]
+    )
+    func editDuplicateCheck(front: String, back: String, saves: Bool) {
         let kuca = card("kuća")
-        given(service).duplicate(of: .any, in: .any, excluding: .any).willReturn(card("Kuca"))
+        let other = card("Kuca")
+        given(service).duplicate(of: .any, in: .any, excluding: .any).willReturn(other)
         given(service).update(.any, with: .any).willReturn()
         let model = CardEditorViewModel(editing: kuca, fallbackFolder: serbian, service: service)
-        model.back = "house"
+        model.front = front
+        model.back = back
 
-        #expect(model.save() == true)
-        verify(service).update(.value(kuca), with: .matching { $0.back == "house" }).called(.once)
+        #expect(model.save() == saves)
+        #expect(model.duplicate == (saves ? nil : other))
+    }
+
+    // Catches: blocking swipe-to-dismiss and asking "Discard changes?" for a form with nothing in it.
+    @Test("Only real content counts as unsaved changes")
+    func hasChanges() {
+        let model = CardEditorViewModel(adding: serbian, service: service)
+        model.back = "a"
+        model.back = ""
+        model.selectedSource = .synonyms
+        model.front = "  "
+        #expect(model.hasChanges == false)
+
+        model.back = "thanks"
+        #expect(model.hasChanges == true)
     }
 }

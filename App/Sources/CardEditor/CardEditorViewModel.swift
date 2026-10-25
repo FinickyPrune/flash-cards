@@ -6,7 +6,7 @@ import Observation
 /// its text is the back.
 @MainActor
 @Observable
-final class CardEditorViewModel {
+final class CardEditorViewModel: Identifiable {
     enum Mode {
         case add
         case edit(Card)
@@ -26,12 +26,29 @@ final class CardEditorViewModel {
     private let initial: Snapshot
     private let service: any CardServicing
 
+    /// What the form holds, compared by content: trimmed text, empty tiles ignored, and the
+    /// selected tile only once some tile has text.
     private struct Snapshot: Equatable {
         let front: String
         let context: String
         let folder: Folder
-        let selectedSource: BackSource
+        let selectedSource: BackSource?
         let tileTexts: [BackSource: String]
+
+        init(
+            front: String,
+            context: String,
+            folder: Folder,
+            selectedSource: BackSource,
+            tileTexts: [BackSource: String]
+        ) {
+            let texts = tileTexts.mapValues(\.trimmed).filter { !$0.value.isEmpty }
+            self.front = front.trimmed
+            self.context = context.trimmed
+            self.folder = folder
+            self.selectedSource = texts.isEmpty ? nil : selectedSource
+            self.tileTexts = texts
+        }
     }
 
     /// A new card in `folder`, starting on the back source last used in its root.
@@ -49,21 +66,19 @@ final class CardEditorViewModel {
 
     /// An existing card; `fallbackFolder` is used only if the card has lost its folder.
     init(editing card: Card, fallbackFolder: Folder, service: any CardServicing) {
-        let snapshot = Snapshot(
-            front: card.front,
-            context: card.context ?? "",
-            folder: card.folder ?? fallbackFolder,
-            selectedSource: card.source,
-            tileTexts: [card.source: card.back]
-        )
+        let front = card.front
+        let context = card.context ?? ""
+        let folder = card.folder ?? fallbackFolder
+        let source = card.source
+        let tileTexts = [source: card.back]
         mode = .edit(card)
-        front = snapshot.front
-        context = snapshot.context
-        folder = snapshot.folder
-        selectedSource = snapshot.selectedSource
-        tileTexts = snapshot.tileTexts
+        self.front = front
+        self.context = context
+        self.folder = folder
+        selectedSource = source
+        self.tileTexts = tileTexts
         self.service = service
-        initial = snapshot
+        initial = Snapshot(front: front, context: context, folder: folder, selectedSource: source, tileTexts: tileTexts)
     }
 
     /// The text of the selected tile: the back.

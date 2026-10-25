@@ -6,8 +6,8 @@ import Observation
 final class FolderViewModel {
     let folder: Folder
     var isCreatingSubfolder = false
-    var isCreatingCard = false
-    var editingCard: Card?
+    /// The open card editor; built once when it opens, so it never re-reads a card it deleted.
+    var editor: CardEditorViewModel?
     var saveError: String?
     let rowActions: FolderRowActionsModel
     private let service: any CatalogServicing
@@ -20,12 +20,12 @@ final class FolderViewModel {
         rowActions = FolderRowActionsModel(service: service)
     }
 
-    func newCardModel() -> CardEditorViewModel {
-        CardEditorViewModel(adding: folder, service: cardService)
+    func addCard() {
+        editor = CardEditorViewModel(adding: folder, service: cardService)
     }
 
-    func editModel(for card: Card) -> CardEditorViewModel {
-        CardEditorViewModel(editing: card, fallbackFolder: folder, service: cardService)
+    func edit(_ card: Card) {
+        editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: cardService)
     }
 
     /// Swipe to delete in the folder list; no confirmation there (`card-editor.md`).

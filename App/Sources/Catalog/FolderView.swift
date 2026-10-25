@@ -26,7 +26,7 @@ struct FolderView: View {
             if !cards.isEmpty {
                 Section("Cards") {
                     ForEach(cards) { card in
-                        Button { model.editingCard = card } label: {
+                        Button { model.edit(card) } label: {
                             CardRow(card: card)
                         }
                         .foregroundStyle(Color.primary)
@@ -45,7 +45,7 @@ struct FolderView: View {
                 } description: {
                     Text("Add a card or a subfolder.")
                 } actions: {
-                    Button("New Card") { model.isCreatingCard = true }
+                    Button("New Card") { model.addCard() }
                         .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewCard)
                     Button("New Subfolder") { model.isCreatingSubfolder = true }
                         .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewSubfolder)
@@ -58,13 +58,12 @@ struct FolderView: View {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("New Subfolder", systemImage: "folder.badge.plus") { model.isCreatingSubfolder = true }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newSubfolder)
-                Button("New Card", systemImage: "plus") { model.isCreatingCard = true }
+                Button("New Card", systemImage: "plus") { model.addCard() }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newCard)
             }
         }
         .sheet(isPresented: $model.isCreatingSubfolder) { FolderNameSheet(model: model.newSubfolderModel()) }
-        .sheet(isPresented: $model.isCreatingCard) { CardEditorSheet(model: model.newCardModel()) }
-        .sheet(item: $model.editingCard) { CardEditorSheet(model: model.editModel(for: $0)) }
+        .sheet(item: $model.editor) { CardEditorSheet(model: $0) }
         .saveErrorAlert($model.saveError)
         .folderActionsPresentation(model.rowActions)
     }

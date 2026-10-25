@@ -63,6 +63,35 @@ struct CardServiceTests {
         #expect(english.defaultBackSource == .translation)
     }
 
+    // Catches: an edit that only fixes a typo resetting the next card's default tile.
+    @Test("An edit remembers the back source only when it picks another tile")
+    func editRemembersChangedSource() throws {
+        let card = try service.create(draft("kuca", source: .translation, in: words))
+        try service.create(draft("hvala", back: "thanks", source: .synonyms, in: words))
+
+        try service.update(card, with: draft("kuća", source: .translation, in: words))
+        #expect(serbian.defaultBackSource == .synonyms)
+
+        try service.update(card, with: draft("kuća", back: "house", source: .custom, in: words))
+        #expect(serbian.defaultBackSource == .custom)
+    }
+
+    // Catches: deleting the card but leaving its review history behind (or deleting the folder).
+    @Test("Deleting a card deletes its review history, not its folder")
+    func deleteCard() throws {
+        let context = container.mainContext
+        let card = try service.create(draft("kuća", in: words))
+        context.insert(ReviewState(card: card))
+        context.insert(ReviewLog(card: card, rating: 2))
+
+        try service.delete(card)
+
+        #expect(try context.fetchCount(FetchDescriptor<Card>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<ReviewState>()) == 0)
+        #expect(try context.fetchCount(FetchDescriptor<ReviewLog>()) == 0)
+        #expect(words.cards?.isEmpty == true)
+    }
+
     // Catches: an edit that updates the front but leaves a stale front key, or ignores the folder.
     @Test("Editing a card can change its front, back and folder")
     func edit() throws {

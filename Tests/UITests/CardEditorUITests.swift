@@ -39,11 +39,22 @@ final class CardEditorUITests: XCTestCase {
         let custom = app.buttons["cardEditor.tile.custom"]
         XCTAssertTrue(custom.waitForExistence(timeout: 5))
         custom.tap()
+        // The new tile's field gets focus on its own; wait for it rather than tapping it.
+        let focused = expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: back)
+        wait(for: [focused], timeout: 5)
         back.typeText("thank you")
         app.buttons["cardEditor.save"].tap()
 
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         let predicate = NSPredicate(format: "label CONTAINS %@", "thank you")
         XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: predicate, evaluatedWith: row)], timeout: 5), .completed)
+
+        // Delete from the editor.
+        row.tap()
+        let delete = app.buttons["cardEditor.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        delete.tap()
+        app.buttons["cardEditor.confirmDelete"].firstMatch.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["folder.empty"].firstMatch.waitForExistence(timeout: 5))
     }
 }

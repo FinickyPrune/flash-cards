@@ -27,33 +27,29 @@ struct CardService: CardServicing {
         )
         context.insert(card)
         draft.folder.root.lastBackSource = draft.backSource.rawValue
-        try save()
+        try context.saveOrRollback()
         return card
     }
 
+    /// Remembers the back source only when the edit picks another one or moves the card to another
+    /// root folder; fixing a typo in an old card doesn't change the next card's default tile.
     func update(_ card: Card, with draft: CardDraft) throws {
         guard draft.isComplete else { throw CardError.incomplete }
+        let remembers = card.source != draft.backSource || card.folder?.root !== draft.folder.root
         card.setFront(draft.front.trimmed)
         card.back = draft.back.trimmed
         card.backSource = draft.backSource.rawValue
         card.context = draft.context.trimmed.isEmpty ? nil : draft.context.trimmed
         card.folder = draft.folder
         card.updatedAt = .now
-        draft.folder.root.lastBackSource = draft.backSource.rawValue
-        try save()
+        if remembers {
+            draft.folder.root.lastBackSource = draft.backSource.rawValue
+        }
+        try context.saveOrRollback()
     }
 
     func delete(_ card: Card) throws {
         context.delete(card)
-        try save()
-    }
-
-    private func save() throws {
-        do {
-            try context.save()
-        } catch {
-            context.rollback()
-            throw error
-        }
+        try context.saveOrRollback()
     }
 }

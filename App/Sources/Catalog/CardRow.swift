@@ -13,6 +13,5 @@ struct CardRow: View {
                 .lineLimit(2)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(AccessibilityID.Row.card(card.front))
     }
 }

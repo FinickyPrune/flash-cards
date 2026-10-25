@@ -7,9 +7,11 @@ final class HomeViewModel {
     var isCreatingFolder = false
     let rowActions: FolderRowActionsModel
     private let service: any CatalogServicing
+    private let cardService: any CardServicing
 
-    init(service: any CatalogServicing) {
+    init(service: any CatalogServicing, cardService: any CardServicing) {
         self.service = service
+        self.cardService = cardService
         rowActions = FolderRowActionsModel(service: service)
     }
 
@@ -19,6 +21,6 @@ final class HomeViewModel {
 
     /// Every pushed folder screen, at any depth: Home owns the navigation stack.
     func folderModel(for folder: Folder) -> FolderViewModel {
-        FolderViewModel(folder: folder, service: service)
+        FolderViewModel(folder: folder, service: service, cardService: cardService)
     }
 }

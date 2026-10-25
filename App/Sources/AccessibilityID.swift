@@ -6,6 +6,8 @@ enum AccessibilityID {
     }
 
     enum FolderScreen {
+        static let newCard = "folder.newCard"
+        static let emptyNewCard = "folder.emptyNewCard"
         static let newSubfolder = "folder.newSubfolder"
         static let empty = "folder.empty"
         static let emptyNewSubfolder = "folder.emptyNewSubfolder"
@@ -33,6 +35,25 @@ enum AccessibilityID {
         static let save = "folderForm.save"
         static let learningLanguage = "folderForm.learningLanguage"
         static let backLanguage = "folderForm.backLanguage"
+    }
+
+    enum CardEditor {
+        static let front = "cardEditor.front"
+        static let context = "cardEditor.context"
+        static let backText = "cardEditor.backText"
+        static let folder = "cardEditor.folder"
+        static let save = "cardEditor.save"
+        static let saveAnyway = "cardEditor.saveAnyway"
+        static let delete = "cardEditor.delete"
+        static let confirmDelete = "cardEditor.confirmDelete"
+
+        static func tile(_ source: String) -> String {
+            "cardEditor.tile.\(source)"
+        }
+
+        static func folderOption(_ name: String) -> String {
+            "cardEditor.folderOption.\(name)"
+        }
     }
 
     enum LanguagePicker {

@@ -13,22 +13,6 @@ struct MoveFolderSheet: View {
         _model = State(initialValue: model)
     }
 
-    private struct Entry: Identifiable {
-        let folder: Folder
-        let depth: Int
-        var id: PersistentIdentifier {
-            folder.persistentModelID
-        }
-    }
-
-    /// Every folder depth-first, children by name, as the catalog shows them.
-    private var entries: [Entry] {
-        func walk(_ folders: [Folder], depth: Int) -> [Entry] {
-            folders.flatMap { [Entry(folder: $0, depth: depth)] + walk($0.sortedChildren, depth: depth + 1) }
-        }
-        return walk(folders.filter { $0.parent == nil }, depth: 0)
-    }
-
     var body: some View {
         NavigationStack {
             List {
@@ -36,7 +20,7 @@ struct MoveFolderSheet: View {
                     Label("Top Level", systemImage: "list.bullet")
                 }
                 .accessibilityIdentifier(AccessibilityID.Move.topLevel)
-                ForEach(entries) { entry in
+                ForEach(FolderTree.entries(folders)) { entry in
                     destinationButton(to: entry.folder) {
                         Label(entry.folder.name, systemImage: "folder")
                             .padding(.leading, indent * Double(entry.depth))

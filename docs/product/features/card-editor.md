@@ -20,7 +20,7 @@ Status: planned (milestone 1; hints in milestone 4)
 - Duplicate check on save: another card with the same front key in the same root folder →
   warn and ask "Create anyway?". The front key ignores case, diacritics and surrounding
   spaces, and treats any run of spaces inside as one, so `kuća` = `Kuca ` and
-  `ice  cream` = `ice cream`.
+  `ice  cream` = `ice cream`. Letters with a stroke are letters, not diacritics: `đak` ≠ `dak`.
 - When the front came from a token whose lemma differs (`running` → `run`, `saw` → `see`), a
   toggle switches the front between the lemma and the form in the text. The front starts as
   the lemma. Lemma rules: decision 0007. The toggle changes only the front: tiles keep their

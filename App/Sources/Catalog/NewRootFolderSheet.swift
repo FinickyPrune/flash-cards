@@ -5,8 +5,8 @@ struct NewRootFolderSheet: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
-    @State private var learningLanguage = Languages.identifier(for: .current)
-    @State private var backLanguage = Languages.identifier(for: .current)
+    @State private var learningLanguage = Languages.systemLanguage
+    @State private var backLanguage = Languages.systemLanguage
     @State private var saveError: String?
     @FocusState private var isNameFocused: Bool
 

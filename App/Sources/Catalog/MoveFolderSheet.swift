@@ -23,11 +23,7 @@ struct MoveFolderSheet: View {
     /// Every folder depth-first, children by name, as the catalog shows them.
     private var entries: [Entry] {
         func walk(_ folders: [Folder], depth: Int) -> [Entry] {
-            folders.flatMap { folder in
-                let children = (folder.children ?? [])
-                    .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-                return [Entry(folder: folder, depth: depth)] + walk(children, depth: depth + 1)
-            }
+            folders.flatMap { [Entry(folder: $0, depth: depth)] + walk($0.sortedChildren, depth: depth + 1) }
         }
         return walk(folders.filter { $0.parent == nil }, depth: 0)
     }

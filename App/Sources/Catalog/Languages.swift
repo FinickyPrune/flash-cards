@@ -10,6 +10,18 @@ enum Languages {
         let name: String
     }
 
+    /// The device's first preferred language. `Locale.current` would follow the app's own
+    /// localization instead, which isn't the user's language when the app lacks theirs.
+    static var systemLanguage: String {
+        identifier(for: Locale(identifier: Locale.preferredLanguages.first ?? "en"))
+    }
+
+    /// `all()` off the main actor: it builds several hundred locales (~20 ms).
+    @concurrent
+    static func loadAll() async -> [Option] {
+        all()
+    }
+
     static func all(displayedIn displayLocale: Locale = .current) -> [Option] {
         let ids = Set(Locale.availableIdentifiers.map { identifier(for: Locale(identifier: $0)) })
         return ids
@@ -17,13 +29,13 @@ enum Languages {
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
 
-    /// The language of `locale` as a stored tag; with `.current` it is the default for both sides of a pair.
+    /// The language of `locale` as a stored tag. Not `minimalIdentifier`: for a non-default script
+    /// it puts a region back (`zh-Hant` → `zh-TW`).
     static func identifier(for locale: Locale) -> String {
-        Locale.Language(
-            languageCode: locale.language.languageCode,
-            script: locale.language.script,
-            region: nil
-        ).minimalIdentifier
+        guard let code = locale.language.languageCode else { return "und" }
+        guard let script = locale.language.script else { return code.identifier }
+        let likely = Locale.Language(identifier: Locale.Language(languageCode: code).maximalIdentifier)
+        return script == likely.script ? code.identifier : "\(code.identifier)-\(script.identifier)"
     }
 
     static func name(of identifier: String, displayedIn displayLocale: Locale = .current) -> String {

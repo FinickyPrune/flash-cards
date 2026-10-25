@@ -8,15 +8,9 @@ struct FolderView: View {
     @State private var actions = FolderActions()
     @State private var isCreatingSubfolder = false
 
-    private var subfolders: [Folder] {
-        (folder.children ?? []).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-    }
-
-    private var cards: [Card] {
-        (folder.cards ?? []).sorted { $0.createdAt > $1.createdAt }
-    }
-
     var body: some View {
+        let subfolders = folder.sortedChildren
+        let cards = (folder.cards ?? []).sorted { $0.createdAt > $1.createdAt }
         List {
             if !subfolders.isEmpty {
                 Section("Folders") {
@@ -43,6 +37,7 @@ struct FolderView: View {
                     Text("This folder has no subfolders or cards yet.")
                 } actions: {
                     Button("New Subfolder") { isCreatingSubfolder = true }
+                        .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewSubfolder)
                 }
                 .accessibilityIdentifier(AccessibilityID.FolderScreen.empty)
             }

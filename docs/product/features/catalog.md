@@ -19,12 +19,16 @@ Status: partial (folder tree shipped in milestone 1; progress and Play in milest
 - **New card** on a folder screen opens the card editor in add mode with that folder chosen. (planned, #15)
 
 ## States and edge cases
+- No folders yet: home offers New folder.
 - Empty folder: no subfolders and no cards; offers New subfolder, later New card (#15) and
   screenshot import (milestone 4).
-- Moving a folder under itself or one of its own descendants is not allowed.
+- Moving a folder under itself or one of its own descendants, or to where it already is, is not
+  allowed; those destinations are shown dimmed.
 - Moving a folder to another root folder is allowed; its cards take on the new root's language
   pair. If the pairs differ, a warning is shown before the move.
 - Moving a subfolder to the top level makes it a root folder that keeps the pair it had.
+- A root folder moved under another folder becomes a subfolder: it drops its own pair and last
+  back source and takes the new root's.
 
 ## Not supported
 - Tags.

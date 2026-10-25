@@ -2,11 +2,13 @@
 enum AccessibilityID {
     enum Home {
         static let newFolder = "home.newFolder"
+        static let emptyNewFolder = "home.emptyNewFolder"
     }
 
     enum FolderScreen {
         static let newSubfolder = "folder.newSubfolder"
         static let empty = "folder.empty"
+        static let emptyNewSubfolder = "folder.emptyNewSubfolder"
     }
 
     enum Row {

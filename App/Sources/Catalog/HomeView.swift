@@ -28,6 +28,7 @@ struct HomeView: View {
                         Text("Create a folder to start collecting cards.")
                     } actions: {
                         Button("New Folder") { isCreatingFolder = true }
+                            .accessibilityIdentifier(AccessibilityID.Home.emptyNewFolder)
                     }
                 }
             }

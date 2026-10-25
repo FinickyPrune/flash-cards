@@ -5,10 +5,13 @@ import Testing
 @Suite("Languages")
 struct LanguagesTests {
     // Catches: keeping the region (`en-GB` wouldn't match any option, so nothing is preselected)
-    // or dropping the script (Serbian Latin would collapse into Cyrillic `sr`).
+    // or dropping the script (Serbian Latin would collapse into Cyrillic `sr`), or `minimalIdentifier`
+    // turning a non-default script into a region (`zh-Hant` → `zh-TW`).
     @Test(
         "The system language maps to a stored tag",
-        arguments: [("en_GB", "en"), ("ru_RU", "ru"), ("sr_Latn_RS", "sr-Latn"), ("sr_RS", "sr")]
+        arguments: [
+            ("en_GB", "en"), ("ru_RU", "ru"), ("sr_Latn_RS", "sr-Latn"), ("sr_RS", "sr"), ("zh_Hant_TW", "zh-Hant"),
+        ]
     )
     func identifierForLocale(locale: String, expected: String) {
         #expect(Languages.identifier(for: Locale(identifier: locale)) == expected)

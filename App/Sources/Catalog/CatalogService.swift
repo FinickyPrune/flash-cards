@@ -1,7 +1,8 @@
 import Foundation
 import SwiftData
 
-/// Folder tree changes (`catalog.md` → Rules). Every change is saved right away.
+/// Folder tree changes (`catalog.md` → Rules). Every change is saved right away; a failed save
+/// rolls the context back, so the UI never shows a change that isn't stored.
 @MainActor
 struct CatalogService {
     let context: ModelContext
@@ -14,7 +15,7 @@ struct CatalogService {
             backLanguage: backLanguage
         )
         context.insert(folder)
-        try context.save()
+        try save()
         return folder
     }
 
@@ -22,13 +23,13 @@ struct CatalogService {
     func createSubfolder(name: String, in parent: Folder) throws -> Folder {
         let folder = try Folder(name: validName(name), parent: parent)
         context.insert(folder)
-        try context.save()
+        try save()
         return folder
     }
 
     func rename(_ folder: Folder, to name: String) throws {
         folder.name = try validName(name)
-        try context.save()
+        try save()
     }
 
     /// `destination == nil` means the top level: the folder becomes a root folder.
@@ -63,13 +64,22 @@ struct CatalogService {
             folder.lastBackSource = root.lastBackSource
             folder.parent = nil
         }
-        try context.save()
+        try save()
     }
 
     /// Deletes the folder with its subfolders and cards.
     func delete(_ folder: Folder) throws {
         context.delete(folder)
-        try context.save()
+        try save()
+    }
+
+    private func save() throws {
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
     }
 
     private func validName(_ name: String) throws -> String {

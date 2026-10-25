@@ -4,10 +4,10 @@ import Foundation
 enum LaunchOptions {
     /// `-uitest-reset`: an empty in-memory store instead of the one on disk.
     static var inMemoryStore: Bool {
-        isDebug && ProcessInfo.processInfo.arguments.contains("-uitest-reset")
+        seed || isDebug && ProcessInfo.processInfo.arguments.contains("-uitest-reset")
     }
 
-    /// `-uitest-seed`: add `SampleData` at launch (use with `-uitest-reset`).
+    /// `-uitest-seed`: an in-memory store with `SampleData`, so samples never reach the disk.
     static var seed: Bool {
         isDebug && ProcessInfo.processInfo.arguments.contains("-uitest-seed")
     }

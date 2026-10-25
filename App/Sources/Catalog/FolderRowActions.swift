@@ -13,7 +13,9 @@ extension View {
                 .accessibilityIdentifier(AccessibilityID.FolderAction.delete)
         }
         .swipeActions(edge: .trailing) {
-            Button("Delete", systemImage: "trash", role: .destructive) { actions.deleting = folder }
+            // Not `.destructive`: that role animates the row away before the user confirms.
+            Button("Delete", systemImage: "trash") { actions.deleting = folder }
+                .tint(.red)
             Button("Move", systemImage: "folder") { actions.moving = folder }
         }
         .swipeActions(edge: .leading) {
@@ -54,8 +56,12 @@ private struct FolderActionsPresentation: ViewModifier {
                 titleVisibility: .visible,
                 presenting: actions.deleting
             ) { folder in
-                Button("Delete Folder", role: .destructive) { delete(folder) }
-                    .accessibilityIdentifier(AccessibilityID.FolderAction.confirmDelete)
+                Button("Delete Folder", role: .destructive) {
+                    // Close the dialog first so it never reads the deleted model.
+                    actions.deleting = nil
+                    delete(folder)
+                }
+                .accessibilityIdentifier(AccessibilityID.FolderAction.confirmDelete)
             } message: { _ in
                 Text("Its subfolders and cards will be deleted too. This can't be undone.")
             }

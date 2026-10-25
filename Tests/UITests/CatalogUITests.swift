@@ -17,13 +17,17 @@ final class CatalogUITests: XCTestCase {
         name.typeText("English")
         app.buttons["folderForm.save"].tap()
 
-        app.buttons["row.folder.English"].tap()
+        let english = app.buttons["row.folder.English"]
+        XCTAssertTrue(english.waitForExistence(timeout: 5))
+        english.tap()
         app.buttons["folder.newSubfolder"].tap()
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.typeText("Season 1")
         app.buttons["folderForm.save"].tap()
 
-        app.buttons["row.folder.Season 1"].press(forDuration: 1)
+        let season = app.buttons["row.folder.Season 1"]
+        XCTAssertTrue(season.waitForExistence(timeout: 5))
+        season.press(forDuration: 1)
         app.buttons["folderAction.rename"].tap()
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Season 1".count) + "Pilot")

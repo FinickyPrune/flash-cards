@@ -35,7 +35,7 @@ struct LanguagePicker: View {
             }
             .searchable(text: $query)
             .navigationTitle(title)
-            .onAppear { options = Languages.all() }
+            .task { options = await Languages.loadAll() }
             .onChange(of: options) { proxy.scrollTo(selection, anchor: .center) }
         }
     }

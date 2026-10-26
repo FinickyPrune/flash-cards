@@ -15,7 +15,7 @@ struct CatalogService: CatalogServicing {
             backLanguage: backLanguage
         )
         context.insert(folder)
-        try save()
+        try context.saveOrRollback()
         return folder
     }
 
@@ -23,13 +23,13 @@ struct CatalogService: CatalogServicing {
     func createSubfolder(name: String, in parent: Folder) throws -> Folder {
         let folder = try Folder(name: validName(name), parent: parent)
         context.insert(folder)
-        try save()
+        try context.saveOrRollback()
         return folder
     }
 
     func rename(_ folder: Folder, to name: String) throws {
         folder.name = try validName(name)
-        try save()
+        try context.saveOrRollback()
     }
 
     /// `destination == nil` means the top level: the folder becomes a root folder.
@@ -64,22 +64,13 @@ struct CatalogService: CatalogServicing {
             folder.lastBackSource = root.lastBackSource
             folder.parent = nil
         }
-        try save()
+        try context.saveOrRollback()
     }
 
     /// Deletes the folder with its subfolders and cards.
     func delete(_ folder: Folder) throws {
         context.delete(folder)
-        try save()
-    }
-
-    private func save() throws {
-        do {
-            try context.save()
-        } catch {
-            context.rollback()
-            throw error
-        }
+        try context.saveOrRollback()
     }
 
     private func validName(_ name: String) throws -> String {

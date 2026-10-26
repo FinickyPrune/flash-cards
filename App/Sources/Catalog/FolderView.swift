@@ -25,7 +25,16 @@ struct FolderView: View {
             }
             if !cards.isEmpty {
                 Section("Cards") {
-                    ForEach(cards) { CardRow(card: $0) }
+                    ForEach(cards) { card in
+                        Button { model.edit(card) } label: {
+                            CardRow(card: card)
+                        }
+                        .foregroundStyle(Color.primary)
+                        .swipeActions {
+                            Button("Delete", systemImage: "trash", role: .destructive) { model.deleteCard(card) }
+                        }
+                        .accessibilityIdentifier(AccessibilityID.Row.card(card.front))
+                    }
                 }
             }
         }
@@ -34,8 +43,10 @@ struct FolderView: View {
                 ContentUnavailableView {
                     Label("Empty Folder", systemImage: "folder")
                 } description: {
-                    Text("This folder has no subfolders or cards yet.")
+                    Text("Add a card or a subfolder.")
                 } actions: {
+                    Button("New Card") { model.addCard() }
+                        .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewCard)
                     Button("New Subfolder") { model.isCreatingSubfolder = true }
                         .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewSubfolder)
                 }
@@ -44,12 +55,16 @@ struct FolderView: View {
         }
         .navigationTitle(model.folder.name)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
                 Button("New Subfolder", systemImage: "folder.badge.plus") { model.isCreatingSubfolder = true }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newSubfolder)
+                Button("New Card", systemImage: "plus") { model.addCard() }
+                    .accessibilityIdentifier(AccessibilityID.FolderScreen.newCard)
             }
         }
         .sheet(isPresented: $model.isCreatingSubfolder) { FolderNameSheet(model: model.newSubfolderModel()) }
+        .sheet(item: $model.editor) { CardEditorSheet(model: $0) }
+        .saveErrorAlert($model.saveError)
         .folderActionsPresentation(model.rowActions)
     }
 }

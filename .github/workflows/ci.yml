@@ -31,7 +31,8 @@ jobs:
       - name: Show toolchain
         run: |
           xcodebuild -version
-          echo "Simulator: $(scripts/sim.sh)"
+          udid=$(scripts/sim.sh)
+          echo "Simulator: $(xcrun simctl list devices | grep "$udid" | sed -E 's/ *\(Booted\)| *\(Shutdown\)//') on $(xcrun simctl list runtimes | grep iOS | tail -1)"
       - name: Unit tests
         run: make test
       - name: UI tests

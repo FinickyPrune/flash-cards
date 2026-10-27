@@ -31,7 +31,7 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Lapse | Again on a card that was answered right before; its interval starts over. | `lapses` | — |
 | Learned card | A card whose forward interval is at least 21 days; counted in folder progress. | `isLearned` | Выучено |
 | New card | A card never reviewed. | `isNew` | — |
-| Practice | Playing random cards of a subtree when nothing is due or new; doesn't change the schedule. | `isPractice` | Практика |
+| Practice | Playing random cards of a subtree when nothing is due or new; doesn't change the schedule. | `isPractice`; `ReviewLog.kind` = `practice` | Практика |
 | Direction | Forward = front → back (MVP). Reverse = back → front (later). | `direction`: `forward` / `reverse` | — |
 | Review state | Scheduling state of one card in one direction. | `ReviewState` | — |
 | Review log | Every rating ever given, kept to recompute schedules (e.g. for FSRS). | `ReviewLog` | — |

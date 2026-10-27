@@ -44,6 +44,8 @@ PhotosUI (`PhotosPicker`), StoreKit 2 (tip jar only).
 
 ## Invariants
 - No network calls except StoreKit (vision principle 1).
+- Schema versions: shipped schemas are frozen in `SchemaVn` and migrated by `AppMigrationPlan`;
+  `Tests/UnitTests/Model/Fixtures` keeps a store written by each shipped version, and a test opens it.
 - CloudKit-compatible model (decision 0001): every property has a default or is optional,
   every relationship is optional, no `@Attribute(.unique)`, no `.deny` delete rule. Uniqueness
   (duplicates) is enforced in code. Container is local: `cloudKitDatabase: .none`.
@@ -91,4 +93,5 @@ ReviewLog                    // every rating; lets us recompute history for FSRS
   direction: String
   rating: Int                // 0 again, 1 hard, 2 good, 3 easy
   reviewedAt: Date
+  kind: String               // "review" | "practice" (schema V2); practice never changed a schedule
 ```

@@ -38,8 +38,19 @@ struct ReviewServiceTests {
         container.mainContext.insert(root)
     }
 
-    private func card(_ front: String, in folder: Folder, state: SchedulingState? = nil) -> Card {
-        let card = Card(front: front, back: "x", backSource: "custom", folder: folder)
+    private func card(
+        _ front: String,
+        in folder: Folder,
+        createdDay: Int = 1,
+        state: SchedulingState? = nil
+    ) -> Card {
+        let card = Card(
+            front: front,
+            back: "x",
+            backSource: "custom",
+            folder: folder,
+            createdAt: Self.date(createdDay, 0)
+        )
         context.insert(card)
         if let state {
             let reviewState = ReviewState(card: card)
@@ -90,21 +101,22 @@ struct ReviewServiceTests {
         #expect(try logs() == ["0 \(expectedKind) forward @ now"])
     }
 
-    // Catches: reviewing only the folder's own cards, including a sibling's, or ignoring stored
-    // schedules (a card due next week would then count as new).
-    @Test("Build reviews the whole subtree with each card's schedule")
+    // Catches: reviewing only the folder's own cards, including a sibling's, ignoring stored
+    // schedules (a card due next week would then count as new), or passing the wrong creation
+    // date (new cards go oldest first). Practice takes the same subtree, due or not.
+    @Test("Build and practice use the whole subtree with each card's schedule")
     func buildSubtree() throws {
         let child = Folder(name: "Show", parent: root)
         let grandchild = Folder(name: "Season", parent: child)
         let sibling = Folder(name: "Other", parent: root)
-        let own = card("one", in: child)
-        let deep = card("two", in: grandchild)
+        let own = card("one", in: child, createdDay: 2)
+        let deep = card("two", in: grandchild, createdDay: 1)
         let overdue = card(
             "three",
             in: grandchild,
             state: SchedulingState(repetitions: 1, intervalDays: 1, dueDate: Self.date(1, 4))
         )
-        _ = card(
+        let later = card(
             "later",
             in: grandchild,
             state: SchedulingState(repetitions: 1, intervalDays: 6, dueDate: Self.date(7, 4))
@@ -112,12 +124,8 @@ struct ReviewServiceTests {
         _ = card("elsewhere", in: sibling)
         try context.save()
 
-        guard case let .session(ids) = service.build(for: child) else {
-            Issue.record("Expected a session")
-            return
-        }
-        // Due first; the new ones are ordered by creation time, which is equal here.
-        #expect(ids.first == overdue.id)
-        #expect(Set(ids) == [own.id, deep.id, overdue.id])
+        // Due first, then new cards oldest first; the card due next week waits.
+        #expect(service.build(for: child) == .session([overdue.id, deep.id, own.id]))
+        #expect(Set(service.practice(for: child)) == [own.id, deep.id, overdue.id, later.id])
     }
 }

@@ -3,7 +3,8 @@ import Foundation
 import Mockable
 
 /// Picks a folder's cards for review and records ratings; `ReviewService` saves them with
-/// SwiftData. The review screen depends on this.
+/// SwiftData. The review screen depends on this and resolves the returned card ids through
+/// `Folder.subtreeCards`.
 @Mockable
 @MainActor
 protocol ReviewServicing {

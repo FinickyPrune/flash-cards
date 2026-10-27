@@ -9,7 +9,7 @@ enum AppModelContainer {
     static let schema = Schema(versionedSchema: SchemaV2.self)
 
     /// `inMemory` is for tests and previews; `url` lets migration tests open a store file of
-    /// their own (default: the app's store).
+    /// their own (default: the app's store). A `url` wins over `inMemory`.
     static func make(inMemory: Bool = false, url: URL? = nil) throws -> ModelContainer {
         let configuration = if let url {
             ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)

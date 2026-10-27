@@ -13,7 +13,9 @@ struct MigrationTests {
     // English > Season 1 > card "run" (back "бежать", context "Run!", screenshot [1, 2, 3]),
     // a review state of 6 days and two ratings, Good and Easy.
     // Catches: a frozen V1 copy that no longer matches real version 1 stores (they would fail to
-    // open), a broken migration plan, or `kind` without a default for old rows.
+    // open), a migration stage that breaks the data, or `kind` without a default for old rows.
+    // Not caught: a missing stage, since SwiftData infers lightweight ones. Not covered: external
+    // blob files; the fixture's screenshot is small enough to be stored inline.
     @Test("A store written by version 1 opens with the current schema and keeps its data")
     func fromV1() throws {
         let fixture = try #require(Bundle(for: BundleToken.self).url(forResource: "store-v1", withExtension: "sqlite"))

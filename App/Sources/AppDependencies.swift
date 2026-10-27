@@ -5,16 +5,16 @@ import SwiftData
 /// (`docs/architecture.md` → Layers).
 @MainActor
 struct AppDependencies {
-    let catalog: any CatalogServicing
-    let cards: any CardServicing
-    let review: any ReviewServicing
+    let catalogService: any CatalogServicing
+    let cardService: any CardServicing
+    let reviewService: any ReviewServicing
 
     /// The real services, all on one context.
     static func live(context: ModelContext) -> AppDependencies {
         AppDependencies(
-            catalog: CatalogService(context: context),
-            cards: CardService(context: context),
-            review: ReviewService(context: context)
+            catalogService: CatalogService(context: context),
+            cardService: CardService(context: context),
+            reviewService: ReviewService(context: context)
         )
     }
 }

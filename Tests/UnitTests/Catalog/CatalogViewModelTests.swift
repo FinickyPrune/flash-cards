@@ -42,9 +42,9 @@ struct CatalogViewModelTests {
         let season = folder("Season 1")
         given(service).delete(.any).willReturn()
         let actions = FolderRowActionsModel(dependencies: AppDependencies(
-            catalog: service,
-            cards: MockCardServicing(),
-            review: MockReviewServicing()
+            catalogService: service,
+            cardService: MockCardServicing(),
+            reviewService: MockReviewServicing()
         ))
         actions.deleting = season
 

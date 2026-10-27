@@ -18,17 +18,17 @@ final class FolderRowActionsModel {
 
     /// Starts the session before presenting, so the cover never slides up empty.
     func play(_ folder: Folder) {
-        let model = ReviewViewModel(folder: folder, service: dependencies.review)
+        let model = ReviewViewModel(folder: folder, service: dependencies.reviewService)
         model.start()
         review = model
     }
 
     func renameModel(for folder: Folder) -> FolderNameViewModel {
-        FolderNameViewModel(mode: .rename(folder), service: dependencies.catalog)
+        FolderNameViewModel(mode: .rename(folder), service: dependencies.catalogService)
     }
 
     func moveModel(for folder: Folder) -> MoveFolderViewModel {
-        MoveFolderViewModel(folder: folder, service: dependencies.catalog)
+        MoveFolderViewModel(folder: folder, service: dependencies.catalogService)
     }
 
     /// Deletes `folder` after the user confirmed. Clears `deleting` first so the dialog never reads
@@ -36,7 +36,7 @@ final class FolderRowActionsModel {
     func confirmDelete(_ folder: Folder) {
         deleting = nil
         do {
-            try dependencies.catalog.delete(folder)
+            try dependencies.catalogService.delete(folder)
         } catch {
             saveError = error.localizedDescription
         }

@@ -20,23 +20,23 @@ final class FolderViewModel {
     }
 
     func addCard() {
-        editor = CardEditorViewModel(adding: folder, service: dependencies.cards)
+        editor = CardEditorViewModel(adding: folder, service: dependencies.cardService)
     }
 
     func edit(_ card: Card) {
-        editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: dependencies.cards)
+        editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: dependencies.cardService)
     }
 
     /// Swipe to delete in the folder list; no confirmation there (`card-editor.md`).
     func deleteCard(_ card: Card) {
         do {
-            try dependencies.cards.delete(card)
+            try dependencies.cardService.delete(card)
         } catch {
             saveError = error.localizedDescription
         }
     }
 
     func newSubfolderModel() -> FolderNameViewModel {
-        FolderNameViewModel(mode: .newSubfolder(in: folder), service: dependencies.catalog)
+        FolderNameViewModel(mode: .newSubfolder(in: folder), service: dependencies.catalogService)
     }
 }

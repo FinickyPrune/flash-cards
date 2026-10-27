@@ -24,6 +24,8 @@ jobs:
     timeout-minutes: 30
     env:
       XCBEAUTIFY_FLAGS: --quiet --is-ci --renderer github-actions
+      # The runner image has no iOS 26 runtime: test on the same device, on its newest iOS (#38).
+      SIM_OS: ""
     steps:
       - uses: actions/checkout@v4
       - name: Install tools

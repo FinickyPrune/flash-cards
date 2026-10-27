@@ -43,5 +43,5 @@ When in doubt, flag it. Otherwise check "None of the above" and merge with `scri
 
 ## Gotchas
 - Hooks in `.claude/settings.json` auto-format and lint every Swift edit and block unsafe git commands. If a hook blocks you, fix the cause; don't work around it.
-- Simulator is picked by `scripts/sim.sh`: iPhone 17 on the newest iOS 26 runtime (lighter than the newest device and runtime), same locally and on CI; created if missing. `SIM_NAME="iPhone Duo" SIM_OS=` to override (e.g. to check a short screen; `SIM_OS=` allows any iOS).
+- Simulator is picked by `scripts/sim.sh`: iPhone 17, created if missing. Locally on the newest iOS 26 runtime (lighter on the Mac); CI has no iOS 26 and uses its newest iOS (`SIM_OS=`). A UI test failing only on CI: reproduce with `SIM_OS= make test-ui ONLY=…`. `SIM_NAME="iPhone Duo" SIM_OS=` to check a short screen.
 - SourceKit diagnostics in the editor may show false "No such module" errors; trust `make build`.

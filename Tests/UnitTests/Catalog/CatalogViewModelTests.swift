@@ -41,7 +41,11 @@ struct CatalogViewModelTests {
     func confirmDelete() {
         let season = folder("Season 1")
         given(service).delete(.any).willReturn()
-        let actions = FolderRowActionsModel(service: service, reviewService: MockReviewServicing())
+        let actions = FolderRowActionsModel(dependencies: AppDependencies(
+            catalog: service,
+            cards: MockCardServicing(),
+            review: MockReviewServicing()
+        ))
         actions.deleting = season
 
         actions.confirmDelete(season)

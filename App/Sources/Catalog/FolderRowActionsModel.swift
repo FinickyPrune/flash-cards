@@ -10,27 +10,25 @@ final class FolderRowActionsModel {
     var saveError: String?
     /// The open review; built and started once when Play is tapped.
     var review: ReviewViewModel?
-    private let service: any CatalogServicing
-    private let reviewService: any ReviewServicing
+    private let dependencies: AppDependencies
 
-    init(service: any CatalogServicing, reviewService: any ReviewServicing) {
-        self.service = service
-        self.reviewService = reviewService
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
     }
 
     /// Starts the session before presenting, so the cover never slides up empty.
     func play(_ folder: Folder) {
-        let model = ReviewViewModel(folder: folder, service: reviewService)
+        let model = ReviewViewModel(folder: folder, service: dependencies.review)
         model.start()
         review = model
     }
 
     func renameModel(for folder: Folder) -> FolderNameViewModel {
-        FolderNameViewModel(mode: .rename(folder), service: service)
+        FolderNameViewModel(mode: .rename(folder), service: dependencies.catalog)
     }
 
     func moveModel(for folder: Folder) -> MoveFolderViewModel {
-        MoveFolderViewModel(folder: folder, service: service)
+        MoveFolderViewModel(folder: folder, service: dependencies.catalog)
     }
 
     /// Deletes `folder` after the user confirmed. Clears `deleting` first so the dialog never reads
@@ -38,7 +36,7 @@ final class FolderRowActionsModel {
     func confirmDelete(_ folder: Folder) {
         deleting = nil
         do {
-            try service.delete(folder)
+            try dependencies.catalog.delete(folder)
         } catch {
             saveError = error.localizedDescription
         }

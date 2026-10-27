@@ -16,9 +16,15 @@ View → `@Observable` view model → services → SwiftData.
 - Every change goes through the screen's view model, which calls a service protocol
   (`@Mockable`, e.g. `CatalogServicing`). The service owns the rules and the save; view models
   own form state, presentation state and error messages.
-- A parent's view model creates its children's and passes the service down: a presenter builds
+- A parent's view model creates its children's and passes the services down: a presenter builds
   its sheets' view models, the view model of the screen that owns a `NavigationStack` builds every
-  pushed screen's. The app builds the first one, once, with the real service.
+  pushed screen's.
+- Services travel in one `AppDependencies` struct, passed through `init` (never the SwiftUI
+  environment). `FlashCardsApp` is the composition root: it builds `AppDependencies.live(context:)`
+  once and hands it to the first view model; previews use the same factory. Presenters (view
+  models that build other view models) take `AppDependencies` whole; leaf view models take only
+  the one service they use, so their `init` shows what they touch and a test needs one mock.
+  A new service is added to `AppDependencies` and `live`, then read by the presenter that needs it.
 - A view model's `init` is cheap and has no side effects: SwiftUI may build and drop it on any
   parent render. Start work (fetching, lookups) from `.task`.
 Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only

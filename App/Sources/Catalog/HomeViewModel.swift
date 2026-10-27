@@ -6,23 +6,19 @@ import Observation
 final class HomeViewModel {
     var isCreatingFolder = false
     let rowActions: FolderRowActionsModel
-    private let service: any CatalogServicing
-    private let cardService: any CardServicing
-    private let reviewService: any ReviewServicing
+    private let dependencies: AppDependencies
 
-    init(service: any CatalogServicing, cardService: any CardServicing, reviewService: any ReviewServicing) {
-        self.service = service
-        self.cardService = cardService
-        self.reviewService = reviewService
-        rowActions = FolderRowActionsModel(service: service, reviewService: reviewService)
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+        rowActions = FolderRowActionsModel(dependencies: dependencies)
     }
 
     func newRootFolderModel() -> NewRootFolderViewModel {
-        NewRootFolderViewModel(service: service)
+        NewRootFolderViewModel(service: dependencies.catalog)
     }
 
     /// Every pushed folder screen, at any depth: Home owns the navigation stack.
     func folderModel(for folder: Folder) -> FolderViewModel {
-        FolderViewModel(folder: folder, service: service, cardService: cardService, reviewService: reviewService)
+        FolderViewModel(folder: folder, dependencies: dependencies)
     }
 }

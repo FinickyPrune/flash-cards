@@ -11,39 +11,32 @@ final class FolderViewModel {
     var editor: CardEditorViewModel?
     var saveError: String?
     let rowActions: FolderRowActionsModel
-    private let service: any CatalogServicing
-    private let cardService: any CardServicing
+    private let dependencies: AppDependencies
 
-    init(
-        folder: Folder,
-        service: any CatalogServicing,
-        cardService: any CardServicing,
-        reviewService: any ReviewServicing
-    ) {
+    init(folder: Folder, dependencies: AppDependencies) {
         self.folder = folder
-        self.service = service
-        self.cardService = cardService
-        rowActions = FolderRowActionsModel(service: service, reviewService: reviewService)
+        self.dependencies = dependencies
+        rowActions = FolderRowActionsModel(dependencies: dependencies)
     }
 
     func addCard() {
-        editor = CardEditorViewModel(adding: folder, service: cardService)
+        editor = CardEditorViewModel(adding: folder, service: dependencies.cards)
     }
 
     func edit(_ card: Card) {
-        editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: cardService)
+        editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: dependencies.cards)
     }
 
     /// Swipe to delete in the folder list; no confirmation there (`card-editor.md`).
     func deleteCard(_ card: Card) {
         do {
-            try cardService.delete(card)
+            try dependencies.cards.delete(card)
         } catch {
             saveError = error.localizedDescription
         }
     }
 
     func newSubfolderModel() -> FolderNameViewModel {
-        FolderNameViewModel(mode: .newSubfolder(in: folder), service: service)
+        FolderNameViewModel(mode: .newSubfolder(in: folder), service: dependencies.catalog)
     }
 }

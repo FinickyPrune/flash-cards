@@ -17,16 +17,26 @@ enum SampleData {
             (season, [("chemistry", "химия"), ("cook", "варить, готовить"), ("ice cream", "мороженое")]),
             (serbian, [("kuća", "дом"), ("hvala", "спасибо")]),
         ]
+        // Forward intervals of reviewed cards; 21 days and up counts as learned.
+        let intervals: [String: Double] = ["reckon": 30, "chemistry": 25, "cook": 6]
         var createdAt = Date(timeIntervalSince1970: 1_790_000_000)
         for (folder, words) in cards {
             for (front, back) in words {
-                context.insert(Card(
+                let card = Card(
                     front: front,
                     back: back,
                     backSource: "translation",
                     folder: folder,
                     createdAt: createdAt
-                ))
+                )
+                context.insert(card)
+                if let interval = intervals[front] {
+                    let state = ReviewState(card: card)
+                    state.intervalDays = interval
+                    state.repetitions = 3
+                    state.dueDate = createdAt.addingTimeInterval(interval * 86400)
+                    context.insert(state)
+                }
                 createdAt += 60
             }
         }

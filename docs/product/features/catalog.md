@@ -1,6 +1,6 @@
 # Catalog
 A tree of folders holding cards; every folder shows progress and can start a review of its subtree.
-Status: partial (folder tree shipped in milestone 1; progress and Play in milestone 2)
+Status: partial (folder tree shipped in milestone 1, progress in milestone 2; Play planned)
 
 ## Rules
 - Folders nest to any depth. Design and test the UI at 2–3 levels.
@@ -14,7 +14,9 @@ Status: partial (folder tree shipped in milestone 1; progress and Play in milest
 - Home lists the root folders by name, each with its language pair.
 - A folder screen lists its subfolders by name, then its cards newest first; a card row shows
   the front and the back. (#14)
-- Each folder row shows progress: learned cards / all cards in its subtree. (planned)
+- Each folder row (home and folder screens) shows progress: learned cards / all cards in its
+  subtree, e.g. `12 / 40`, in grey on the right. A learned card is defined in `review.md`.
+  A folder whose subtree has no cards shows no progress. (#29)
 - **Play** is available on every folder and reviews the folder's subtree (see `review.md`). (planned)
 - **New card** on a folder screen opens the card editor in add mode with that folder chosen;
   tapping a card opens it in edit mode. (#15)

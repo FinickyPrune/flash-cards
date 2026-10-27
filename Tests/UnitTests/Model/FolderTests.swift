@@ -46,6 +46,41 @@ struct FolderTests {
         #expect(try context.fetch(FetchDescriptor<ReviewLog>()).map(\.card?.front) == ["kuća"])
     }
 
+    // Catches: counting only the folder's own cards, counting a sibling's, an off-by-one or
+    // rounding at 21 days, reading the reverse direction, or progress cached past a lapse.
+    @Test("Progress counts learned cards over all cards in the subtree")
+    func progress() throws {
+        let root = Folder(name: "Root", learningLanguage: "en", backLanguage: "ru")
+        let child = Folder(name: "Child", parent: root)
+        let grandchild = Folder(name: "Grandchild", parent: child)
+        let sibling = Folder(name: "Sibling", parent: root)
+        context.insert(root)
+        func card(in folder: Folder, interval: Double?, direction: String = "forward") -> Card {
+            let card = Card(front: "w", back: "x", backSource: "custom", folder: folder)
+            context.insert(card)
+            if let interval {
+                let state = ReviewState(card: card, direction: direction)
+                state.intervalDays = interval
+                context.insert(state)
+            }
+            return card
+        }
+        let learned = card(in: child, interval: 21)
+        // Just under 21 days: rounding the stored interval would wrongly count it.
+        _ = card(in: grandchild, interval: 20.5)
+        _ = card(in: grandchild, interval: nil)
+        _ = card(in: grandchild, interval: 30, direction: "reverse")
+        _ = card(in: sibling, interval: 40)
+        try context.save()
+
+        #expect(child.progress == FolderProgress(learned: 1, total: 4))
+        #expect(root.progress == FolderProgress(learned: 2, total: 5))
+
+        // A lapse resets the interval to 1 day.
+        learned.forwardReviewState?.intervalDays = 1
+        #expect(child.progress == FolderProgress(learned: 0, total: 4))
+    }
+
     // Catches: resolving from the direct parent only, or reading the subfolder's own (empty) fields.
     @Test("A subfolder at any depth reports its root folder's language pair")
     func subfolderLanguagePair() {

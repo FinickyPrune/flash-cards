@@ -10,7 +10,7 @@ Formats and update rules: `product-docs` skill. Actionable work: GitHub Issues.
 - [../architecture.md](../architecture.md): targets, layers, invariants, initial data model (engineering).
 
 ## Features
-Catalog's folder tree and the card editor for manual cards are shipped; everything else is planned.
+Catalog's folder tree with progress and the card editor for manual cards are shipped; everything else is planned.
 - [catalog.md](features/catalog.md): folder tree, progress, Play on any folder.
 - [card-editor.md](features/card-editor.md): add/edit screen, four back tiles, folder chip, duplicate check.
 - [review.md](features/review.md): review flow, four ratings, session queue, summary.

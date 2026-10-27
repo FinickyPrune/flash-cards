@@ -51,8 +51,10 @@ struct DeckStoreTests {
 |---|---|
 | All unit tests | `make test` |
 | One suite / test | `make test ONLY=FlashCardsTests/DeckStoreTests` or `.../DeckStoreTests/addCard()` |
-| UI tests | `make test-ui` |
-| Everything + lint (pre-PR gate) | `make check` |
+| UI tests of one class (pre-PR, touched screens) | `make test-ui ONLY=FlashCardsUITests/ReviewUITests` |
+| All UI tests | `make test-ui` (CI runs it on every PR; locally only when needed) |
+| Everything CI runs | `make check` |
+| PR screenshots | `make screenshots` (`run-ios-app`) |
 | Coverage per function | see `pragmatic-testing` → "In this repo" |
 
 `make` exits non-zero when a test fails. Output is filtered by xcbeautify to errors and test
@@ -61,7 +63,8 @@ results. If a failure isn't clear from it, inspect the result bundle:
 xcrun xcresulttool get test-results summary --path build/results/unit.xcresult
 xcrun xcresulttool get test-results tests --path build/results/unit.xcresult
 ```
-For a UI test failure, `build/results/ui.xcresult` also holds the failure screenshot:
+UI runs capture screenshots, not a screen recording, and keep them only for failing tests
+(`project.yml` → scheme test options). For a UI test failure, `build/results/ui.xcresult` holds them:
 `xcrun xcresulttool export attachments --path build/results/ui.xcresult --output-path build/results/attachments`.
 
 ## Rules

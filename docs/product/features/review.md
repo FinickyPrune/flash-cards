@@ -23,19 +23,26 @@ Status: planned (milestone 2)
     a new one.
   - Ease never drops below 1.3; intervals never exceed 365 days (at the cap Hard, Good and
     Easy all give 365); no random spread.
-- Session queue: due cards first, then new cards; at most **20** cards in total (one constant).
-- A card rated Again comes back later in the same session, after a few other cards (exact gap set
-  when the session builder is built).
-- No due cards → the user can still play: **20** random cards from the subtree. These
-  ratings go to the review log but don't change the schedule.
+- Session queue: due cards first, most overdue first; then new cards, oldest first; at most
+  **20** cards in total (one constant). No shuffling. No daily limit on new cards: Play again
+  gives the next 20. (#26)
+- A card rated Again comes back after **3** other cards (at the end if fewer remain), at most
+  **2** times per session; Again on its third showing just moves on. (#26)
+- Only a card's **first** rating in a session changes its schedule; later ratings of it are
+  only logged. (#26)
+- **Practice**: only when the subtree has cards but none due and none new. Play then shows
+  "All caught up" with the next due date and offers **20** random cards from the subtree
+  (all of them if fewer). Practice ratings go to the review log but don't change the schedule.
 - Every rating is written to the review log.
-- Session summary: number of cards reviewed, and how many were rated Good or Easy.
+- Session summary: distinct cards reviewed, and how many of them were rated Good or Easy on
+  their first rating. (#26)
+- The "3 / 20" counter counts distinct cards; a card coming back doesn't advance it. (#26)
 - A card counts as **learned** for folder progress when its forward interval is ≥ **21 days**.
   A lapse that resets the interval makes it not learned again.
 
 ## States and edge cases
 - Empty subtree: Play shows that there is nothing to review.
-- A card rated Again several times in one session: (to be defined, e.g. at most N returns)
+- Nothing due or new, but cards exist: "All caught up", next due date, Practice.
 
 ## Not supported
 - Reverse direction (back → front) in the UI. The model and session builder allow it.

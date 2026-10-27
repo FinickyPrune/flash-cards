@@ -1,3 +1,4 @@
+import FlashCore
 import Foundation
 import SwiftData
 
@@ -16,5 +17,16 @@ final class ReviewState {
     init(card: Card, direction: String = "forward") {
         self.card = card
         self.direction = direction
+    }
+
+    /// The stored fields as the scheduler sees them; the scheduler works in whole days.
+    var schedulingState: SchedulingState {
+        SchedulingState(
+            repetitions: repetitions,
+            intervalDays: Int(intervalDays.rounded()),
+            ease: ease,
+            lapses: lapses,
+            dueDate: dueDate
+        )
     }
 }

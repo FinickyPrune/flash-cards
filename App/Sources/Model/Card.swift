@@ -48,6 +48,16 @@ final class Card {
         BackSource(rawValue: backSource) ?? .custom
     }
 
+    /// `nil` until the card is first rated.
+    var forwardReviewState: ReviewState? {
+        reviewStates?.first { $0.direction == "forward" }
+    }
+
+    /// Counted as learned in folder progress (`review.md`).
+    var isLearned: Bool {
+        forwardReviewState?.schedulingState.isLearned ?? false
+    }
+
     func setFront(_ front: String) {
         self.front = front
         frontKey = FrontKey.make(from: front)

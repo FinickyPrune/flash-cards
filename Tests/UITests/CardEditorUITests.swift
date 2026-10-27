@@ -18,6 +18,8 @@ final class CardEditorUITests: XCTestCase {
         app.buttons["folderForm.save"].tap()
         let folder = app.buttons["row.folder.Serbian"]
         XCTAssertTrue(folder.waitForExistence(timeout: 5))
+        // No cards yet: the row shows no progress.
+        XCTAssertFalse(folder.label.contains("/"))
         folder.tap()
 
         app.buttons["folder.newCard"].tap()
@@ -34,6 +36,13 @@ final class CardEditorUITests: XCTestCase {
         let row = app.buttons["row.card.hvala"]
         XCTAssertTrue(row.waitForExistence(timeout: 5))
         XCTAssertTrue(row.label.contains("thanks"))
+
+        // Back home, the folder row now shows its progress.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let progress = NSPredicate(format: "label CONTAINS %@", "0 / 1")
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: progress, evaluatedWith: folder)], timeout: 5), .completed)
+        folder.tap()
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
 
         // Edit: switch the back to the Custom text tile.
         row.tap()

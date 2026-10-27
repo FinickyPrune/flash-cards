@@ -54,6 +54,17 @@ final class Folder {
         root.lastBackSource.flatMap(BackSource.init(rawValue:)) ?? .translation
     }
 
+    /// Cards in this folder and in all its subfolders.
+    var subtreeCards: [Card] {
+        (cards ?? []) + (children ?? []).flatMap(\.subtreeCards)
+    }
+
+    /// Walks the subtree on every call; fine at MVP catalog sizes.
+    var progress: FolderProgress {
+        let cards = subtreeCards
+        return FolderProgress(learned: cards.count(where: \.isLearned), total: cards.count)
+    }
+
     var resolvedLearningLanguage: String? {
         root.learningLanguage
     }

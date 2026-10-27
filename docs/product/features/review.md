@@ -45,7 +45,7 @@ Status: shipped (milestone 2)
 - Session summary: distinct cards reviewed, and how many of them were rated Good or Easy on
   their first rating. (#26) It offers **Done** and, when Play on the folder would now give a new
   session (due or new cards remain, e.g. cards rated Again), **More**, which starts that session
-  in place. After practice nothing is due or new, so More doesn't show. (#28)
+  in place. The same rule holds after practice, where normally nothing is due or new. (#28)
 - The "3 / 20" counter counts distinct cards shown so far, the current one included (so it
   starts at 1); a card coming back doesn't advance it. (#26)
 - A card counts as **learned** for folder progress when its forward interval is ≥ **21 days**.

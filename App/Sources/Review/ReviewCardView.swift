@@ -5,6 +5,8 @@ import UIKit
 struct ReviewCardView: View {
     let card: Card
     let isFlipped: Bool
+    /// Decoded once per card, off the main actor, so the flip doesn't decode it again.
+    @State private var screenshot: UIImage?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -15,8 +17,8 @@ struct ReviewCardView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
-            if let data = card.screenshot, let image = UIImage(data: data) {
-                Image(uiImage: image)
+            if let screenshot {
+                Image(uiImage: screenshot)
                     .resizable()
                     .scaledToFit()
                     .clipShape(.rect(cornerRadius: 12))
@@ -31,5 +33,8 @@ struct ReviewCardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
+        .task(id: card.id) {
+            screenshot = await card.screenshot.flatMap(UIImage.init(data:))?.byPreparingForDisplay()
+        }
     }
 }

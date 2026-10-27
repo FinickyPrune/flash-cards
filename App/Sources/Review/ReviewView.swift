@@ -18,6 +18,7 @@ struct ReviewView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { toolbar }
         }
+        // Play starts the session before presenting; this covers a model built without it.
         .task { model.start() }
         .saveErrorAlert($model.saveError)
     }
@@ -72,7 +73,9 @@ struct ReviewView: View {
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .accessibilityHint(model.isFlipped ? "" : "Shows the back")
+            .accessibilityHint(model.isFlipped ? Text(verbatim: "") : Text("Shows the back"))
+            // Flipped, it is only the card's content; VoiceOver moves on to the ratings.
+            .accessibilityRemoveTraits(model.isFlipped ? .isButton : [])
             .accessibilityIdentifier(AccessibilityID.Review.card)
         }
         // A new card starts at the top, not at the previous card's scroll offset.
@@ -102,11 +105,12 @@ struct ReviewView: View {
 
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            Button("Close", systemImage: "xmark") { dismiss() }
-                .accessibilityIdentifier(AccessibilityID.Review.close)
-        }
+        // The other states have their own Close or Done.
         if model.phase == .card {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Close", systemImage: "xmark") { dismiss() }
+                    .accessibilityIdentifier(AccessibilityID.Review.close)
+            }
             ToolbarItem(placement: .principal) {
                 VStack {
                     if model.session.isPractice {
@@ -123,14 +127,9 @@ struct ReviewView: View {
         }
     }
 
-    /// "today", "tomorrow", "in 3 days": whole calendar days, since cards are due at the start of
-    /// a review day.
-    private static func relativeDay(of date: Date, now: Date = .now, calendar: Calendar = .current) -> String {
-        let days = calendar.dateComponents(
-            [.day],
-            from: calendar.startOfDay(for: now),
-            to: calendar.startOfDay(for: date)
-        ).day ?? 0
+    /// "today", "tomorrow", "in 3 days": whole review days, since cards are due at the start of one.
+    private static func relativeDay(of date: Date) -> String {
+        let days = ReviewDay.count(from: .now, to: date, calendar: .current)
         let formatter = RelativeDateTimeFormatter()
         formatter.dateTimeStyle = .named
         formatter.unitsStyle = .full

@@ -50,7 +50,9 @@ enum SampleData {
     /// A drawn stand-in for a subtitled video frame, as a compressed JPEG like a stored copy.
     private static func screenshot(subtitle: String) -> Data? {
         let size = CGSize(width: 1280, height: 720)
-        let image = UIGraphicsImageRenderer(size: size).image { context in
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { context in
             let colors = [UIColor.systemTeal.cgColor, UIColor.systemIndigo.cgColor] as CFArray
             if let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: nil) {
                 context.cgContext.drawLinearGradient(

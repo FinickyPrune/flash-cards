@@ -8,7 +8,7 @@ final class FolderRowActionsModel {
     var moving: Folder?
     var deleting: Folder?
     var saveError: String?
-    /// The open review; built once when Play is tapped.
+    /// The open review; built and started once when Play is tapped.
     var review: ReviewViewModel?
     private let service: any CatalogServicing
     private let reviewService: any ReviewServicing
@@ -18,8 +18,11 @@ final class FolderRowActionsModel {
         self.reviewService = reviewService
     }
 
+    /// Starts the session before presenting, so the cover never slides up empty.
     func play(_ folder: Folder) {
-        review = ReviewViewModel(folder: folder, service: reviewService)
+        let model = ReviewViewModel(folder: folder, service: reviewService)
+        model.start()
+        review = model
     }
 
     func renameModel(for folder: Folder) -> FolderNameViewModel {

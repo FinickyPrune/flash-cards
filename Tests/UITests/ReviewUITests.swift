@@ -34,6 +34,7 @@ final class ReviewUITests: XCTestCase {
         let reviewed = app.staticTexts["review.reviewed"]
         XCTAssertTrue(reviewed.waitForExistence(timeout: 5))
         XCTAssertEqual(reviewed.label, "Reviewed 3")
+        // Good never makes a card due again today, so Play would give no new session.
         XCTAssertFalse(app.buttons["review.more"].exists)
         app.buttons["review.done"].tap()
 

@@ -55,6 +55,10 @@ struct FolderView: View {
         }
         .navigationTitle(model.folder.name)
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Play", systemImage: "play.fill") { model.rowActions.play(model.folder) }
+                    .accessibilityIdentifier(AccessibilityID.FolderScreen.play)
+            }
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("New Subfolder", systemImage: "folder.badge.plus") { model.isCreatingSubfolder = true }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newSubfolder)

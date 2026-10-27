@@ -1,6 +1,7 @@
 import Observation
 
-/// One folder screen: its subfolders' actions, creating a subfolder, and its cards.
+/// One folder screen: its subfolders' actions (Play of the folder itself goes through them too),
+/// creating a subfolder, and its cards.
 @MainActor
 @Observable
 final class FolderViewModel {
@@ -13,11 +14,16 @@ final class FolderViewModel {
     private let service: any CatalogServicing
     private let cardService: any CardServicing
 
-    init(folder: Folder, service: any CatalogServicing, cardService: any CardServicing) {
+    init(
+        folder: Folder,
+        service: any CatalogServicing,
+        cardService: any CardServicing,
+        reviewService: any ReviewServicing
+    ) {
         self.folder = folder
         self.service = service
         self.cardService = cardService
-        rowActions = FolderRowActionsModel(service: service)
+        rowActions = FolderRowActionsModel(service: service, reviewService: reviewService)
     }
 
     func addCard() {

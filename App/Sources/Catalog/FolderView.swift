@@ -55,6 +55,10 @@ struct FolderView: View {
         }
         .navigationTitle(model.folder.name)
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Play", systemImage: "play.fill") { model.play() }
+                    .accessibilityIdentifier(AccessibilityID.FolderScreen.play)
+            }
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("New Subfolder", systemImage: "folder.badge.plus") { model.isCreatingSubfolder = true }
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.newSubfolder)
@@ -64,6 +68,7 @@ struct FolderView: View {
         }
         .sheet(isPresented: $model.isCreatingSubfolder) { FolderNameSheet(model: model.newSubfolderModel()) }
         .sheet(item: $model.editor) { CardEditorSheet(model: $0) }
+        .fullScreenCover(item: $model.review) { ReviewView(model: $0) }
         .saveErrorAlert($model.saveError)
         .folderActionsPresentation(model.rowActions)
     }

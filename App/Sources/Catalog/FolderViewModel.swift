@@ -1,6 +1,6 @@
 import Observation
 
-/// One folder screen: its subfolders' actions, creating a subfolder, and its cards.
+/// One folder screen: Play, its subfolders' actions, creating a subfolder, and its cards.
 @MainActor
 @Observable
 final class FolderViewModel {
@@ -9,15 +9,28 @@ final class FolderViewModel {
     /// The open card editor; built once when it opens, so it never re-reads a card it deleted.
     var editor: CardEditorViewModel?
     var saveError: String?
+    /// The open review of this folder; built once when Play is tapped.
+    var review: ReviewViewModel?
     let rowActions: FolderRowActionsModel
     private let service: any CatalogServicing
     private let cardService: any CardServicing
+    private let reviewService: any ReviewServicing
 
-    init(folder: Folder, service: any CatalogServicing, cardService: any CardServicing) {
+    init(
+        folder: Folder,
+        service: any CatalogServicing,
+        cardService: any CardServicing,
+        reviewService: any ReviewServicing
+    ) {
         self.folder = folder
         self.service = service
         self.cardService = cardService
-        rowActions = FolderRowActionsModel(service: service)
+        self.reviewService = reviewService
+        rowActions = FolderRowActionsModel(service: service, reviewService: reviewService)
+    }
+
+    func play() {
+        review = ReviewViewModel(folder: folder, service: reviewService)
     }
 
     func addCard() {

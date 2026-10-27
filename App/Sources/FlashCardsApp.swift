@@ -18,7 +18,8 @@ struct FlashCardsApp: App {
         }
         homeModel = HomeViewModel(
             service: CatalogService(context: container.mainContext),
-            cardService: CardService(context: container.mainContext)
+            cardService: CardService(context: container.mainContext),
+            reviewService: ReviewService(context: container.mainContext)
         )
     }
 

@@ -1,6 +1,6 @@
 import Observation
 
-/// Rename, move and delete for the folder rows of one list (home or a folder screen).
+/// Play, rename, move and delete for the folder rows of one list (home or a folder screen).
 @MainActor
 @Observable
 final class FolderRowActionsModel {
@@ -8,10 +8,18 @@ final class FolderRowActionsModel {
     var moving: Folder?
     var deleting: Folder?
     var saveError: String?
+    /// The open review; built once when Play is tapped.
+    var review: ReviewViewModel?
     private let service: any CatalogServicing
+    private let reviewService: any ReviewServicing
 
-    init(service: any CatalogServicing) {
+    init(service: any CatalogServicing, reviewService: any ReviewServicing) {
         self.service = service
+        self.reviewService = reviewService
+    }
+
+    func play(_ folder: Folder) {
+        review = ReviewViewModel(folder: folder, service: reviewService)
     }
 
     func renameModel(for folder: Folder) -> FolderNameViewModel {

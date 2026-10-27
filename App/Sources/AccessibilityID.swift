@@ -1,3 +1,5 @@
+import FlashCore
+
 /// Identifiers UI tests find elements by.
 enum AccessibilityID {
     enum Home {
@@ -11,6 +13,7 @@ enum AccessibilityID {
         static let newSubfolder = "folder.newSubfolder"
         static let empty = "folder.empty"
         static let emptyNewSubfolder = "folder.emptyNewSubfolder"
+        static let play = "folder.play"
     }
 
     enum Row {
@@ -24,10 +27,29 @@ enum AccessibilityID {
     }
 
     enum FolderAction {
+        static let play = "folderAction.play"
         static let rename = "folderAction.rename"
         static let move = "folderAction.move"
         static let delete = "folderAction.delete"
         static let confirmDelete = "folderAction.confirmDelete"
+    }
+
+    enum Review {
+        static let close = "review.close"
+        static let position = "review.position"
+        static let card = "review.card"
+        static let back = "review.back"
+        static let empty = "review.empty"
+        static let allCaughtUp = "review.allCaughtUp"
+        static let practice = "review.practice"
+        static let summary = "review.summary"
+        static let reviewed = "review.reviewed"
+        static let done = "review.done"
+        static let more = "review.more"
+
+        static func rating(_ rating: Rating) -> String {
+            "review.rating.\(rating)"
+        }
     }
 
     enum FolderForm {

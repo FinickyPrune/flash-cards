@@ -53,7 +53,8 @@ struct HomeView: View {
     let container = ModelContainer.preview
     HomeView(model: HomeViewModel(
         service: CatalogService(context: container.mainContext),
-        cardService: CardService(context: container.mainContext)
+        cardService: CardService(context: container.mainContext),
+        reviewService: ReviewService(context: container.mainContext)
     ))
     .modelContainer(container)
 }

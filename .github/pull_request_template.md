@@ -22,7 +22,8 @@ Closes #
 |  |  |
 
 ## Verification
-<!-- Paste the `make check` summary lines. -->
+<!-- Paste the summary lines of `make lint test` and the touched UI test classes (`make test-ui ONLY=…`).
+     CI runs the full UI suite; paste `make check` only if you ran it. -->
 
 ## Screenshots
 <!-- Light + dark for every changed screen (scripts/upload-screenshot.sh). Remove if no UI change. -->

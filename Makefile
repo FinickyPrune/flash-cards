@@ -91,15 +91,16 @@ screenshot: ## Save a simulator screenshot to build/screenshots/$(NAME).png
 .PHONY: screenshots
 screenshots: generate ## Screenshot tour in light and dark -> build/screenshots/<stop>-<light|dark>.png
 	@xcrun simctl boot $(SIM_UDID) 2>/dev/null || true
-	@export TEST_RUNNER_SCREENSHOT_TOUR=1; for mode in light dark; do \
+	@trap 'xcrun simctl ui $(SIM_UDID) appearance light' EXIT; \
+	export TEST_RUNNER_SCREENSHOT_TOUR=1; \
+	for mode in light dark; do \
 		xcrun simctl ui $(SIM_UDID) appearance $$mode; \
 		rm -rf $(RESULTS)/screenshots-$$mode.xcresult; \
+		rm -f $(SCREENSHOTS)/*-$$mode.png; \
 		$(XCODEBUILD) test -only-testing:FlashCardsUITests/ScreenshotTour \
-			-resultBundlePath $(RESULTS)/screenshots-$$mode.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS) \
-			|| { xcrun simctl ui $(SIM_UDID) appearance light; exit 1; }; \
-		scripts/export-screenshots.sh $(RESULTS)/screenshots-$$mode.xcresult $$mode $(SCREENSHOTS); \
-	done; \
-	xcrun simctl ui $(SIM_UDID) appearance light
+			-resultBundlePath $(RESULTS)/screenshots-$$mode.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS) || exit 1; \
+		scripts/export-screenshots.sh $(RESULTS)/screenshots-$$mode.xcresult $$mode $(SCREENSHOTS) || exit 1; \
+	done
 
 .PHONY: sim-stop
 sim-stop: ## Shut down every booted simulator (frees memory and CPU after a work session)

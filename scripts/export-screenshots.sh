@@ -13,11 +13,14 @@ trap 'rm -rf "$raw"' EXIT
 xcrun xcresulttool export attachments --path "$bundle" --output-path "$raw" >/dev/null
 mkdir -p "$out"
 # Attachment files are named "<name>_<index>_<UUID>.png"; system screenshots aren't kept on success.
-jq -r '.[].attachments[] | "\(.exportedFileName)\t\(.suggestedHumanReadableName)"' "$raw/manifest.json" |
-  while IFS=$'\t' read -r file name; do
-    stop=$(sed -E 's/_[0-9]+_[0-9A-F-]+\.png$//' <<<"$name")
-    [[ "$stop" != "$name" ]] || continue
-    cp "$raw/$file" "$out/$stop-$appearance.png"
-    sips --resampleHeightWidthMax 1000 "$out/$stop-$appearance.png" >/dev/null
-    echo "$out/$stop-$appearance.png"
-  done
+count=0
+while IFS=$'\t' read -r file name; do
+  stop=$(sed -E 's/_[0-9]+_[0-9A-F-]+\.png$//' <<<"$name")
+  [[ "$stop" != "$name" ]] || continue
+  cp "$raw/$file" "$out/$stop-$appearance.png"
+  sips --resampleHeightWidthMax 1000 "$out/$stop-$appearance.png" >/dev/null
+  echo "$out/$stop-$appearance.png"
+  count=$((count + 1))
+done < <(jq -r '.[].attachments[] | "\(.exportedFileName)\t\(.suggestedHumanReadableName)"' "$raw/manifest.json")
+# A skipped tour exits 0 with no attachments; never let old PNGs pass for new ones.
+(( count > 0 )) || { echo "No tour screenshots in $bundle (was the tour skipped?)" >&2; exit 1; }

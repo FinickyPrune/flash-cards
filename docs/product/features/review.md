@@ -9,8 +9,18 @@ Status: planned (milestone 2)
   editor) → rate it.
 - Ratings: **Again** (Не знаю), **Hard** (Сложно), **Good** (Хорошо), **Easy** (Легко).
 - Intervals are whole days. No notifications.
-- Scheduling: SM-2-like, behind a replaceable scheduler (decision 0002). Exact parameters are
-  set when the scheduler is built.
+- A review day starts at **04:00** local time, so a late-night session counts as the evening's
+  day. A card due in N days is due at 04:00 on the N-th review day after the rating. (#25)
+- Scheduling: SM-2-like, behind a replaceable scheduler (decision 0002). (#25)
+  - A new card (or one after a lapse): Again → due again today; Hard or Good → 1 day;
+    Easy → 4 days. Ease starts at 2.5 and doesn't change on these first ratings.
+  - After that: Hard → interval × 1.2, ease −0.15; Good → 6 days on the second step, then
+    interval × ease; Easy → interval × ease × 1.3, ease +0.15. Intervals round to whole days.
+  - Hard is at least the previous interval + 1 day, Good at least Hard + 1, Easy at least
+    Good + 1, so a harder answer never gives a longer interval.
+  - Again on a card answered right before is a **lapse**: due tomorrow (interval 1 day),
+    ease −0.2, it starts over as a new card.
+  - Ease never drops below 1.3; intervals never exceed 365 days; no random spread.
 - Session queue: due cards first, then new cards; at most **20** cards in total (one constant).
 - A card rated Again comes back later in the same session, after a few other cards (exact gap set
   when the session builder is built).

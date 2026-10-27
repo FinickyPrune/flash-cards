@@ -46,8 +46,8 @@ struct FolderTests {
         #expect(try context.fetch(FetchDescriptor<ReviewLog>()).map(\.card?.front) == ["kuća"])
     }
 
-    // Catches: counting only the folder's own cards, counting a sibling's, an off-by-one at
-    // 21 days, reading the reverse direction, or progress cached past a lapse.
+    // Catches: counting only the folder's own cards, counting a sibling's, an off-by-one or
+    // rounding at 21 days, reading the reverse direction, or progress cached past a lapse.
     @Test("Progress counts learned cards over all cards in the subtree")
     func progress() throws {
         let root = Folder(name: "Root", learningLanguage: "en", backLanguage: "ru")
@@ -66,7 +66,8 @@ struct FolderTests {
             return card
         }
         let learned = card(in: child, interval: 21)
-        _ = card(in: grandchild, interval: 20)
+        // Just under 21 days: rounding the stored interval would wrongly count it.
+        _ = card(in: grandchild, interval: 20.5)
         _ = card(in: grandchild, interval: nil)
         _ = card(in: grandchild, interval: 30, direction: "reverse")
         _ = card(in: sibling, interval: 40)

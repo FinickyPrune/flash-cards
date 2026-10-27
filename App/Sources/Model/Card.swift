@@ -53,9 +53,10 @@ final class Card {
         reviewStates?.first { $0.direction == "forward" }
     }
 
-    /// Counted as learned in folder progress (`review.md`).
+    /// Counted as learned in folder progress (`review.md`). Compares the stored interval as is,
+    /// so 20.5 days is not learned.
     var isLearned: Bool {
-        forwardReviewState?.schedulingState.isLearned ?? false
+        (forwardReviewState?.intervalDays ?? 0) >= Double(SchedulingState.learnedIntervalDays)
     }
 
     func setFront(_ front: String) {

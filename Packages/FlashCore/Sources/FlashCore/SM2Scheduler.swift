@@ -7,7 +7,8 @@ public struct SM2Scheduler: Scheduler {
 
     private let calendar: Calendar
 
-    public init(calendar: Calendar = .current) {
+    /// `autoupdatingCurrent` follows a time-zone change while the app runs.
+    public init(calendar: Calendar = .autoupdatingCurrent) {
         self.calendar = calendar
     }
 
@@ -40,17 +41,24 @@ public struct SM2Scheduler: Scheduler {
         guard state.repetitions > 0 else {
             return rating == .easy ? 4 : 1
         }
-        let previous = Double(state.intervalDays)
+        // Integer percentages: halves like 5 × 2.3 = 11.5 must round up, which Double can miss.
+        let previous = state.intervalDays
+        let easePercent = Int((state.ease * 100).rounded())
         // A harder answer never gives a longer interval, and Hard never stalls on the same one.
-        let hard = max(state.intervalDays + 1, Int((previous * 1.2).rounded()))
-        let good = max(hard + 1, state.repetitions == 1 ? 6 : Int((previous * state.ease).rounded()))
-        let easy = max(good + 1, Int((previous * state.ease * 1.3).rounded()))
+        let hard = max(previous + 1, roundedDivision(previous * 120, by: 100))
+        let good = max(hard + 1, state.repetitions == 1 ? 6 : roundedDivision(previous * easePercent, by: 100))
+        let easy = max(good + 1, roundedDivision(previous * easePercent * 130, by: 10000))
         let days = switch rating {
         case .again, .hard: hard
         case .good: good
         case .easy: easy
         }
         return min(days, maximumIntervalDays)
+    }
+
+    /// Rounds half up; both operands are non-negative here.
+    private static func roundedDivision(_ dividend: Int, by divisor: Int) -> Int {
+        (dividend + divisor / 2) / divisor
     }
 
     private static func easeChange(for rating: Rating) -> Double {

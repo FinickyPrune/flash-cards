@@ -68,6 +68,12 @@ struct SM2SchedulerTests {
                 .easy,
                 SchedulingState(repetitions: 4, intervalDays: 33, ease: 2.65, dueDate: date(12, 4, 4))
             ),
+            // 5 × 2.3 = 11.5 rounds up to 12, though 2.3 isn't exact in binary.
+            (
+                SchedulingState(repetitions: 3, intervalDays: 5, ease: 2.3),
+                .good,
+                SchedulingState(repetitions: 4, intervalDays: 12, ease: 2.3, dueDate: date(11, 13, 4))
+            ),
             // Lapse: back to 1 day, ease −0.2.
             (
                 SchedulingState(repetitions: 3, intervalDays: 30),
@@ -117,6 +123,10 @@ struct SM2SchedulerTests {
             (date(11, 2, 4, 1), date(11, 3, 4)),
             // The night of Oct 24–25 is an hour longer.
             (date(10, 24, 12), date(10, 25, 4)),
+            // 03:30 on the 25-hour day itself still belongs to Oct 24.
+            (date(10, 25, 3, 30), date(10, 25, 4)),
+            // The night of Mar 27–28, 2027 is an hour shorter.
+            (date(3, 27, 12, year: 2027), date(3, 28, 4, year: 2027)),
         ]
     )
     func dayBoundary(ratedAt: Date, expectedDue: Date) {

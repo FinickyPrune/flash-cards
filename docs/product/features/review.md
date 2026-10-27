@@ -16,11 +16,13 @@ Status: planned (milestone 2)
     Easy → 4 days. Ease starts at 2.5 and doesn't change on these first ratings.
   - After that: Hard → interval × 1.2, ease −0.15; Good → 6 days on the second step, then
     interval × ease; Easy → interval × ease × 1.3, ease +0.15. Intervals round to whole days.
-  - Hard is at least the previous interval + 1 day, Good at least Hard + 1, Easy at least
-    Good + 1, so a harder answer never gives a longer interval.
+    From the second step on, Hard is at least the previous interval + 1 day, Good at least
+    Hard + 1, Easy at least Good + 1, so a harder answer never gives a longer interval.
   - Again on a card answered right before is a **lapse**: due tomorrow (interval 1 day),
-    ease −0.2, it starts over as a new card.
-  - Ease never drops below 1.3; intervals never exceed 365 days; no random spread.
+    ease −0.2, and its next ratings start over from the first step. It stays a due card, not
+    a new one.
+  - Ease never drops below 1.3; intervals never exceed 365 days (at the cap Hard, Good and
+    Easy all give 365); no random spread.
 - Session queue: due cards first, then new cards; at most **20** cards in total (one constant).
 - A card rated Again comes back later in the same session, after a few other cards (exact gap set
   when the session builder is built).

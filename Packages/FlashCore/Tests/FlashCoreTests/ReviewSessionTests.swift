@@ -17,7 +17,7 @@ struct ReviewSessionTests {
         for rating in ratings {
             guard let current = session.current else { break }
             shown += names[current] ?? "?"
-            session.rate(rating)
+            _ = session.rate(rating)
         }
         return shown
     }

@@ -47,6 +47,18 @@ struct SessionBuilderTests {
         #expect(SessionBuilder.build(from: cards, at: Self.now) == .session(expected))
     }
 
+    // Cards rated on the same day with the same interval share a 04:00 due date, so ties are common.
+    // Catches: a tie-break by newest, or none (input order from an unordered fetch).
+    @Test("Cards due at the same time go oldest first")
+    func sameDueDate() {
+        let dueDate = Self.daysFromNow(-1)
+        let state = SchedulingState(repetitions: 1, intervalDays: 1, dueDate: dueDate)
+        let older = SessionCard(id: UUID(), createdAt: Self.daysFromNow(-10), state: state)
+        let newer = SessionCard(id: UUID(), createdAt: Self.daysFromNow(-5), state: state)
+
+        #expect(SessionBuilder.build(from: [newer, older], at: Self.now) == .session([older.id, newer.id]))
+    }
+
     // Catches: an empty session instead of "all caught up", or the latest due date instead of the earliest.
     @Test("Nothing due or new gives the earliest next due date; no cards gives empty")
     func nothingToReview() {

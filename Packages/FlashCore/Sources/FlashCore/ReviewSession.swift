@@ -8,16 +8,26 @@ public struct ReviewSession: Sendable, Equatable {
     public static let maxReturns = 2
 
     public struct Rated: Sendable, Equatable {
-        public var cardID: UUID
+        public let cardID: UUID
         /// Only the first rating of a card in a session changes its schedule.
-        public var isFirstRating: Bool
+        public let isFirstRating: Bool
+
+        public init(cardID: UUID, isFirstRating: Bool) {
+            self.cardID = cardID
+            self.isFirstRating = isFirstRating
+        }
     }
 
     public struct Summary: Sendable, Equatable {
         /// Distinct cards rated.
-        public var reviewed: Int
+        public let reviewed: Int
         /// Distinct cards whose first rating was Good or Easy.
-        public var goodOrEasy: Int
+        public let goodOrEasy: Int
+
+        public init(reviewed: Int, goodOrEasy: Int) {
+            self.reviewed = reviewed
+            self.goodOrEasy = goodOrEasy
+        }
     }
 
     /// Practice never changes the schedule.
@@ -58,7 +68,6 @@ public struct ReviewSession: Sendable, Equatable {
     }
 
     /// Rates the current card and moves on; `nil` when the session is already finished.
-    @discardableResult
     public mutating func rate(_ rating: Rating) -> Rated? {
         guard !queue.isEmpty else {
             return nil

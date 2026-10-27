@@ -4,15 +4,16 @@ import Foundation
 public enum SessionBuilder {
     public static let sessionSize = 20
 
-    public enum Result: Sendable, Equatable {
-        /// Due cards, most overdue first, then new cards, oldest first; at most `sessionSize`.
+    public enum Outcome: Sendable, Equatable {
+        /// Due cards, most overdue first (same due date: older card first), then new cards,
+        /// oldest first; at most `sessionSize`.
         case session([UUID])
         /// There are cards, but none is due or new; `nextDue` is the earliest due date.
         case allCaughtUp(nextDue: Date)
         case empty
     }
 
-    public static func build(from cards: [SessionCard], at now: Date) -> Result {
+    public static func build(from cards: [SessionCard], at now: Date) -> Outcome {
         let due = cards
             .filter { $0.isDue(at: now) }
             .sorted { ($0.state.dueDate ?? now, $0.createdAt) < ($1.state.dueDate ?? now, $1.createdAt) }
@@ -35,6 +36,6 @@ public enum SessionBuilder {
         count: Int = sessionSize,
         using generator: inout some RandomNumberGenerator
     ) -> [UUID] {
-        Array(cards.shuffled(using: &generator).prefix(count).map(\.id))
+        cards.shuffled(using: &generator).prefix(count).map(\.id)
     }
 }

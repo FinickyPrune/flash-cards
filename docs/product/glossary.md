@@ -24,13 +24,14 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Sense | One meaning of a dictionary entry; the Definition tile shows one sense. | — | Значение |
 | Review | Playing cards and rating each answer. "Game" in early notes = review. | — | Игра |
 | Play | The action that starts a review session for a folder's subtree. | — | Играть |
-| Session | One review run: a queue of at most 20 cards. | `SessionBuilder` builds it | Сессия |
+| Session | One review run: a queue of at most 20 cards. | `ReviewSession`, built by `SessionBuilder` | Сессия |
 | Rating | Answer grade: again 0, hard 1, good 2, easy 3. | `Rating`, `rating` | Не знаю / Сложно / Хорошо / Легко |
 | Review day | A day for scheduling; starts at 04:00 local time, not midnight. | `ReviewDay` | — |
 | Due card | A card whose review state's due date has passed. | `dueDate` | — |
 | Lapse | Again on a card that was answered right before; its interval starts over. | `lapses` | — |
 | Learned card | A card whose forward interval is at least 21 days; counted in folder progress. | `isLearned` | Выучено |
-| New card | A card never reviewed. | — | — |
+| New card | A card never reviewed. | `isNew` | — |
+| Practice | Playing random cards of a subtree when nothing is due or new; doesn't change the schedule. | `isPractice` | Практика |
 | Direction | Forward = front → back (MVP). Reverse = back → front (later). | `direction`: `forward` / `reverse` | — |
 | Review state | Scheduling state of one card in one direction. | `ReviewState` | — |
 | Review log | Every rating ever given, kept to recompute schedules (e.g. for FSRS). | `ReviewLog` | — |

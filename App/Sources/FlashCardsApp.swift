@@ -16,11 +16,7 @@ struct FlashCardsApp: App {
         if LaunchOptions.seed {
             SampleData.insert(into: container.mainContext)
         }
-        homeModel = HomeViewModel(
-            service: CatalogService(context: container.mainContext),
-            cardService: CardService(context: container.mainContext),
-            reviewService: ReviewService(context: container.mainContext)
-        )
+        homeModel = HomeViewModel(dependencies: .live(context: container.mainContext))
     }
 
     var body: some Scene {

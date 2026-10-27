@@ -143,7 +143,7 @@ struct ReviewView: View {
     if let folder {
         ReviewView(model: ReviewViewModel(
             folder: folder,
-            service: ReviewService(context: container.mainContext)
+            service: AppDependencies.live(context: container.mainContext).reviewService
         ))
         .modelContainer(container)
     }

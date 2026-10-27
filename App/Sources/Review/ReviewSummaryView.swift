@@ -16,6 +16,7 @@ struct ReviewSummaryView: View {
                     .accessibilityIdentifier(AccessibilityID.Review.reviewed)
             } icon: {
                 Image(systemName: "checkmark.circle")
+                    .accessibilityHidden(true)
             }
         } description: {
             Text("Good or Easy \(summary.goodOrEasy)")
@@ -28,6 +29,5 @@ struct ReviewSummaryView: View {
                     .accessibilityIdentifier(AccessibilityID.Review.more)
             }
         }
-        .accessibilityIdentifier(AccessibilityID.Review.summary)
     }
 }

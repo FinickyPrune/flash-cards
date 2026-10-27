@@ -29,16 +29,18 @@ struct ReviewView: View {
             Color.clear
         case .empty:
             ContentUnavailableView {
+                // On the label: an identifier on the whole view would replace the buttons' own.
                 Label("Nothing to Review", systemImage: "rectangle.stack")
+                    .accessibilityIdentifier(AccessibilityID.Review.empty)
             } description: {
                 Text("This folder has no cards yet.")
             } actions: {
                 Button("Close") { dismiss() }
             }
-            .accessibilityIdentifier(AccessibilityID.Review.empty)
         case let .allCaughtUp(nextDue):
             ContentUnavailableView {
                 Label("All Caught Up", systemImage: "checkmark.circle")
+                    .accessibilityIdentifier(AccessibilityID.Review.allCaughtUp)
             } description: {
                 Text("Next card: \(Self.relativeDay(of: nextDue))")
             } actions: {
@@ -47,7 +49,6 @@ struct ReviewView: View {
                     .accessibilityIdentifier(AccessibilityID.Review.practice)
                 Button("Close") { dismiss() }
             }
-            .accessibilityIdentifier(AccessibilityID.Review.allCaughtUp)
         case .card:
             if let card = model.currentCard {
                 cardFlow(card)

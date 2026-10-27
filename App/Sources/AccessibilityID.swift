@@ -42,7 +42,6 @@ enum AccessibilityID {
         static let empty = "review.empty"
         static let allCaughtUp = "review.allCaughtUp"
         static let practice = "review.practice"
-        static let summary = "review.summary"
         static let reviewed = "review.reviewed"
         static let done = "review.done"
         static let more = "review.more"

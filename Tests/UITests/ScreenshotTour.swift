@@ -1,9 +1,12 @@
 import XCTest
 
-/// Walks the seeded app through its screens and attaches a named screenshot at each stop, for
-/// `make screenshots`. Skipped unless that target runs it (it sets `TEST_RUNNER_SCREENSHOT_TOUR`).
-/// Add a stop when a PR changes a screen the tour doesn't reach yet.
+/// Walks the seeded app through its screens in light and then dark mode and attaches a screenshot
+/// named `<stop>-<light|dark>` at each stop, for `make screenshots`. Skipped unless that target runs
+/// it (it sets `TEST_RUNNER_SCREENSHOT_TOUR`). Add a stop when a PR changes a screen the tour
+/// doesn't reach yet.
 final class ScreenshotTour: XCTestCase {
+    private var appearance = "light"
+
     override func setUpWithError() throws {
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["SCREENSHOT_TOUR"] == "1",
@@ -12,8 +15,23 @@ final class ScreenshotTour: XCTestCase {
         continueAfterFailure = false
     }
 
+    override func tearDown() {
+        // The simulator is shared with other runs; leave it in light mode.
+        MainActor.assumeIsolated { XCUIDevice.shared.appearance = .light }
+    }
+
     @MainActor
     func testTour() {
+        for (mode, name) in [(XCUIDevice.Appearance.light, "light"), (.dark, "dark")] {
+            XCUIDevice.shared.appearance = mode
+            appearance = name
+            tour()
+        }
+    }
+
+    /// One pass; relaunching resets the in-memory seed, so both passes start from the same data.
+    @MainActor
+    private func tour() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-seed"]
         app.launch()
@@ -65,6 +83,7 @@ final class ScreenshotTour: XCTestCase {
         XCTAssertTrue(good.waitForExistence(timeout: 5))
         stop("review-practice", in: app)
         app.buttons["review.close"].tap()
+        XCTAssertTrue(play.waitForExistence(timeout: 5))
     }
 
     @MainActor
@@ -94,7 +113,7 @@ final class ScreenshotTour: XCTestCase {
         // The stop's element already exists; this lets its transition finish so the frame is settled.
         Thread.sleep(forTimeInterval: 0.7)
         let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = name
+        attachment.name = "\(name)-\(appearance)"
         attachment.lifetime = .keepAlways
         add(attachment)
     }

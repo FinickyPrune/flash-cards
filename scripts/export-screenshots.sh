@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Usage: export-screenshots.sh <result bundle> <appearance> <output dir>
-# Copies the screenshot tour's named attachments to <output dir>/<name>-<appearance>.png,
-# downscaled to 1000 px so they stay cheap to read and upload.
+# Usage: export-screenshots.sh <result bundle> <output dir>
+# Copies the screenshot tour's named attachments to <output dir>/<name>.png (names end in
+# -light or -dark), downscaled to 1000 px so they stay cheap to read and upload.
 set -euo pipefail
 
 bundle=$1
-appearance=$2
-out=$3
+out=$2
 raw=$(mktemp -d)
 trap 'rm -rf "$raw"' EXIT
 
@@ -15,11 +14,11 @@ mkdir -p "$out"
 # Attachment files are named "<name>_<index>_<UUID>.png"; system screenshots aren't kept on success.
 count=0
 while IFS=$'\t' read -r file name; do
-  stop=$(sed -E 's/_[0-9]+_[0-9A-F-]+\.png$//' <<<"$name")
+  stop=$(sed -E 's/_[0-9]+_[0-9A-Fa-f-]+\.png$//' <<<"$name")
   [[ "$stop" != "$name" ]] || continue
-  cp "$raw/$file" "$out/$stop-$appearance.png"
-  sips --resampleHeightWidthMax 1000 "$out/$stop-$appearance.png" >/dev/null
-  echo "$out/$stop-$appearance.png"
+  cp "$raw/$file" "$out/$stop.png"
+  sips --resampleHeightWidthMax 1000 "$out/$stop.png" >/dev/null
+  echo "$out/$stop.png"
   count=$((count + 1))
 done < <(jq -r '.[].attachments[] | "\(.exportedFileName)\t\(.suggestedHumanReadableName)"' "$raw/manifest.json")
 # A skipped tour exits 0 with no attachments; never let old PNGs pass for new ones.

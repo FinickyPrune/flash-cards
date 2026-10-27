@@ -87,20 +87,14 @@ screenshot: ## Save a simulator screenshot to build/screenshots/$(NAME).png
 	@echo $(SCREENSHOTS)/$(NAME).png
 
 # The tour test is skipped unless TEST_RUNNER_SCREENSHOT_TOUR is set (xcodebuild passes it on
-# without the prefix).
+# without the prefix). It switches light/dark itself, so one run covers both.
 .PHONY: screenshots
 screenshots: generate ## Screenshot tour in light and dark -> build/screenshots/<stop>-<light|dark>.png
-	@xcrun simctl boot $(SIM_UDID) 2>/dev/null || true
-	@trap 'xcrun simctl ui $(SIM_UDID) appearance light' EXIT; \
-	export TEST_RUNNER_SCREENSHOT_TOUR=1; \
-	for mode in light dark; do \
-		xcrun simctl ui $(SIM_UDID) appearance $$mode; \
-		rm -rf $(RESULTS)/screenshots-$$mode.xcresult; \
-		rm -f $(SCREENSHOTS)/*-$$mode.png; \
-		$(XCODEBUILD) test -only-testing:FlashCardsUITests/ScreenshotTour \
-			-resultBundlePath $(RESULTS)/screenshots-$$mode.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS) || exit 1; \
-		scripts/export-screenshots.sh $(RESULTS)/screenshots-$$mode.xcresult $$mode $(SCREENSHOTS) || exit 1; \
-	done
+	@rm -rf $(RESULTS)/screenshots.xcresult
+	@rm -f $(SCREENSHOTS)/*-light.png $(SCREENSHOTS)/*-dark.png
+	export TEST_RUNNER_SCREENSHOT_TOUR=1 && $(XCODEBUILD) test -only-testing:FlashCardsUITests/ScreenshotTour \
+		-resultBundlePath $(RESULTS)/screenshots.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
+	@scripts/export-screenshots.sh $(RESULTS)/screenshots.xcresult $(SCREENSHOTS)
 
 .PHONY: sim-stop
 sim-stop: ## Shut down every booted simulator (frees memory and CPU after a work session)

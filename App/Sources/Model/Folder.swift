@@ -54,6 +54,11 @@ final class Folder {
         root.lastBackSource.flatMap(BackSource.init(rawValue:)) ?? .translation
     }
 
+    /// Cards in this folder and in all its subfolders; what Play reviews.
+    var subtreeCards: [Card] {
+        (cards ?? []) + (children ?? []).flatMap(\.subtreeCards)
+    }
+
     /// Learned / all cards in this folder and its subfolders. Walks the subtree on every call;
     /// fine at MVP catalog sizes.
     var progress: FolderProgress {

@@ -13,8 +13,9 @@ Screenshot Flashcards: turns screenshots (e.g. of subtitled shows) into flash ca
 ## Commands
 `make help` lists everything. Main ones:
 - `make build` · `make test` (unit; `ONLY=FlashCardsTests/Suite[/test()]` to narrow) · `make test-ui` · `make lint` · `make format`
-- `make check` — lint + all tests; must pass before any PR
-- `make run` then `NAME=x make screenshot` — launch in simulator and capture `build/screenshots/x.png`
+- Before a PR: `make lint test` + the UI tests of touched screens (`make test-ui ONLY=FlashCardsUITests/<Class>`). The full UI suite runs on CI, which merging requires. `make check` (everything CI runs) is for a manual full run.
+- `make screenshots` — screenshot tour, light + dark, into `build/screenshots/`; `make run` then `NAME=x make screenshot` for a one-off
+- `make sim-stop` — shut down simulators at the end of a work session
 - Fresh clone / missing tools: `make bootstrap`
 
 ## Project layout
@@ -22,7 +23,8 @@ Screenshot Flashcards: turns screenshots (e.g. of subtitled shows) into flash ca
 - `App/Sources`, `Tests/UnitTests`, `Tests/UITests` are synced folders: new files are picked up without regenerating.
 
 ## Workflow
-Issue → branch → plan → code + tests → `make check` → screenshots (UI) → `/code-review` + `pr-reviewer` subagent → push → PR → merge (self or user, see below).
+Issue → branch → plan → code + tests → lint + unit + touched UI tests → screenshots (UI) → `/code-review` + `pr-reviewer` subagent → push → PR (CI runs the full UI suite) → merge (self or user, see below) → `make sim-stop`.
+- Keep the Mac light: run each heavy step once, at the end (full test runs, screenshots after the last UI change); narrow with `ONLY=` while iterating.
 - New idea without an issue → `write-spec` skill. Implementing an issue → `work-issue` skill.
 - Branches: `<type>/<issue>-<slug>`. Commits: Conventional Commits with `Refs #<issue>`.
 - Show evidence (test summary, screenshot), not "it works".
@@ -41,5 +43,5 @@ When in doubt, flag it. Otherwise check "None of the above" and merge with `scri
 
 ## Gotchas
 - Hooks in `.claude/settings.json` auto-format and lint every Swift edit and block unsafe git commands. If a hook blocks you, fix the cause; don't work around it.
-- Simulator is picked by `scripts/sim.sh`: iPhone 18 Pro on the newest iOS runtime, same locally and on CI. `SIM_NAME="iPhone Duo"` to override (e.g. to check a short screen).
+- Simulator is picked by `scripts/sim.sh`: iPhone 17, created if missing. Locally on the newest iOS 26 runtime (lighter on the Mac); CI has no iOS 26 and uses its newest iOS (`SIM_OS=`). A UI test failing only on CI: reproduce with `SIM_OS= make test-ui ONLY=…`. `SIM_NAME="iPhone Duo" SIM_OS=` to check a short screen.
 - SourceKit diagnostics in the editor may show false "No such module" errors; trust `make build`.

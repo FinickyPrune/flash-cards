@@ -9,7 +9,8 @@ RESULTS     := build/results
 SCREENSHOTS := build/screenshots
 APP_PATH    := $(DERIVED)/Build/Products/Debug-iphonesimulator/$(SCHEME).app
 
-# Resolved once per make invocation. Override with SIM_NAME="iPhone 17" or SIM_UDID=<udid>.
+# Resolved once per make invocation. Override with SIM_NAME="iPhone Duo" SIM_OS= (any iOS) or
+# SIM_UDID=<udid>; see scripts/sim.sh.
 SIM_UDID ?= $(eval SIM_UDID := $$(or $$(shell scripts/sim.sh),$$(error No simulator found, see scripts/sim.sh)))$(SIM_UDID)
 
 # Compact output: only warnings, errors and test results. CI overrides with --renderer github-actions.
@@ -67,7 +68,7 @@ format: ## Auto-fix formatting and fixable lint issues
 	swiftlint lint --fix --quiet
 
 .PHONY: check
-check: lint test test-ui ## Full gate before opening a PR
+check: lint test test-ui ## Everything CI runs: lint + all unit and UI tests
 
 .PHONY: run
 run: build ## Build, install and launch in the simulator
@@ -84,6 +85,20 @@ screenshot: ## Save a simulator screenshot to build/screenshots/$(NAME).png
 	@xcrun simctl io $(SIM_UDID) screenshot --type=png $(SCREENSHOTS)/$(NAME).png >/dev/null
 	@sips --resampleHeightWidthMax 1000 $(SCREENSHOTS)/$(NAME).png >/dev/null # keep images cheap to read
 	@echo $(SCREENSHOTS)/$(NAME).png
+
+# The tour test is skipped unless TEST_RUNNER_SCREENSHOT_TOUR is set (xcodebuild passes it on
+# without the prefix). It switches light/dark itself, so one run covers both.
+.PHONY: screenshots
+screenshots: generate ## Screenshot tour in light and dark -> build/screenshots/<stop>-<light|dark>.png
+	@rm -rf $(RESULTS)/screenshots.xcresult
+	@rm -f $(SCREENSHOTS)/*-light.png $(SCREENSHOTS)/*-dark.png
+	export TEST_RUNNER_SCREENSHOT_TOUR=1 && $(XCODEBUILD) test -only-testing:FlashCardsUITests/ScreenshotTour \
+		-resultBundlePath $(RESULTS)/screenshots.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
+	@scripts/export-screenshots.sh $(RESULTS)/screenshots.xcresult $(SCREENSHOTS)
+
+.PHONY: sim-stop
+sim-stop: ## Shut down every booted simulator (frees memory and CPU after a work session)
+	xcrun simctl shutdown all
 
 .PHONY: clean
 clean: ## Remove build artifacts and the generated project

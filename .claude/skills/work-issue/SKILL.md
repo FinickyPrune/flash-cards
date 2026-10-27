@@ -27,26 +27,28 @@ For each step: code + the tests `pragmatic-testing` says it earns (usually 1–3
 - Stay in scope. Unrelated problems you notice → note them for the PR description, don't fix them here.
 
 ## 5. Verify
-- `make check` (lint + all unit + UI tests) must pass. Paste the summary lines, not "tests pass".
-- UI changed → follow `run-ios-app`: screenshot each changed screen, light and dark, and check against the criteria.
+- `make lint test` must pass, plus the UI test classes the change touches (`make test-ui ONLY=FlashCardsUITests/<Class>`). The full UI suite runs on CI (step 7). Paste the summary lines, not "tests pass".
+- UI changed → follow `run-ios-app`: `make screenshots` once, after the last UI change, and check each changed screen, light and dark, against the criteria.
+- Run each heavy step once: no repeat runs just to read an exit code (`make …; echo $?` in the same call).
 - Walk through every acceptance criterion and name the test or screenshot that proves it.
 
 ## 6. Self-review
 - Run `/code-review` on the branch diff and fix real findings.
 - Then use the `pr-reviewer` subagent: it checks the diff against the issue's acceptance criteria in a fresh context. Fix correctness/requirement gaps; treat style nits as optional.
-- Re-run `make check` if anything changed.
+- Re-run lint, unit and touched UI tests if anything changed; screenshots only if UI changed.
 
 ## 7. Ship
 ```bash
 git push -u origin HEAD
 gh pr create --title "<conventional title>" --body-file <tmp file>   # follows .github/pull_request_template.md, includes "Closes #$ARGUMENTS"
 ```
-Upload screenshots with `scripts/upload-screenshot.sh <pr> <png>...` and put them in the body. Then `gh pr checks <pr> --watch` and fix CI failures.
+Upload screenshots with `scripts/upload-screenshot.sh <pr> <png>...` and put them in the body. Then `gh pr checks <pr> --watch` (it takes ~12 min; run it in the background) and fix CI failures; a failing UI test is reproduced locally with `ONLY=`, and CI uploads `build/results` as an artifact on failure.
 
 ## 8. Merge or hand over
 Fill the PR's **Review flags** per CLAUDE.md → "Who merges" (take the `pr-reviewer` verdict into account).
 - Any flag → add the `needs-review` label and leave the PR to the user.
 - None → `scripts/merge-pr.sh <pr>`.
 
-## 9. Report (in Russian)
+## 9. Clean up and report (in Russian)
+`make sim-stop` once the work session is done (not between steps).
 PR link, merged or waiting for review (and which flags, why), what was done, how it was verified, anything left out of scope or worth a follow-up issue.

@@ -89,6 +89,9 @@ schemes:
         - FlashCardsUITests
         - package: FlashCore/FlashCoreTests
       gatherCoverageData: true
+      # UI tests capture screenshots, not a screen recording, to keep simulator runs light (#38).
+      # They are kept only for failing tests (XcodeGen's default).
+      preferredScreenCaptureFormat: screenshots
       coverageTargets:
         - FlashCards
         - package: FlashCore/FlashCore

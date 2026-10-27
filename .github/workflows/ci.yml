@@ -24,6 +24,8 @@ jobs:
     timeout-minutes: 30
     env:
       XCBEAUTIFY_FLAGS: --quiet --is-ci --renderer github-actions
+      # The runner image has no iOS 26 runtime: test on the same device, on its newest iOS (#38).
+      SIM_OS: ""
     steps:
       - uses: actions/checkout@v4
       - name: Install tools
@@ -31,8 +33,10 @@ jobs:
       - name: Show toolchain
         run: |
           xcodebuild -version
+          xcrun simctl list runtimes | grep iOS
           udid=$(scripts/sim.sh)
-          echo "Simulator: $(xcrun simctl list devices | grep "$udid" | sed -E 's/ *\(Booted\)| *\(Shutdown\)//') on $(xcrun simctl list runtimes | grep iOS | tail -1)"
+          xcrun simctl list devices -j | jq -r --arg udid "$udid" \
+            '.devices | to_entries[] | .key as $rt | .value[] | select(.udid == $udid) | "Simulator: \(.name) on \($rt)"'
       - name: Unit tests
         run: make test
       - name: UI tests

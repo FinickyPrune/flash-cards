@@ -5,7 +5,9 @@ description: Launch the FlashCards app in the iOS Simulator and visually verify 
 
 # Run and visually verify
 
-1. `make run` — builds, boots the simulator (iPhone 18 Pro on the newest iOS runtime, as on CI; override with `SIM_NAME="iPhone Duo"`), installs and launches. The simulator runs headless; no window needed.
+For PR screenshots use `make screenshots` (below). For a quick look at one screen:
+
+1. `make run` — builds, boots the simulator (iPhone 17 on iOS 26, as on CI; override with `SIM_NAME="iPhone Duo" SIM_OS=`), installs and launches. The simulator runs headless; no window needed.
 2. Wait ~2s for the UI to settle, then `NAME=<short-name> make screenshot`. It prints the path (`build/screenshots/<name>.png`, downscaled to 1000px).
 3. Read the PNG and check it against the acceptance criteria / design. List concrete differences and fix them; repeat.
 
@@ -15,7 +17,11 @@ Useful extras:
 - Deep state (e.g. a specific screen) is reached via launch arguments: `xcrun simctl launch --terminate-running-process $(scripts/sim.sh) dev.finickyprune.FlashCards -uitest-reset` — add support for the argument in the app if needed.
 - App logs: `xcrun simctl spawn $(scripts/sim.sh) log stream --level debug --predicate 'subsystem == "dev.finickyprune.FlashCards"'` (run in background, stop when done).
 
-Interactions (taps, typing) are not scripted here — drive multi-step flows with a UI test instead, then screenshot the end state.
+## Screenshot tour
+`make screenshots` runs `Tests/UITests/ScreenshotTour.swift` on seeded data in light and dark and writes
+`build/screenshots/<stop>-<light|dark>.png` (downscaled to 1000 px). The tour is skipped in normal UI runs.
+A screen the tour doesn't reach yet → add a stop (`stop("<name>", in: app)`) in the same PR; never write a
+throwaway tour. Run it once, after the last UI change.
 
 ## For the PR
 Every UI change needs light + dark screenshots of each changed screen in the PR. `build/` is gitignored and

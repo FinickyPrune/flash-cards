@@ -12,9 +12,11 @@ open FlashCards.xcodeproj
 ```bash
 make build       # build for the simulator
 make test        # unit tests (Swift Testing)
-make test-ui     # UI tests
-make check       # lint + all tests (pre-PR gate)
+make test-ui     # UI tests (ONLY=FlashCardsUITests/<Class> to narrow)
+make check       # everything CI runs: lint + all tests (manual full run)
+make screenshots # screenshot tour, light + dark, into build/screenshots
 make run         # launch in the simulator
+make sim-stop    # shut down simulators when done
 make help        # everything else
 ```
 

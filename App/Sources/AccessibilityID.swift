@@ -55,6 +55,7 @@ enum AccessibilityID {
     enum FolderForm {
         static let name = "folderForm.name"
         static let save = "folderForm.save"
+        static let cancel = "folderForm.cancel"
         static let learningLanguage = "folderForm.learningLanguage"
         static let backLanguage = "folderForm.backLanguage"
     }

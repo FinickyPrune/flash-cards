@@ -6,11 +6,14 @@ import UIKit
 @MainActor
 enum SampleData {
     static func insert(into context: ModelContext) {
-        let english = Folder(name: "English", learningLanguage: "en", backLanguage: "ru")
+        let english = Folder(name: "English", learningLanguage: "en", backLanguage: "ru", palette: .indigo)
         let show = Folder(name: "Breaking Bad", parent: english)
+        show.ownPalette = .lagoon
         let season = Folder(name: "Season 1", parent: show)
-        let serbian = Folder(name: "Serbian", learningLanguage: "sr-Latn", backLanguage: "ru")
-        for folder in [english, show, season, Folder(name: "Season 2", parent: show), serbian] {
+        let season2 = Folder(name: "Season 2", parent: show)
+        season2.ownPalette = .arctic
+        let serbian = Folder(name: "Serbian", learningLanguage: "sr-Latn", backLanguage: "ru", palette: .mint)
+        for folder in [english, show, season, season2, serbian] {
             context.insert(folder)
         }
         let cards: [(folder: Folder, words: [(front: String, back: String)])] = [

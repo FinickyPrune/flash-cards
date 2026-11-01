@@ -34,6 +34,7 @@ struct NewRootFolderSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .accessibilityIdentifier(AccessibilityID.FolderForm.cancel)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Create", action: create)

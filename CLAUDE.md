@@ -13,8 +13,8 @@ Screenshot Flashcards: turns screenshots (e.g. of subtitled shows) into flash ca
 ## Commands
 `make help` lists everything. Main ones:
 - `make build` · `make test` (unit; `ONLY=FlashCardsTests/Suite[/test()]` to narrow) · `make test-ui` · `make lint` · `make format`
-- Before a PR: `make lint test` + the UI tests of touched screens (`make test-ui ONLY=FlashCardsUITests/<Class>`). The full UI suite runs on CI, which merging requires. `make check` (everything CI runs) is for a manual full run.
-- `make screenshots` — screenshot tour, light + dark, into `build/screenshots/`; `make run` then `NAME=x make screenshot` for a one-off
+- Before a PR: `make lint test` + only the UI tests the PR adds or changes, in one run (`make test-ui ONLY="FlashCardsUITests/<Class>/<test> …"`). The full UI suite runs on CI, which merging requires. `make check` (everything CI runs) is for a manual full run.
+- Screenshots: CI's `Screenshots` workflow runs the tour (light + dark) on every PR touching `App/` or `Tests/UITests/` and posts it as a PR comment. Locally `make screenshots` only while iterating on visuals; `make run` then `NAME=x make screenshot` for a one-off
 - `make sim-stop` — shut down simulators at the end of a work session
 - Fresh clone / missing tools: `make bootstrap`
 
@@ -23,8 +23,8 @@ Screenshot Flashcards: turns screenshots (e.g. of subtitled shows) into flash ca
 - `App/Sources`, `Tests/UnitTests`, `Tests/UITests` are synced folders: new files are picked up without regenerating.
 
 ## Workflow
-Issue → branch → plan → code + tests → lint + unit + touched UI tests → screenshots (UI) → `/code-review` + `pr-reviewer` subagent → push → PR (CI runs the full UI suite) → merge (self or user, see below) → `make sim-stop`.
-- Keep the Mac light: run each heavy step once, at the end (full test runs, screenshots after the last UI change); narrow with `ONLY=` while iterating.
+Issue → branch → plan → code + tests → lint + unit + new/changed UI tests → `/code-review` + `pr-reviewer` subagent → push → PR (CI runs the full UI suite and posts screenshots; check them) → merge (self or user, see below) → `make sim-stop`.
+- Keep the Mac light: local xcodebuild runs at background priority (`taskpolicy -b`; `LOW_PRIORITY=0` to opt out) and UI runs skip coverage. Run each heavy step once, at the end, and several test classes in one `ONLY="…"` run, never one command per class.
 - New idea without an issue → `write-spec` skill. Implementing an issue → `work-issue` skill.
 - Branches: `<type>/<issue>-<slug>`. Commits: Conventional Commits with `Refs #<issue>`.
 - Show evidence (test summary, screenshot), not "it works".

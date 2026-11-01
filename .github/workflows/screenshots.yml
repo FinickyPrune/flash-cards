@@ -1,0 +1,53 @@
+name: Screenshots
+
+# The screenshot tour, light and dark, posted as one PR comment, so local runs can skip it.
+# Not a required check.
+on:
+  pull_request:
+    paths:
+      - "App/**"
+      - "Tests/UITests/**"
+      # And changes to how it runs, so they are tried on their own PR.
+      - ".github/workflows/screenshots.yml"
+      - "scripts/post-screenshots.sh"
+      - "scripts/upload-screenshot.sh"
+      - "scripts/export-screenshots.sh"
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write # upload to the pr-assets branch
+  pull-requests: write # post the comment
+
+jobs:
+  tour:
+    # A fork's token can't write; its author runs `make screenshots` instead.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: xcode-27
+    timeout-minutes: 30
+    env:
+      XCBEAUTIFY_FLAGS: --quiet --is-ci --renderer github-actions
+      # The runner image has no iOS 26 runtime: same device, its newest iOS (#38).
+      SIM_OS: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen xcbeautify
+      - name: Screenshot tour
+        run: make screenshots
+      - name: Post to the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --depth=1 origin "$HEAD_SHA"
+          scripts/post-screenshots.sh ${{ github.event.pull_request.number }} build/screenshots
+      - name: Upload results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-results
+          path: build/results
+          retention-days: 7

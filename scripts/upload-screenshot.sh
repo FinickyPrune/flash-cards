@@ -2,6 +2,8 @@
 # Usage: scripts/upload-screenshot.sh <pr-number> <file.png>...
 # Stores screenshots on the `pr-assets` branch (via the GitHub API, the working tree
 # is untouched) and prints a markdown image line for each one.
+# ASSET_DIR overrides the folder on that branch (default pr-<n>); CI uses one per commit so a
+# re-run never shows a cached older image.
 set -euo pipefail
 
 [[ $# -ge 2 ]] || { echo "usage: $0 <pr-number> <file.png>..." >&2; exit 1; }
@@ -17,7 +19,7 @@ fi
 
 for file in "$@"; do
     name=$(basename "$file")
-    path="pr-$pr/$(jq -rn --arg n "$name" '$n | @uri')"
+    path="${ASSET_DIR:-pr-$pr}/$(jq -rn --arg n "$name" '$n | @uri')"
     # Overwrite if it already exists (re-uploading after a fix).
     sha=$(gh api "repos/$repo/contents/$path?ref=$branch" -q .sha 2>/dev/null || true)
     # Body goes through stdin: a base64 PNG can exceed the argv size limit.

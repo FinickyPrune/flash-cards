@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 
 /// Home: the root folders' actions and creating a root folder.
@@ -11,6 +12,11 @@ final class HomeViewModel {
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
         rowActions = FolderRowActionsModel(dependencies: dependencies)
+    }
+
+    /// Home's subtitle count: what Play would take today across all root folders.
+    static func dueToday(in roots: [Folder], at now: Date) -> Int {
+        roots.reduce(0) { $0 + $1.dueCount(at: now) }
     }
 
     func newRootFolderModel() -> NewRootFolderViewModel {

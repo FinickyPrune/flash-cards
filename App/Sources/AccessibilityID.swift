@@ -14,6 +14,8 @@ enum AccessibilityID {
         static let empty = "folder.empty"
         static let emptyNewSubfolder = "folder.emptyNewSubfolder"
         static let play = "folder.play"
+        static let more = "folder.more"
+        static let title = "folder.title"
     }
 
     enum Row {

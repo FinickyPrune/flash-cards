@@ -1,3 +1,4 @@
+import FlashCore
 import Foundation
 import SwiftData
 
@@ -76,6 +77,15 @@ final class Folder {
         let start = FolderProgress(learned: own.count(where: \.isLearned), total: own.count)
         return (children ?? []).map(\.progress).reduce(start) {
             FolderProgress(learned: $0.learned + $1.learned, total: $0.total + $1.total)
+        }
+    }
+
+    /// Cards in the subtree Play would take at `now`, without the session cap: due or new
+    /// (`catalog.md`). Due dates fall on the 04:00 review-day start, so this needs no calendar.
+    func dueCount(at now: Date) -> Int {
+        subtreeCards.count {
+            let card = $0.sessionCard
+            return card.isNew || card.isDue(at: now)
         }
     }
 

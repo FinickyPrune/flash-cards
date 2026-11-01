@@ -10,6 +10,10 @@ final class FolderViewModel {
     /// The open card editor; built once when it opens, so it never re-reads a card it deleted.
     var editor: CardEditorViewModel?
     var saveError: String?
+    /// The folder itself, while its delete from the More menu waits for confirmation.
+    var deleting: Folder?
+    /// Set once the folder is deleted; the screen stops reading it and leaves.
+    private(set) var isDeleted = false
     let rowActions: FolderRowActionsModel
     private let dependencies: AppDependencies
 
@@ -34,6 +38,25 @@ final class FolderViewModel {
         } catch {
             saveError = error.localizedDescription
         }
+    }
+
+    /// Deletes the folder after the user confirmed; returns whether the screen should leave. Marks
+    /// it deleted first so the screen never reads a deleted model.
+    func confirmDelete() -> Bool {
+        deleting = nil
+        isDeleted = true
+        do {
+            try dependencies.catalogService.delete(folder)
+            return true
+        } catch {
+            isDeleted = false
+            saveError = error.localizedDescription
+            return false
+        }
+    }
+
+    func subfolderModel(for subfolder: Folder) -> FolderViewModel {
+        FolderViewModel(folder: subfolder, dependencies: dependencies)
     }
 
     func newSubfolderModel() -> FolderNameViewModel {

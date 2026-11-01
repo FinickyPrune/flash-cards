@@ -40,9 +40,9 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
   its cards newest first, a row showing the front in bold and the back. (#14, #43)
 - Progress is learned cards / all cards in the subtree. A learned card is defined in
   `review.md`. (#29)
-- **Play** is available on every folder and reviews the folder's subtree (see `review.md`): on
-  the folder screen's summary card, and first on a folder's context menu (home and folder
-  screens). (#28, #43)
+- **Play** reviews a folder's subtree (see `review.md`): first on a folder's context menu (home
+  and folder screens) for every folder, and on the folder screen's summary card while the
+  subtree has cards. (#28, #43)
 - **New card** on a folder screen opens the card editor in add mode with that folder chosen;
   tapping a card opens it in edit mode. (#15)
 

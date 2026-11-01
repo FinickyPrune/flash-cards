@@ -29,7 +29,6 @@ struct SubfolderTile: View {
         .padding(14)
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
         .background { CardGlow(palette: palette).clipShape(.rect(cornerRadius: 24, style: .continuous)) }
-        .contentShape(.contextMenuPreview, .rect(cornerRadius: 24, style: .continuous))
         .shadow(color: Color(rgb: 0x1E2350, opacity: 0.07), radius: 11, y: 8)
     }
 }

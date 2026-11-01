@@ -45,18 +45,30 @@ extension View {
 struct FolderActionButtons: View {
     let folder: Folder
     let actions: FolderRowActionsModel
+    /// Off on the folder's own screen, where Play is on the summary card.
+    var includesPlay = true
+    /// Asks before deleting; by default through `actions`.
+    var delete: (() -> Void)?
 
     var body: some View {
-        Button("Play", systemImage: "play") { actions.play(folder) }
-            .accessibilityIdentifier(AccessibilityID.FolderAction.play)
+        if includesPlay {
+            Button("Play", systemImage: "play") { actions.play(folder) }
+                .accessibilityIdentifier(AccessibilityID.FolderAction.play)
+        }
         Button("Rename", systemImage: "pencil") { actions.renaming = folder }
             .accessibilityIdentifier(AccessibilityID.FolderAction.rename)
         Button("Appearance", systemImage: "paintpalette") { actions.styling = folder }
             .accessibilityIdentifier(AccessibilityID.FolderAction.appearance)
         Button("Move", systemImage: "folder") { actions.moving = folder }
             .accessibilityIdentifier(AccessibilityID.FolderAction.move)
-        Button("Delete", systemImage: "trash", role: .destructive) { actions.deleting = folder }
-            .accessibilityIdentifier(AccessibilityID.FolderAction.delete)
+        Button("Delete", systemImage: "trash", role: .destructive) {
+            if let delete {
+                delete()
+            } else {
+                actions.deleting = folder
+            }
+        }
+        .accessibilityIdentifier(AccessibilityID.FolderAction.delete)
     }
 }
 

@@ -26,10 +26,8 @@ final class ScreenshotTour: XCTestCase {
             XCUIDevice.shared.appearance = mode
             appearance = name
             tour()
+            largestText()
         }
-        XCUIDevice.shared.appearance = .light
-        appearance = "light"
-        largestText()
     }
 
     /// Home and a folder at the largest accessibility text size, to catch clipping.
@@ -42,6 +40,7 @@ final class ScreenshotTour: XCTestCase {
         app.launch()
         let english = app.buttons["row.folder.English"]
         XCTAssertTrue(english.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["English"].firstMatch.waitForExistence(timeout: 5))
         stop("home-largest-text", in: app)
         english.tap()
         XCTAssertTrue(app.buttons["row.folder.Breaking Bad"].waitForExistence(timeout: 5))

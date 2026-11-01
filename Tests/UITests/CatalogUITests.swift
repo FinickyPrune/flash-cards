@@ -137,6 +137,10 @@ final class CatalogUITests: XCTestCase {
         // Back on English, now empty: Pilot moved out before it was deleted.
         XCTAssertTrue(app.descendants(matching: .any)["folder.empty"].firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(title.label, "English")
+        // The empty state's buttons sit in a list row; only the tapped one may act.
+        app.buttons["folder.emptyNewSubfolder"].tap()
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        app.buttons["folderForm.cancel"].tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(english.waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["row.folder.Pilot"].exists)

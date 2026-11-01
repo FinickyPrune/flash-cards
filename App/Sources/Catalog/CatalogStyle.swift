@@ -9,6 +9,6 @@ enum CatalogStyle {
     /// Text and glyphs on an accent fill: dark accents are deep, light ones are pale.
     static let onAccent = Color(light: 0xFFFFFF, dark: 0x0C0D12)
     /// Home's wash, not tied to a folder.
-    static let homeHues = FolderPalette.Colors(first: 0x8A8AF5, second: 0x8FD3F7, accent: 0)
-    static let homeHuesDark = FolderPalette.Colors(first: 0x5B5BE8, second: 0x4FAEDB, accent: 0)
+    static let homeHues: (first: UInt32, second: UInt32) = (0x8A8AF5, 0x8FD3F7)
+    static let homeHuesDark: (first: UInt32, second: UInt32) = (0x5B5BE8, 0x4FAEDB)
 }

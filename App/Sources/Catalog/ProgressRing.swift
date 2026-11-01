@@ -7,7 +7,7 @@ struct ProgressRing: View {
     @ScaledMetric private var size = 44.0
 
     var body: some View {
-        let fraction = Double(progress.learned) / Double(max(progress.total, 1))
+        let fraction = progress.fraction
         ZStack {
             Circle()
                 .stroke(Color.primary.opacity(0.09), lineWidth: size * 0.09)
@@ -15,7 +15,7 @@ struct ProgressRing: View {
                 .trim(from: 0, to: fraction)
                 .stroke(accent, style: StrokeStyle(lineWidth: size * 0.09, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-            Text(fraction, format: .percent.precision(.fractionLength(0)))
+            Text("\(progress.percent)%")
                 .font(.system(size: size * 0.25, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.secondary)

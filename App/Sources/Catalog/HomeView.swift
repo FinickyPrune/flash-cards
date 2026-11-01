@@ -16,18 +16,9 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            let now = Date.now
-            List(roots) { folder in
-                NavigationLink(value: folder) {
-                    FolderRow(folder: folder, now: now)
-                }
-                .folderRowActions(for: folder, model.rowActions)
-                .listRowBackground(CatalogStyle.surface)
-                .accessibilityIdentifier(AccessibilityID.Row.folder(folder.name))
-            }
-            .scrollContentBackground(.hidden)
-            .background {
-                ScreenWash(light: CatalogStyle.homeHues, dark: CatalogStyle.homeHuesDark, strength: 0.8)
+            // Re-read every minute so cards turn due at 04:00 while home is open.
+            TimelineView(.everyMinute) { context in
+                folderList(now: context.date)
             }
             .overlay {
                 if roots.isEmpty {
@@ -42,7 +33,6 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Folders")
-            .navigationSubtitle(subtitle(due: HomeViewModel.dueToday(in: roots, at: now)))
             .navigationDestination(for: Folder.self) { FolderView(model: model.folderModel(for: $0)) }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -53,6 +43,22 @@ struct HomeView: View {
             .sheet(isPresented: $model.isCreatingFolder) { NewRootFolderSheet(model: model.newRootFolderModel()) }
             .folderActionsPresentation(model.rowActions)
         }
+    }
+
+    private func folderList(now: Date) -> some View {
+        List(roots) { folder in
+            NavigationLink(value: folder) {
+                FolderRow(folder: folder, now: now)
+            }
+            .folderRowActions(for: folder, model.rowActions)
+            .listRowBackground(CatalogStyle.surface)
+            .accessibilityIdentifier(AccessibilityID.Row.folder(folder.name))
+        }
+        .scrollContentBackground(.hidden)
+        .background {
+            ScreenWash(light: CatalogStyle.homeHues, dark: CatalogStyle.homeHuesDark, strength: 0.8)
+        }
+        .navigationSubtitle(subtitle(due: HomeViewModel.dueToday(in: roots, at: now)))
     }
 }
 

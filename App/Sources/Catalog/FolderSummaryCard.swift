@@ -28,7 +28,7 @@ struct FolderSummaryCard: View {
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             }
-            ProgressBar(fraction: Double(progress.learned) / Double(max(progress.total, 1)), color: palette.accent)
+            ProgressBar(fraction: progress.fraction, color: palette.accent)
             Button(action: play) {
                 Label("Play", systemImage: "play.fill")
                     .font(.headline)

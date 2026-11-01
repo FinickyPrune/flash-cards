@@ -3,8 +3,9 @@ import SwiftUI
 /// A screen's background: two hues spreading from the top corners and fading out by mid-screen,
 /// over a near-white or near-black base; weaker in dark mode so the hues don't go muddy.
 struct ScreenWash: View {
-    let light: FolderPalette.Colors
-    let dark: FolderPalette.Colors
+    /// The two hues, `0xRRGGBB`, for light and for dark mode.
+    let light: (first: UInt32, second: UInt32)
+    let dark: (first: UInt32, second: UInt32)
     /// 1 for a folder screen; home's wash is a little softer.
     var strength = 1.0
     @Environment(\.colorScheme) private var colorScheme
@@ -29,6 +30,9 @@ struct ScreenWash: View {
 extension ScreenWash {
     /// A folder screen's wash, in the folder's palette.
     init(palette: FolderPalette) {
-        self.init(light: palette.light, dark: palette.dark)
+        self.init(
+            light: (palette.light.first, palette.light.second),
+            dark: (palette.dark.first, palette.dark.second)
+        )
     }
 }

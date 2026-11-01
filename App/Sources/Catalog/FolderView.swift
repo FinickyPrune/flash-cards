@@ -53,7 +53,11 @@ struct FolderView: View {
                         Button("New Subfolder") { model.isCreatingSubfolder = true }
                             .accessibilityIdentifier(AccessibilityID.FolderScreen.emptyNewSubfolder)
                     }
+                    // Contain: the buttons keep their own identifiers.
+                    .accessibilityElement(children: .contain)
                     .accessibilityIdentifier(AccessibilityID.FolderScreen.empty)
+                    // Borderless: in a list row, default buttons all fire on a tap anywhere in it.
+                    .buttonStyle(.borderless)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                 }
@@ -61,11 +65,14 @@ struct FolderView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     FolderHeader(folder: folder)
                     if progress.total > 0 {
-                        FolderSummaryCard(
-                            palette: palette,
-                            due: folder.dueCount(at: .now),
-                            progress: progress
-                        ) { model.rowActions.play(folder) }
+                        // Re-read every minute so cards turn due at 04:00 while the screen is open.
+                        TimelineView(.everyMinute) { context in
+                            FolderSummaryCard(
+                                palette: palette,
+                                due: folder.dueCount(at: context.date),
+                                progress: progress
+                            ) { model.rowActions.play(folder) }
+                        }
                     }
                     if !subfolders.isEmpty {
                         SectionTitle("Folders")
@@ -116,17 +123,13 @@ struct FolderView: View {
         .folderActionsPresentation(model.rowActions)
     }
 
-    /// The folder's own actions; Play is on the summary card.
+    /// The folder's own actions, as on its context menu but without Play (on the summary card);
+    /// deleting it also leaves the screen.
     private func moreMenu(for folder: Folder) -> some View {
         Menu("More", systemImage: "ellipsis") {
-            Button("Rename", systemImage: "pencil") { model.rowActions.renaming = folder }
-                .accessibilityIdentifier(AccessibilityID.FolderAction.rename)
-            Button("Move", systemImage: "folder") { model.rowActions.moving = folder }
-                .accessibilityIdentifier(AccessibilityID.FolderAction.move)
-            Button("Appearance", systemImage: "paintpalette") { model.rowActions.styling = folder }
-                .accessibilityIdentifier(AccessibilityID.FolderAction.appearance)
-            Button("Delete", systemImage: "trash", role: .destructive) { model.deleting = folder }
-                .accessibilityIdentifier(AccessibilityID.FolderAction.delete)
+            FolderActionButtons(folder: folder, actions: model.rowActions, includesPlay: false) {
+                model.deleting = folder
+            }
         }
         .accessibilityIdentifier(AccessibilityID.FolderScreen.more)
     }
@@ -158,6 +161,7 @@ private struct SubfolderGrid: View {
                 }
                 .menuStyle(.button)
                 .buttonStyle(.plain)
+                .accessibilityActions { FolderActionButtons(folder: subfolder, actions: actions) }
                 .accessibilityIdentifier(AccessibilityID.Row.folder(subfolder.name))
             }
         }

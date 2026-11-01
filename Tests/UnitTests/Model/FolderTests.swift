@@ -81,6 +81,15 @@ struct FolderTests {
         #expect(child.progress == FolderProgress(learned: 0, total: 4))
     }
 
+    // Catches: rounding to nearest, which shows an unfinished folder as 100%, or dividing by zero.
+    @Test(
+        "The ring's percent rounds down",
+        arguments: [(199, 200, 99), (1, 3, 33), (2, 2, 100), (0, 0, 0)]
+    )
+    func percent(learned: Int, total: Int, expected: Int) {
+        #expect(FolderProgress(learned: learned, total: total).percent == expected)
+    }
+
     // Catches: counting only due or only new cards, counting a future card, skipping subfolders,
     // or turning the day over at midnight instead of at the stored 04:00 due date.
     @Test("Due count: due and new cards in the subtree; a card due tomorrow counts from 04:00")

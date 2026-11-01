@@ -1,18 +1,21 @@
 import Foundation
 import Observation
 
-/// The new root folder form: name and language pair, both languages defaulting to the device's.
+/// The new root folder form: name, language pair (both defaulting to the device's language) and
+/// palette (defaulting to one no root folder uses yet).
 @MainActor
 @Observable
 final class NewRootFolderViewModel {
     var name = ""
     var learningLanguage = Languages.systemLanguage
     var backLanguage = Languages.systemLanguage
+    var palette: FolderPalette
     var saveError: String?
     private let service: any CatalogServicing
 
     init(service: any CatalogServicing) {
         self.service = service
+        palette = service.paletteForNewRoot()
     }
 
     var canCreate: Bool {
@@ -23,7 +26,12 @@ final class NewRootFolderViewModel {
     func create() -> Bool {
         guard canCreate else { return false }
         do {
-            try service.createRootFolder(name: name, learningLanguage: learningLanguage, backLanguage: backLanguage)
+            try service.createRootFolder(
+                name: name,
+                learningLanguage: learningLanguage,
+                backLanguage: backLanguage,
+                palette: palette
+            )
             return true
         } catch {
             saveError = error.localizedDescription

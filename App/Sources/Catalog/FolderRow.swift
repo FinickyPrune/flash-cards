@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// A folder in a list; root folders also show their language pair. Trailing: learned / all
-/// cards in the subtree, hidden while the subtree has no cards.
+/// A folder in a list: a tile in its palette, the name, and for a root folder its language pair.
+/// Trailing: learned / all cards in the subtree, hidden while the subtree has no cards.
 struct FolderRow: View {
     let folder: Folder
 
@@ -26,7 +26,7 @@ struct FolderRow: View {
                     }
                 }
             } icon: {
-                Image(systemName: "folder")
+                FolderTile(palette: folder.resolvedPalette)
             }
         }
     }

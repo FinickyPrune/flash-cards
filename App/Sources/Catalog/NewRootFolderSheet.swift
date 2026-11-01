@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Creates a root folder: name and language pair, both languages defaulting to the system one.
+/// Creates a root folder: name, language pair (both defaulting to the system language) and palette.
 struct NewRootFolderSheet: View {
     @State private var model: NewRootFolderViewModel
     @Environment(\.dismiss) private var dismiss
@@ -24,7 +24,11 @@ struct NewRootFolderSheet: View {
                 } footer: {
                     Text("Subfolders use the same languages. They can't be changed later.")
                 }
+                Section("Gradient") {
+                    PalettePicker(selection: $model.palette)
+                }
             }
+            .tint(model.palette.accent)
             .navigationTitle("New Folder")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

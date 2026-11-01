@@ -76,4 +76,24 @@ struct CatalogViewModelTests {
         #expect(model.save() == false)
         #expect(model.saveError != nil)
     }
+
+    // Catches: saving the shown palette while "same as parent" is on (the subfolder would stop
+    // following), or a picked swatch not turning that off.
+    @Test("Appearance saves nil while following the parent and the picked palette otherwise")
+    func appearanceSave() {
+        let english = Folder(name: "English", learningLanguage: "en", backLanguage: "ru", palette: .lilac)
+        let season = Folder(name: "Season 1", parent: english)
+        container.mainContext.insert(english)
+        given(service).setPalette(.any, of: .any).willReturn()
+        let model = AppearanceViewModel(folder: season, service: service)
+
+        #expect(model.isSameAsParent)
+        #expect(model.save())
+        verify(service).setPalette(.value(nil), of: .value(season)).called(.once)
+
+        model.pick(.rose)
+        #expect(!model.isSameAsParent)
+        #expect(model.save())
+        verify(service).setPalette(.value(.rose), of: .value(season)).called(.once)
+    }
 }

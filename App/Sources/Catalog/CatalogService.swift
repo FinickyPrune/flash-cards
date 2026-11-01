@@ -8,11 +8,17 @@ struct CatalogService: CatalogServicing {
     let context: ModelContext
 
     @discardableResult
-    func createRootFolder(name: String, learningLanguage: String, backLanguage: String) throws -> Folder {
+    func createRootFolder(
+        name: String,
+        learningLanguage: String,
+        backLanguage: String,
+        palette: FolderPalette
+    ) throws -> Folder {
         let folder = try Folder(
             name: validName(name),
             learningLanguage: learningLanguage,
-            backLanguage: backLanguage
+            backLanguage: backLanguage,
+            palette: palette
         )
         context.insert(folder)
         try context.saveOrRollback()
@@ -27,8 +33,18 @@ struct CatalogService: CatalogServicing {
         return folder
     }
 
+    func paletteForNewRoot() -> FolderPalette {
+        let roots = (try? context.fetch(FetchDescriptor<Folder>(predicate: #Predicate { $0.parent == nil }))) ?? []
+        return .forNewRoot(used: roots.map(\.resolvedPalette))
+    }
+
     func rename(_ folder: Folder, to name: String) throws {
         folder.name = try validName(name)
+        try context.saveOrRollback()
+    }
+
+    func setPalette(_ palette: FolderPalette?, of folder: Folder) throws {
+        folder.ownPalette = palette
         try context.saveOrRollback()
     }
 
@@ -48,8 +64,8 @@ struct CatalogService: CatalogServicing {
         return samePair ? .allowed : .allowedAfterWarning
     }
 
-    /// A folder that becomes a root keeps the pair it had; one that goes under another
-    /// folder drops its own and inherits the new root's.
+    /// A folder that becomes a root keeps the pair and the palette it had; one that goes under
+    /// another folder drops its own pair and inherits the new root's.
     func move(_ folder: Folder, to destination: Folder?) throws {
         guard moveCheck(folder, to: destination) != .notAllowed else { throw CatalogError.moveNotAllowed }
         if let destination {
@@ -62,6 +78,7 @@ struct CatalogService: CatalogServicing {
             folder.learningLanguage = root.learningLanguage
             folder.backLanguage = root.backLanguage
             folder.lastBackSource = root.lastBackSource
+            folder.ownPalette = folder.resolvedPalette
             folder.parent = nil
         }
         try context.saveOrRollback()

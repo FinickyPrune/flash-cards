@@ -14,10 +14,19 @@ struct CatalogServiceTests {
         service = CatalogService(context: container.mainContext)
     }
 
+    @discardableResult
+    private func createRoot(
+        _ name: String,
+        learning: String = "en",
+        palette: FolderPalette = .lagoon
+    ) throws -> Folder {
+        try service.createRootFolder(name: name, learningLanguage: learning, backLanguage: "ru", palette: palette)
+    }
+
     // Catches: the pair not being stored on the root, or a subfolder storing (and so not inheriting) one.
     @Test("A root folder stores the chosen pair and its subfolder reports it")
     func createWithPair() throws {
-        let root = try service.createRootFolder(name: " English ", learningLanguage: "en", backLanguage: "ru")
+        let root = try createRoot(" English ")
         let sub = try service.createSubfolder(name: "Season 1", in: root)
 
         #expect(root.name == "English")
@@ -39,9 +48,9 @@ struct CatalogServiceTests {
         ]
     )
     func moveCheck(destination: String, expected: MoveCheck) throws {
-        let english = try service.createRootFolder(name: "English", learningLanguage: "en", backLanguage: "ru")
-        let shows = try service.createRootFolder(name: "Shows", learningLanguage: "en", backLanguage: "ru")
-        let serbian = try service.createRootFolder(name: "Serbian", learningLanguage: "sr-Latn", backLanguage: "ru")
+        let english = try createRoot("English")
+        let shows = try createRoot("Shows")
+        let serbian = try createRoot("Serbian", learning: "sr-Latn")
         let folder = try service.createSubfolder(name: "Season 1", in: english)
         let grandchild = try service.createSubfolder(
             name: "Episode 2",
@@ -58,8 +67,8 @@ struct CatalogServiceTests {
     // Catches: a moved folder keeping its old pair under the new root, or losing it when it becomes a root.
     @Test("Moving takes the new root's pair; moving to the top level keeps the old one")
     func movePair() throws {
-        let english = try service.createRootFolder(name: "English", learningLanguage: "en", backLanguage: "ru")
-        let serbian = try service.createRootFolder(name: "Serbian", learningLanguage: "sr-Latn", backLanguage: "ru")
+        let english = try createRoot("English")
+        let serbian = try createRoot("Serbian", learning: "sr-Latn")
         let words = try service.createSubfolder(name: "Words", in: english)
 
         try service.move(words, to: nil)
@@ -78,7 +87,7 @@ struct CatalogServiceTests {
     @Test("Deleting a folder removes its subtree only")
     func deleteSubtreeOnly() throws {
         let context = container.mainContext
-        let root = try service.createRootFolder(name: "English", learningLanguage: "en", backLanguage: "ru")
+        let root = try createRoot("English")
         let doomed = try service.createSubfolder(name: "Season 1", in: root)
         try service.createSubfolder(name: "Episode 1", in: doomed)
         let sibling = try service.createSubfolder(name: "Season 2", in: root)
@@ -91,5 +100,37 @@ struct CatalogServiceTests {
         #expect(folders.map(\.name) == ["English", "Season 2"])
         #expect(try context.fetch(FetchDescriptor<Card>()).map(\.front) == ["see"])
         #expect(root.children?.map(\.name) == ["Season 2"])
+    }
+
+    // Catches: counting only stored palettes (an old root's derived one would be offered again)
+    // or ignoring the existing roots altogether.
+    @Test("A new root folder is offered a palette no root folder shows yet")
+    func paletteForNewRoot() throws {
+        for palette in [FolderPalette.lagoon, .indigo, .mint, .arctic, .glacier, .aurora] {
+            try createRoot(palette.rawValue, palette: palette)
+        }
+        // A root from before palettes; this id derives Lilac.
+        let legacy = Folder(name: "Old", learningLanguage: "en", backLanguage: "ru")
+        legacy.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+        container.mainContext.insert(legacy)
+
+        #expect(service.paletteForNewRoot() == .rose)
+    }
+
+    // Catches: a folder that becomes a root jumping to its derived palette, or a following
+    // subfolder keeping the old parent's colours after a move.
+    @Test("Moving to the top level keeps the palette shown; a following subfolder follows its new parent")
+    func movePalette() throws {
+        let english = try createRoot("English", palette: .lilac)
+        let shows = try createRoot("Shows", palette: .rose)
+        let words = try service.createSubfolder(name: "Words", in: english)
+        let clips = try service.createSubfolder(name: "Clips", in: english)
+
+        try service.move(words, to: nil)
+        try service.move(clips, to: shows)
+
+        #expect(words.ownPalette == .lilac)
+        #expect(clips.ownPalette == nil)
+        #expect(clips.resolvedPalette == .rose)
     }
 }

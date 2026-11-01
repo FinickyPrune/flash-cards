@@ -29,11 +29,13 @@ struct FolderPaletteTests {
         #expect(ids.map(FolderPalette.derived(from:)) == [.lilac, .aurora])
     }
 
-    /// WCAG 2 contrast for normal text. Catches: a new or edited accent too light to read as text.
+    /// WCAG 2 contrast for normal text, against the grouped background (#F2F2F7, darker than
+    /// white) and the lightest dark grouped surface (#2C2C2E). Catches: a new or edited accent too
+    /// light (or too dark) to read as text.
     @Test("Every accent is readable on its background", arguments: FolderPalette.allCases)
     func accentContrast(palette: FolderPalette) {
-        #expect(Self.contrast(palette.light.accent, 0xFFFFFF) >= 4.5)
-        #expect(Self.contrast(palette.dark.accent, 0x1A1C24) >= 4.5)
+        #expect(Self.contrast(palette.light.accent, 0xF2F2F7) >= 4.5)
+        #expect(Self.contrast(palette.dark.accent, 0x2C2C2E) >= 4.5)
     }
 
     private static func contrast(_ first: UInt32, _ second: UInt32) -> Double {

@@ -117,20 +117,27 @@ struct CatalogServiceTests {
         #expect(service.paletteForNewRoot() == .rose)
     }
 
-    // Catches: a folder that becomes a root jumping to its derived palette, or a following
-    // subfolder keeping the old parent's colours after a move.
-    @Test("Moving to the top level keeps the palette shown; a following subfolder follows its new parent")
+    // Catches: a folder that becomes a root jumping to its derived palette, an old root taking
+    // its new parent's colours, or a following subfolder keeping the old parent's colours.
+    @Test("A moved root or a new top-level folder keeps its palette; a following subfolder follows its new parent")
     func movePalette() throws {
         let english = try createRoot("English", palette: .lilac)
         let shows = try createRoot("Shows", palette: .rose)
         let words = try service.createSubfolder(name: "Words", in: english)
         let clips = try service.createSubfolder(name: "Clips", in: english)
 
+        // A root from before palettes; this id derives Lilac.
+        let legacy = Folder(name: "Old", learningLanguage: "en", backLanguage: "ru")
+        legacy.id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+        container.mainContext.insert(legacy)
+
         try service.move(words, to: nil)
         try service.move(clips, to: shows)
+        try service.move(legacy, to: shows)
 
         #expect(words.ownPalette == .lilac)
         #expect(clips.ownPalette == nil)
         #expect(clips.resolvedPalette == .rose)
+        #expect(legacy.resolvedPalette == .lilac)
     }
 }

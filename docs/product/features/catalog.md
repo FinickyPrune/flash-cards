@@ -20,8 +20,8 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
   - **Appearance** on a folder row's context menu changes it later; for a subfolder it can go
     back to following the parent.
   - A root folder from before palettes gets one derived from its id, stable across launches.
-  - A folder moved to the top level keeps the palette it showed; a following subfolder moved
-    elsewhere follows its new parent.
+  - A folder moved to the top level, or a root folder moved under another folder, keeps the
+    palette it showed; a following subfolder moved elsewhere follows its new parent.
   - Folder rows show a tile in the palette's gradient; a folder screen uses its accent.
 - Home lists the root folders by name, each with its language pair.
 - A folder screen lists its subfolders by name, then its cards newest first; a card row shows

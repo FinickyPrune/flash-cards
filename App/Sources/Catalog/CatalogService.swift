@@ -34,6 +34,7 @@ struct CatalogService: CatalogServicing {
     }
 
     func paletteForNewRoot() -> FolderPalette {
+        // Only a default the user sees and can change: if the fetch fails, offer the first palette.
         let roots = (try? context.fetch(FetchDescriptor<Folder>(predicate: #Predicate { $0.parent == nil }))) ?? []
         return .forNewRoot(used: roots.map(\.resolvedPalette))
     }
@@ -65,9 +66,13 @@ struct CatalogService: CatalogServicing {
     }
 
     /// A folder that becomes a root keeps the pair and the palette it had; one that goes under
-    /// another folder drops its own pair and inherits the new root's.
+    /// another folder drops its own pair and inherits the new root's. A root keeps its palette
+    /// either way, even one derived from its id.
     func move(_ folder: Folder, to destination: Folder?) throws {
         guard moveCheck(folder, to: destination) != .notAllowed else { throw CatalogError.moveNotAllowed }
+        if folder.parent == nil || destination == nil {
+            folder.ownPalette = folder.resolvedPalette
+        }
         if let destination {
             folder.learningLanguage = nil
             folder.backLanguage = nil
@@ -78,7 +83,6 @@ struct CatalogService: CatalogServicing {
             folder.learningLanguage = root.learningLanguage
             folder.backLanguage = root.backLanguage
             folder.lastBackSource = root.lastBackSource
-            folder.ownPalette = folder.resolvedPalette
             folder.parent = nil
         }
         try context.saveOrRollback()

@@ -1,7 +1,8 @@
 import SwiftUI
 
 extension View {
-    /// Play, rename, appearance, move and delete on a folder row: context menu and swipe actions.
+    /// Play, rename, appearance, move and delete on a folder row's context menu; rename, move and
+    /// delete also as swipe actions.
     func folderRowActions(for folder: Folder, _ actions: FolderRowActionsModel) -> some View {
         contextMenu {
             Button("Play", systemImage: "play") { actions.play(folder) }

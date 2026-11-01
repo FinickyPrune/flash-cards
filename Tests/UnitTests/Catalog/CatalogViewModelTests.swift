@@ -95,5 +95,26 @@ struct CatalogViewModelTests {
         #expect(!model.isSameAsParent)
         #expect(model.save())
         verify(service).setPalette(.value(.rose), of: .value(season)).called(.once)
+
+        // Back to following: the preview shows the parent's palette again.
+        model.isSameAsParent = true
+        #expect(model.selection == .lilac)
+    }
+
+    // Catches: the form ignoring the service's default, or creating with a fixed palette instead
+    // of the one picked.
+    @Test("The new folder form starts on the offered palette and creates with the picked one")
+    func newRootFolderPalette() {
+        given(service).paletteForNewRoot().willReturn(.aurora)
+        given(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .any)
+            .willReturn(folder("English"))
+        let model = NewRootFolderViewModel(service: service)
+        model.name = "English"
+
+        #expect(model.palette == .aurora)
+        model.palette = .rose
+        #expect(model.create())
+        verify(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .value(.rose))
+            .called(.once)
     }
 }

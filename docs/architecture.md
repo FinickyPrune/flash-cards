@@ -55,6 +55,7 @@ PhotosUI (`PhotosPicker`), StoreKit 2 (tip jar only).
 - No network calls except StoreKit (vision principle 1).
 - Schema versions: shipped schemas are frozen in `SchemaVn` and migrated by `AppMigrationPlan`;
   `Tests/UnitTests/Model/Fixtures` keeps a store written by each shipped version, and a test opens it.
+  Write a fixture from `main` before the schema change, on the minimum deployment iOS.
 - CloudKit-compatible model (decision 0001): every property has a default or is optional,
   every relationship is optional, no `@Attribute(.unique)`, no `.deny` delete rule. Uniqueness
   (duplicates) is enforced in code. Container is local: `cloudKitDatabase: .none`.
@@ -74,6 +75,7 @@ Folder
   backLanguage: String?      // root folder only
   lastBackSource: String?    // last back source used in this root folder
   createdAt: Date
+  palette: String?           // FolderPalette raw value (schema V3); nil follows the parent
 
 Card
   id: UUID

@@ -4,7 +4,8 @@ import SwiftData
 /// Catalog node holding cards and subfolders (`catalog.md`).
 ///
 /// The language pair and the last back source are stored on the root folder only;
-/// subfolders resolve them from their root.
+/// subfolders resolve them from their root. A palette is stored where the user chose one;
+/// a subfolder without one follows its parent.
 @Model
 final class Folder {
     var id = UUID()
@@ -19,12 +20,21 @@ final class Folder {
     /// Raw value of the back source last used in this root folder, see `Card.backSource`.
     var lastBackSource: String?
     var createdAt = Date.now
+    /// Raw value of the folder's own `FolderPalette`; nil follows the parent (schema V3).
+    var palette: String?
 
     /// A root folder, which owns the language pair.
-    init(name: String, learningLanguage: String, backLanguage: String, createdAt: Date = .now) {
+    init(
+        name: String,
+        learningLanguage: String,
+        backLanguage: String,
+        palette: FolderPalette? = nil,
+        createdAt: Date = .now
+    ) {
         self.name = name
         self.learningLanguage = learningLanguage
         self.backLanguage = backLanguage
+        self.palette = palette?.rawValue
         self.createdAt = createdAt
     }
 
@@ -67,6 +77,23 @@ final class Folder {
         return (children ?? []).map(\.progress).reduce(start) {
             FolderProgress(learned: $0.learned + $1.learned, total: $0.total + $1.total)
         }
+    }
+
+    /// The palette chosen for this folder itself; nil follows the parent. An unknown stored value
+    /// reads as nil.
+    var ownPalette: FolderPalette? {
+        get { palette.flatMap(FolderPalette.init(rawValue:)) }
+        set { palette = newValue?.rawValue }
+    }
+
+    /// The colours the folder is shown in: its own palette, else the nearest ancestor's; a root
+    /// folder from before palettes gets one derived from its id.
+    var resolvedPalette: FolderPalette {
+        var folder = self
+        while folder.ownPalette == nil, let parent = folder.parent {
+            folder = parent
+        }
+        return folder.ownPalette ?? .derived(from: folder.id)
     }
 
     var resolvedLearningLanguage: String? {

@@ -76,4 +76,45 @@ struct CatalogViewModelTests {
         #expect(model.save() == false)
         #expect(model.saveError != nil)
     }
+
+    // Catches: saving the shown palette while "same as parent" is on (the subfolder would stop
+    // following), or a picked swatch not turning that off.
+    @Test("Appearance saves nil while following the parent and the picked palette otherwise")
+    func appearanceSave() {
+        let english = Folder(name: "English", learningLanguage: "en", backLanguage: "ru", palette: .lilac)
+        let season = Folder(name: "Season 1", parent: english)
+        container.mainContext.insert(english)
+        given(service).setPalette(.any, of: .any).willReturn()
+        let model = AppearanceViewModel(folder: season, service: service)
+
+        #expect(model.isSameAsParent)
+        #expect(model.save())
+        verify(service).setPalette(.value(nil), of: .value(season)).called(.once)
+
+        model.pick(.rose)
+        #expect(!model.isSameAsParent)
+        #expect(model.save())
+        verify(service).setPalette(.value(.rose), of: .value(season)).called(.once)
+
+        // Back to following: the preview shows the parent's palette again.
+        model.isSameAsParent = true
+        #expect(model.selection == .lilac)
+    }
+
+    // Catches: the form ignoring the service's default, or creating with a fixed palette instead
+    // of the one picked.
+    @Test("The new folder form starts on the offered palette and creates with the picked one")
+    func newRootFolderPalette() {
+        given(service).paletteForNewRoot().willReturn(.aurora)
+        given(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .any)
+            .willReturn(folder("English"))
+        let model = NewRootFolderViewModel(service: service)
+        model.name = "English"
+
+        #expect(model.palette == .aurora)
+        model.palette = .rose
+        #expect(model.create())
+        verify(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .value(.rose))
+            .called(.once)
+    }
 }

@@ -30,6 +30,7 @@ enum AccessibilityID {
         static let play = "folderAction.play"
         static let rename = "folderAction.rename"
         static let move = "folderAction.move"
+        static let appearance = "folderAction.appearance"
         static let delete = "folderAction.delete"
         static let confirmDelete = "folderAction.confirmDelete"
     }
@@ -54,8 +55,20 @@ enum AccessibilityID {
     enum FolderForm {
         static let name = "folderForm.name"
         static let save = "folderForm.save"
+        static let cancel = "folderForm.cancel"
         static let learningLanguage = "folderForm.learningLanguage"
         static let backLanguage = "folderForm.backLanguage"
+    }
+
+    enum Appearance {
+        static let sameAsParent = "appearance.sameAsParent"
+        static let done = "appearance.done"
+    }
+
+    enum Palette {
+        static func swatch(_ name: String) -> String {
+            "palette.\(name)"
+        }
     }
 
     enum CardEditor {

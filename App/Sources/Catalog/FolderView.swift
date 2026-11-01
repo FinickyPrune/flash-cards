@@ -54,6 +54,7 @@ struct FolderView: View {
             }
         }
         .navigationTitle(model.folder.name)
+        .tint(model.folder.resolvedPalette.accent)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Play", systemImage: "play.fill") { model.rowActions.play(model.folder) }

@@ -6,7 +6,7 @@ import SwiftData
 /// `groupContainer: .none` keeps the store in the app's own container: with `.automatic`, adding
 /// the App Group for the share extension would silently move it to a new, empty store there.
 enum AppModelContainer {
-    static let schema = Schema(versionedSchema: SchemaV2.self)
+    static let schema = Schema(versionedSchema: SchemaV3.self)
 
     /// `inMemory` is for tests and previews; `url` lets migration tests open a store file of
     /// their own (default: the app's store). A `url` wins over `inMemory`.

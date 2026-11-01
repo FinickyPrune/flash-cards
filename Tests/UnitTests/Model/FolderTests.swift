@@ -91,4 +91,17 @@ struct FolderTests {
         #expect(grandchild.resolvedLearningLanguage == "en")
         #expect(grandchild.resolvedBackLanguage == "ru")
     }
+
+    // Catches: following the direct parent only, or ignoring a subfolder's own palette.
+    @Test("A subfolder shows its own palette, else the nearest ancestor's")
+    func resolvedPalette() {
+        let root = Folder(name: "Root", learningLanguage: "en", backLanguage: "ru", palette: .lilac)
+        let child = Folder(name: "Child", parent: root)
+        let grandchild = Folder(name: "Grandchild", parent: child)
+        context.insert(root)
+
+        #expect([child.resolvedPalette, grandchild.resolvedPalette] == [.lilac, .lilac])
+        child.ownPalette = .rose
+        #expect([root.resolvedPalette, child.resolvedPalette, grandchild.resolvedPalette] == [.lilac, .rose, .rose])
+    }
 }

@@ -1,10 +1,13 @@
 import Observation
 
-/// Play, rename, move and delete for the folder rows of one list (home or a folder screen).
+/// Play, rename, appearance, move and delete for the folder rows of one list (home or a folder
+/// screen).
 @MainActor
 @Observable
 final class FolderRowActionsModel {
     var renaming: Folder?
+    /// The folder whose Appearance sheet is open.
+    var styling: Folder?
     var moving: Folder?
     var deleting: Folder?
     var saveError: String?
@@ -25,6 +28,10 @@ final class FolderRowActionsModel {
 
     func renameModel(for folder: Folder) -> FolderNameViewModel {
         FolderNameViewModel(mode: .rename(folder), service: dependencies.catalogService)
+    }
+
+    func appearanceModel(for folder: Folder) -> AppearanceViewModel {
+        AppearanceViewModel(folder: folder, service: dependencies.catalogService)
     }
 
     func moveModel(for folder: Folder) -> MoveFolderViewModel {

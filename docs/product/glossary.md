@@ -6,6 +6,7 @@ Domain terms, used with exactly these names in docs, issues, code and UI.
 | Folder | Catalog node holding cards and/or subfolders, any depth. "Pack" in early notes = folder. | `Folder` | Папка |
 | Root folder | Top-level folder. Owns the language pair and last back source; subfolders inherit. | `Folder` with `parent == nil` | — |
 | Subtree | A folder with all its descendants. Progress and Play work on the subtree. | — | — |
+| Palette | A folder's colours: two gradient hues and an accent, one of 8 fixed sets. A subfolder follows its parent unless given its own. | `FolderPalette`, `Folder.palette` | Палитра |
 | Language pair | Learning language → back language, e.g. `sr → ru`, `en → en` (definitions in English). | `learningLanguage`, `backLanguage` | — |
 | Card | One item to learn: front and back. | `Card` | Карточка |
 | Front | Word or phrase on top, screenshot below it if present. | `front` | Лицо |

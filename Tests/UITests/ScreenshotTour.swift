@@ -39,8 +39,11 @@ final class ScreenshotTour: XCTestCase {
         let english = app.buttons["row.folder.English"]
         XCTAssertTrue(english.waitForExistence(timeout: 5))
         stop("home", in: app)
+        newFolderSheet(in: app)
         english.tap()
         open("Breaking Bad", in: app)
+        XCTAssertTrue(app.buttons["row.folder.Season 1"].waitForExistence(timeout: 5))
+        stop("folder-subfolders", in: app)
         open("Season 1", in: app)
         XCTAssertTrue(app.buttons["folder.play"].waitForExistence(timeout: 5))
         stop("folder", in: app)
@@ -95,9 +98,25 @@ final class ScreenshotTour: XCTestCase {
         let play = app.buttons["folderAction.play"]
         XCTAssertTrue(play.waitForExistence(timeout: 5))
         stop("folder-context-menu", in: app)
+        app.buttons["folderAction.appearance"].tap()
+        let done = app.buttons["appearance.done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 5))
+        stop("appearance", in: app)
+        done.tap()
+        season2.press(forDuration: 1)
+        XCTAssertTrue(play.waitForExistence(timeout: 5))
         play.tap()
         XCTAssertTrue(app.descendants(matching: .any)["review.empty"].firstMatch.waitForExistence(timeout: 5))
         stop("review-empty", in: app)
+    }
+
+    @MainActor
+    private func newFolderSheet(in app: XCUIApplication) {
+        app.buttons["home.newFolder"].tap()
+        XCTAssertTrue(app.buttons["palette.lagoon"].waitForExistence(timeout: 5))
+        stop("new-folder", in: app)
+        app.buttons["folderForm.cancel"].tap()
+        XCTAssertTrue(app.buttons["row.folder.English"].waitForExistence(timeout: 5))
     }
 
     @MainActor

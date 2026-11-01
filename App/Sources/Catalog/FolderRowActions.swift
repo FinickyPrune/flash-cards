@@ -1,13 +1,16 @@
 import SwiftUI
 
 extension View {
-    /// Play, rename, move and delete on a folder row: context menu and swipe actions.
+    /// Play, rename, appearance, move and delete on a folder row's context menu; rename, move and
+    /// delete also as swipe actions.
     func folderRowActions(for folder: Folder, _ actions: FolderRowActionsModel) -> some View {
         contextMenu {
             Button("Play", systemImage: "play") { actions.play(folder) }
                 .accessibilityIdentifier(AccessibilityID.FolderAction.play)
             Button("Rename", systemImage: "pencil") { actions.renaming = folder }
                 .accessibilityIdentifier(AccessibilityID.FolderAction.rename)
+            Button("Appearance", systemImage: "paintpalette") { actions.styling = folder }
+                .accessibilityIdentifier(AccessibilityID.FolderAction.appearance)
             Button("Move", systemImage: "folder") { actions.moving = folder }
                 .accessibilityIdentifier(AccessibilityID.FolderAction.move)
             Button("Delete", systemImage: "trash", role: .destructive) { actions.deleting = folder }
@@ -38,6 +41,7 @@ private struct FolderActionsPresentation: ViewModifier {
         content
             .fullScreenCover(item: $actions.review) { ReviewView(model: $0) }
             .sheet(item: $actions.renaming) { FolderNameSheet(model: actions.renameModel(for: $0)) }
+            .sheet(item: $actions.styling) { AppearanceSheet(model: actions.appearanceModel(for: $0)) }
             .sheet(item: $actions.moving) { MoveFolderSheet(model: actions.moveModel(for: $0)) }
             .confirmationDialog(
                 Text("Delete “\(actions.deleting?.name ?? "")”?"),

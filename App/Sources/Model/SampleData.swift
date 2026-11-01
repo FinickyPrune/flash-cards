@@ -13,18 +13,24 @@ enum SampleData {
         let season2 = Folder(name: "Season 2", parent: show)
         season2.ownPalette = .arctic
         let serbian = Folder(name: "Serbian", learningLanguage: "sr-Latn", backLanguage: "ru", palette: .mint)
-        for folder in [english, show, season, season2, serbian] {
+        // Nothing due today, and an empty one, for home's states.
+        let ielts = Folder(name: "IELTS words", learningLanguage: "en", backLanguage: "en", palette: .lilac)
+        let spanish = Folder(name: "Spanish", learningLanguage: "es", backLanguage: "ru", palette: .rose)
+        for folder in [english, show, season, season2, serbian, ielts, spanish] {
             context.insert(folder)
         }
         let cards: [(folder: Folder, words: [(front: String, back: String)])] = [
             (english, [("reckon", "считать, полагать")]),
             (season, [("chemistry", "химия"), ("cook", "варить, готовить"), ("ice cream", "мороженое")]),
             (serbian, [("kuća", "дом"), ("hvala", "спасибо")]),
+            (ielts, [("ubiquitous", "found everywhere"), ("meticulous", "very careful")]),
         ]
         // A card with a context and a screenshot, as screenshot import will make them.
         let contexts = ["cook": "He says he can cook it better than anyone in town."]
         // Forward intervals of reviewed cards; 21 days and up counts as learned.
-        let intervals: [String: Double] = ["reckon": 30, "chemistry": 25, "cook": 6]
+        let intervals: [String: Double] = [
+            "reckon": 30, "chemistry": 25, "cook": 6, "ubiquitous": 25, "meticulous": 10,
+        ]
         var createdAt = Date(timeIntervalSince1970: 1_790_000_000)
         for (folder, words) in cards {
             for (front, back) in words {
@@ -42,7 +48,9 @@ enum SampleData {
                     let state = ReviewState(card: card)
                     state.intervalDays = interval
                     state.repetitions = 3
-                    state.dueDate = createdAt.addingTimeInterval(interval * 86400)
+                    // IELTS words was reviewed just now, so nothing in it is due yet.
+                    let reviewedAt = folder === ielts ? Date.now : createdAt
+                    state.dueDate = reviewedAt.addingTimeInterval(interval * 86400)
                     context.insert(state)
                 }
                 createdAt += 60

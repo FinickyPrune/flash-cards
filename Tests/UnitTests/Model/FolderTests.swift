@@ -81,6 +81,45 @@ struct FolderTests {
         #expect(child.progress == FolderProgress(learned: 0, total: 4))
     }
 
+    // Catches: rounding to nearest, which shows an unfinished folder as 100%, or dividing by zero.
+    @Test(
+        "The ring's percent rounds down",
+        arguments: [(199, 200, 99), (1, 3, 33), (2, 2, 100), (0, 0, 0)]
+    )
+    func percent(learned: Int, total: Int, expected: Int) {
+        #expect(FolderProgress(learned: learned, total: total).percent == expected)
+    }
+
+    // Catches: counting only due or only new cards, counting a future card, skipping subfolders,
+    // or turning the day over at midnight instead of at the stored 04:00 due date.
+    @Test("Due count: due and new cards in the subtree; a card due tomorrow counts from 04:00")
+    func dueCount() throws {
+        let root = Folder(name: "Root", learningLanguage: "en", backLanguage: "ru")
+        let child = Folder(name: "Child", parent: root)
+        context.insert(root)
+        let calendar = Calendar.current
+        let midnight = try #require(calendar.date(from: DateComponents(year: 2027, month: 3, day: 2)))
+        let fourAM = try #require(calendar.date(from: DateComponents(year: 2027, month: 3, day: 2, hour: 4)))
+        func card(in folder: Folder, due: Date?) {
+            let card = Card(front: "w", back: "x", backSource: "custom", folder: folder)
+            context.insert(card)
+            if let due {
+                let state = ReviewState(card: card)
+                state.dueDate = due
+                context.insert(state)
+            }
+        }
+        card(in: root, due: nil)
+        card(in: child, due: midnight - 86400)
+        card(in: child, due: fourAM)
+        card(in: child, due: fourAM + 86400)
+
+        #expect(root.dueCount(at: midnight) == 2)
+        #expect(root.dueCount(at: fourAM - 60) == 2)
+        #expect(root.dueCount(at: fourAM) == 3)
+        #expect(child.dueCount(at: fourAM) == 2)
+    }
+
     // Catches: resolving from the direct parent only, or reading the subfolder's own (empty) fields.
     @Test("A subfolder at any depth reports its root folder's language pair")
     func subfolderLanguagePair() {

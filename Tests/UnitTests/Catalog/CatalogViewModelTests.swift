@@ -54,6 +54,19 @@ struct CatalogViewModelTests {
         #expect(actions.deleting == nil)
     }
 
+    // Catches: counting only the first root, or only the roots' own cards and not their subfolders'.
+    @Test("Home's due total sums the root folders' subtrees")
+    func homeDueTotal() {
+        let english = folder("English")
+        let serbian = folder("Serbian")
+        let season = Folder(name: "Season 1", parent: english)
+        for (front, folder) in [("run", english), ("see", season), ("kuća", serbian)] {
+            container.mainContext.insert(Card(front: front, back: "x", backSource: "custom", folder: folder))
+        }
+
+        #expect(HomeViewModel.dueToday(in: [english, serbian], at: .now) == 3)
+    }
+
     // Catches: the two form modes swapped, so a new subfolder renames its parent instead.
     @Test("The new subfolder form creates the folder under its parent")
     func newSubfolder() {

@@ -38,6 +38,7 @@ struct FolderNameSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                        .accessibilityIdentifier(AccessibilityID.FolderForm.cancel)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(saveTitle, action: save)

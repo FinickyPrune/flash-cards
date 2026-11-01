@@ -88,4 +88,71 @@ final class CatalogUITests: XCTestCase {
         XCTAssertEqual(sameAsParent.value as? String, "0")
         XCTAssertTrue(app.buttons["palette.rose"].isSelected)
     }
+
+    /// The folder screen's More menu acts on the folder itself; deleting it leaves the screen.
+    @MainActor
+    func testFolderMoreMenu() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launch()
+
+        let english = createFolder("English", with: "home.newFolder", in: app)
+        english.tap()
+        createFolder("Season 1", with: "folder.newSubfolder", in: app).tap()
+
+        let name = app.textFields["folderForm.name"]
+        let more = app.buttons["folder.more"]
+        let title = app.staticTexts["folder.title"]
+        XCTAssertTrue(more.waitForExistence(timeout: 5))
+        more.tap()
+        app.buttons["folderAction.rename"].tap()
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: "Season 1".count) + "Pilot")
+        app.buttons["folderForm.save"].tap()
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Pilot")
+
+        more.tap()
+        app.buttons["folderAction.appearance"].tap()
+        XCTAssertTrue(app.switches["appearance.sameAsParent"].waitForExistence(timeout: 5))
+        app.buttons["palette.rose"].tap()
+        app.buttons["appearance.done"].tap()
+
+        more.tap()
+        app.buttons["folderAction.move"].tap()
+        let topLevel = app.buttons["move.topLevel"]
+        XCTAssertTrue(topLevel.waitForExistence(timeout: 5))
+        topLevel.tap()
+        // A root folder has no parent to follow.
+        more.tap()
+        app.buttons["folderAction.appearance"].tap()
+        XCTAssertTrue(app.buttons["palette.rose"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.switches["appearance.sameAsParent"].exists)
+        XCTAssertTrue(app.buttons["palette.rose"].isSelected)
+        app.buttons["appearance.done"].tap()
+
+        more.tap()
+        app.buttons["folderAction.delete"].tap()
+        app.buttons["folderAction.confirmDelete"].firstMatch.tap()
+        // Back on English, now empty: Pilot moved out before it was deleted.
+        XCTAssertTrue(app.descendants(matching: .any)["folder.empty"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "English")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(english.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["row.folder.Pilot"].exists)
+    }
+
+    /// Creates a folder through the form `button` opens; returns its row.
+    @MainActor
+    @discardableResult
+    private func createFolder(_ folderName: String, with button: String, in app: XCUIApplication) -> XCUIElement {
+        app.buttons[button].tap()
+        let name = app.textFields["folderForm.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.typeText(folderName)
+        app.buttons["folderForm.save"].tap()
+        let row = app.buttons["row.folder.\(folderName)"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        return row
+    }
 }

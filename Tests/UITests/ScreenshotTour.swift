@@ -27,6 +27,25 @@ final class ScreenshotTour: XCTestCase {
             appearance = name
             tour()
         }
+        XCUIDevice.shared.appearance = .light
+        appearance = "light"
+        largestText()
+    }
+
+    /// Home and a folder at the largest accessibility text size, to catch clipping.
+    @MainActor
+    private func largestText() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-uitest-seed", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
+        ]
+        app.launch()
+        let english = app.buttons["row.folder.English"]
+        XCTAssertTrue(english.waitForExistence(timeout: 5))
+        stop("home-largest-text", in: app)
+        english.tap()
+        XCTAssertTrue(app.buttons["row.folder.Breaking Bad"].waitForExistence(timeout: 5))
+        stop("folder-largest-text", in: app)
     }
 
     /// One pass; relaunching resets the in-memory seed, so both passes start from the same data.
@@ -93,6 +112,11 @@ final class ScreenshotTour: XCTestCase {
     private func playEmptyFolderFromContextMenu(in app: XCUIApplication) {
         app.navigationBars.buttons.element(boundBy: 0).tap()
         let season2 = app.buttons["row.folder.Season 2"]
+        XCTAssertTrue(season2.waitForExistence(timeout: 5))
+        season2.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["folder.empty"].firstMatch.waitForExistence(timeout: 5))
+        stop("folder-empty", in: app)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(season2.waitForExistence(timeout: 5))
         season2.press(forDuration: 1)
         let play = app.buttons["folderAction.play"]

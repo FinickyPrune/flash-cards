@@ -51,10 +51,10 @@ struct DeckStoreTests {
 |---|---|
 | All unit tests | `make test` |
 | One suite / test | `make test ONLY=FlashCardsTests/DeckStoreTests` or `.../DeckStoreTests/addCard()` |
-| UI tests of one class (pre-PR, touched screens) | `make test-ui ONLY=FlashCardsUITests/ReviewUITests` |
+| New/changed UI tests (pre-PR), one run | `make test-ui ONLY="FlashCardsUITests/ReviewUITests/testX FlashCardsUITests/CatalogUITests"` |
 | All UI tests | `make test-ui` (CI runs it on every PR; locally only when needed) |
 | Everything CI runs | `make check` |
-| PR screenshots | `make screenshots` (`run-ios-app`) |
+| PR screenshots | CI's `Screenshots` workflow comments them on the PR; `make screenshots` locally only to iterate (`run-ios-app`) |
 | Coverage per function | see `pragmatic-testing` → "In this repo" |
 
 `make` exits non-zero when a test fails. Output is filtered by xcbeautify to errors and test

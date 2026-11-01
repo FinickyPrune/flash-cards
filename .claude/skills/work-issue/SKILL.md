@@ -27,22 +27,22 @@ For each step: code + the tests `pragmatic-testing` says it earns (usually 1–3
 - Stay in scope. Unrelated problems you notice → note them for the PR description, don't fix them here.
 
 ## 5. Verify
-- `make lint test` must pass, plus the UI test classes the change touches (`make test-ui ONLY=FlashCardsUITests/<Class>`). The full UI suite runs on CI (step 7). Paste the summary lines, not "tests pass".
-- UI changed → follow `run-ios-app`: `make screenshots` once, after the last UI change, and check each changed screen, light and dark, against the criteria.
+- `make lint test` must pass, plus the UI tests the PR adds or changes, all in one run (`make test-ui ONLY="FlashCardsUITests/<Class>/<test> FlashCardsUITests/<Class2>"`). The rest of the UI suite runs on CI (step 7). Paste the summary lines, not "tests pass".
+- UI changed → the screenshots come from CI after the push (step 7). Iterate on visuals locally with `make run` + `make screenshot`; run `make screenshots` locally only when that can't reach the state.
 - Run each heavy step once: no repeat runs just to read an exit code (`make …; echo $?` in the same call).
 - Walk through every acceptance criterion and name the test or screenshot that proves it.
 
 ## 6. Self-review
 - Run `/code-review` on the branch diff and fix real findings.
 - Then use the `pr-reviewer` subagent: it checks the diff against the issue's acceptance criteria in a fresh context. Fix correctness/requirement gaps; treat style nits as optional.
-- Re-run lint, unit and touched UI tests if anything changed; screenshots only if UI changed.
+- Re-run lint, unit and the new/changed UI tests if anything changed.
 
 ## 7. Ship
 ```bash
 git push -u origin HEAD
 gh pr create --title "<conventional title>" --body-file <tmp file>   # follows .github/pull_request_template.md, includes "Closes #$ARGUMENTS"
 ```
-Upload screenshots with `scripts/upload-screenshot.sh <pr> <png>...` and put them in the body. Then `gh pr checks <pr> --watch` (it takes ~12 min; run it in the background) and fix CI failures; a failing UI test is reproduced locally with `ONLY=`, and CI uploads `build/results` as an artifact on failure.
+Then `gh pr checks <pr> --watch` (it takes ~12 min; run it in the background) and fix CI failures; a failing UI test is reproduced locally with `ONLY=`, and CI uploads `build/results` as an artifact on failure. UI changed: the `Screenshots` workflow posts the tour as a PR comment; download the changed screens' images and check each, light and dark, against the criteria, and name them in the PR body's Screenshots section.
 
 ## 8. Merge or hand over
 Fill the PR's **Review flags** per CLAUDE.md → "Who merges" (take the `pr-reviewer` verdict into account).

@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-/// Root of the app: the root folders (`catalog.md`).
+/// Root of the app: the root folders and what is due today, over a fixed wash (`catalog.md`).
 struct HomeView: View {
     @Query(
         filter: #Predicate<Folder> { $0.parent == nil },
@@ -16,12 +16,9 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            List(roots) { folder in
-                NavigationLink(value: folder) {
-                    FolderRow(folder: folder)
-                }
-                .folderRowActions(for: folder, model.rowActions)
-                .accessibilityIdentifier(AccessibilityID.Row.folder(folder.name))
+            // Re-read every minute so cards turn due at 04:00 while home is open.
+            TimelineView(.everyMinute) { context in
+                folderList(now: context.date)
             }
             .overlay {
                 if roots.isEmpty {
@@ -47,6 +44,26 @@ struct HomeView: View {
             .folderActionsPresentation(model.rowActions)
         }
     }
+
+    private func folderList(now: Date) -> some View {
+        List(roots) { folder in
+            NavigationLink(value: folder) {
+                FolderRow(folder: folder, now: now)
+            }
+            .folderRowActions(for: folder, model.rowActions)
+            .listRowBackground(CatalogStyle.surface)
+            .accessibilityIdentifier(AccessibilityID.Row.folder(folder.name))
+        }
+        .scrollContentBackground(.hidden)
+        .background {
+            ScreenWash(light: CatalogStyle.homeHues, dark: CatalogStyle.homeHuesDark, strength: 0.8)
+        }
+        .navigationSubtitle(subtitle(due: HomeViewModel.dueToday(in: roots, at: now)))
+    }
+}
+
+private func subtitle(due: Int) -> Text {
+    due == 0 ? Text("Nothing due today") : Text("^[\(due) card](inflect: true) due today")
 }
 
 #Preview {

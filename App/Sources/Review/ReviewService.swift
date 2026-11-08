@@ -39,12 +39,6 @@ struct ReviewService: ReviewServicing {
     }
 
     private func sessionCards(in folder: Folder) -> [SessionCard] {
-        folder.subtreeCards.map {
-            SessionCard(
-                id: $0.id,
-                createdAt: $0.createdAt,
-                state: $0.forwardReviewState?.schedulingState ?? SchedulingState()
-            )
-        }
+        folder.subtreeCards.map(\.sessionCard)
     }
 }

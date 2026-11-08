@@ -53,6 +53,11 @@ final class Card {
         reviewStates?.first { $0.direction == "forward" }
     }
 
+    /// What the session builder and the due count read: the forward direction, new until rated.
+    var sessionCard: SessionCard {
+        SessionCard(id: id, createdAt: createdAt, state: forwardReviewState?.schedulingState ?? SchedulingState())
+    }
+
     /// Counted as learned in folder progress (`review.md`). Compares the stored interval as is,
     /// so 20.5 days is not learned.
     var isLearned: Bool {

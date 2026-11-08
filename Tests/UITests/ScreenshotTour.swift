@@ -15,15 +15,10 @@ final class ScreenshotTour: XCTestCase {
         continueAfterFailure = false
     }
 
-    override func tearDown() {
-        // The simulator is shared with other runs; leave it in light mode.
-        MainActor.assumeIsolated { XCUIDevice.shared.appearance = .light }
-    }
-
     @MainActor
     func testTour() {
-        for (mode, name) in [(XCUIDevice.Appearance.light, "light"), (.dark, "dark")] {
-            XCUIDevice.shared.appearance = mode
+        // The app takes its appearance from a launch argument; the simulator's setting is left alone.
+        for name in ["light", "dark"] {
             appearance = name
             tour()
             largestText()
@@ -35,7 +30,8 @@ final class ScreenshotTour: XCTestCase {
     private func largestText() {
         let app = XCUIApplication()
         app.launchArguments = [
-            "-uitest-seed", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
+            "-uitest-seed", "-uitest-\(appearance)",
+            "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
         ]
         app.launch()
         let english = app.buttons["row.folder.English"]
@@ -51,7 +47,7 @@ final class ScreenshotTour: XCTestCase {
     @MainActor
     private func tour() {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitest-seed"]
+        app.launchArguments = ["-uitest-seed", "-uitest-\(appearance)"]
         app.launch()
 
         let english = app.buttons["row.folder.English"]

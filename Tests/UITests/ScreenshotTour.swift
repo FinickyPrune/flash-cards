@@ -43,10 +43,12 @@ final class ScreenshotTour: XCTestCase {
         stop("folder-largest-text", in: app)
         app.buttons["folder.newCard"].tap()
         XCTAssertTrue(app.textFields["cardEditor.front"].waitForExistence(timeout: 5))
-        // Without the keyboard, so the form itself shows.
+        // Without the keyboard, so the form itself shows. The newest iOS drops the keyboard's
+        // toolbar (and its Done) at accessibility sizes; the keyboard then stays.
         let keyboardDone = app.buttons["cardEditor.keyboardDone"]
-        XCTAssertTrue(keyboardDone.waitForExistence(timeout: 5))
-        keyboardDone.tap()
+        if keyboardDone.waitForExistence(timeout: 3) {
+            keyboardDone.tap()
+        }
         stop("card-editor-largest-text", in: app)
     }
 

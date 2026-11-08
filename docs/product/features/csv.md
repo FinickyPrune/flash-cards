@@ -7,9 +7,11 @@ Status: planned (milestone 3)
 - The system file importer opens a file; then the user picks the destination folder.
 - Format: UTF-8 with or without a BOM; any other encoding is an error. Line endings `\n`,
   `\r\n` or `\r`. Quoting per RFC 4180 (a quoted field may hold the delimiter, line breaks and
-  `""`). Fields are trimmed. (#54)
+  `""`). A quote that never closes is read as text. Fields are trimmed. (#54)
 - Delimiter: the one of tab, `;` and `,` that splits the most of the first 50 non-blank rows
-  into two or more fields; ties go tab, then `;`, then `,`. (#54)
+  into two or more fields without leaving a quote inside an unquoted field (that means it split a
+  quoted field, as `;` in `pas,"собака; пёс"`); then the most rows split at all; ties go tab,
+  then `;`, then `,`. (#54)
 - Columns: 1 → front, 2 → back (back source = custom), 3 (optional) → context; further columns
   are ignored. (#54)
 - Header row: guessed when the first field is `front`, `word`, `term`, `question`, `phrase`,

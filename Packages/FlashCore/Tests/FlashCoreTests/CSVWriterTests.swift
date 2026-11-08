@@ -24,6 +24,8 @@ struct CSVWriterTests {
             CSVRow(front: "đak", back: "ученик, школьник", context: "Svaki \"đak\" zna."),
             CSVRow(front: "kuća", back: "дом", context: "Line one\r\nline two"),
             CSVRow(front: "ice cream", back: "мороженое"),
+            // A quote and a combining mark form one Character; the quote must still be escaped.
+            CSVRow(front: "a\"\u{0301}b", back: "x"),
         ]
         let document = try CSVDocument(data: CSVWriter.data(for: rows))
         #expect(document.firstRowLooksLikeHeader)

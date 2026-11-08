@@ -17,9 +17,13 @@ struct CSVDocumentTests {
             ("kuća,дом\nreč,слово", ","),
             // The commas are inside quotes, so only `;` splits these rows.
             ("\"a, b\";дом\n\"c, d\";слово", ";"),
+            // `;` splits these rows too, but leaves a quote mid-field: it's inside a quoted field.
+            ("pas,\"собака; пёс\"\nmačka,\"мачка; кот\"", ","),
             // Each candidate splits one row: ties go tab, then `;`.
             ("a;b\nc,d", ";"),
             ("a;b\nc,d\ne\tf", "\t"),
+            // Only the first 50 non-blank rows vote; blank rows don't count towards them.
+            (String(repeating: "a;b\n\n", count: 50) + String(repeating: "c,d\n", count: 60), ";"),
         ] as [(String, Unicode.Scalar)]
     )
     func delimiter(text: String, expected: Unicode.Scalar) throws {
@@ -36,7 +40,18 @@ struct CSVDocumentTests {
         ])
     }
 
-    // Catches: `\r\n` read as two line breaks (an extra blank row is fine, a split field is not) or `\r` ignored.
+    // Catches: an unclosed quote reading the rest of the file as one field, losing every row after it.
+    @Test("A quote that never closes is read as text")
+    func unclosedQuote() throws {
+        let result = try read("\"Hello;привет\nb;c\nd;e")
+        #expect(result.rows == [
+            CSVRow(front: "\"Hello", back: "привет"),
+            CSVRow(front: "b", back: "c"),
+            CSVRow(front: "d", back: "e"),
+        ])
+    }
+
+    // Catches: a lone `\r` not ending a row, or a line break splitting a field in the wrong place.
     @Test("All line endings read the same rows", arguments: ["\n", "\r\n", "\r"])
     func lineEndings(newline: String) throws {
         let result = try read(["a;1", "b;2", ""].joined(separator: newline))

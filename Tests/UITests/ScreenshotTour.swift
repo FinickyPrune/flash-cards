@@ -44,7 +44,9 @@ final class ScreenshotTour: XCTestCase {
         app.buttons["folder.newCard"].tap()
         XCTAssertTrue(app.textFields["cardEditor.front"].waitForExistence(timeout: 5))
         // Without the keyboard, so the form itself shows.
-        app.buttons["cardEditor.keyboardDone"].tap()
+        let keyboardDone = app.buttons["cardEditor.keyboardDone"]
+        XCTAssertTrue(keyboardDone.waitForExistence(timeout: 5))
+        keyboardDone.tap()
         stop("card-editor-largest-text", in: app)
     }
 

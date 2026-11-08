@@ -165,9 +165,7 @@ struct CardEditorSheet: View {
                 Label(FolderTree.path(of: model.folder), systemImage: "folder.fill")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.tint)
-                    .lineLimit(1)
-                    // The deepest folders matter most; a long path loses its start.
-                    .truncationMode(.head)
+                    .multilineTextAlignment(.trailing)
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.tertiary)

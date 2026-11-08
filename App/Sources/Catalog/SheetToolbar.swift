@@ -19,7 +19,8 @@ struct SheetToolbar: ToolbarContent {
         ToolbarItem(placement: .confirmationAction) {
             Button(action: confirm) {
                 Label(confirmTitle, systemImage: "checkmark")
-                    .foregroundStyle(CatalogStyle.onAccent)
+                    // On the accent fill only; disabled, the system greys it out.
+                    .foregroundStyle(canConfirm ? AnyShapeStyle(CatalogStyle.onAccent) : AnyShapeStyle(.secondary))
             }
             .buttonStyle(.glassProminent)
             .tint(accent)

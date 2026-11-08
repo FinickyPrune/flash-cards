@@ -1,12 +1,13 @@
 import SwiftUI
 
 /// How a folder will look in the catalog: its gradient tile, name and language pair, over a soft
-/// wash of its palette. Shown at the top of the New Folder and Appearance sheets.
+/// wash of its palette. Shown at the top of the New Folder sheet.
 struct FolderPreviewRow: View {
     let palette: FolderPalette
     let name: String
     let learningLanguage: String?
     let backLanguage: String?
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         HStack(spacing: 14) {
@@ -16,7 +17,7 @@ struct FolderPreviewRow: View {
                 Text(trimmed.isEmpty ? String(localized: "New Folder") : trimmed)
                     .font(.headline)
                     .foregroundStyle(trimmed.isEmpty ? Color.secondary : Color.primary)
-                    .lineLimit(1)
+                    .lineLimit(2)
                     .accessibilityIdentifier(AccessibilityID.FolderForm.previewName)
                 if let learningLanguage, let backLanguage {
                     Text("\(Languages.name(of: learningLanguage)) → \(Languages.name(of: backLanguage))")
@@ -25,10 +26,13 @@ struct FolderPreviewRow: View {
                 }
             }
             Spacer(minLength: 8)
-            Text("Preview")
-                .font(.caption.weight(.semibold))
-                .textCase(.uppercase)
-                .foregroundStyle(palette.accent)
+            // At accessibility sizes the name needs the room.
+            if !dynamicTypeSize.isAccessibilitySize {
+                Text("Preview")
+                    .font(.caption.weight(.semibold))
+                    .textCase(.uppercase)
+                    .foregroundStyle(palette.accent)
+            }
         }
         .padding(.vertical, 8)
         .listRowBackground(PreviewWash(palette: palette))
@@ -47,7 +51,8 @@ private struct PreviewWash: View {
             .map { (location: $0.location, opacity: $0.opacity * (isDark ? 0.7 : 1)) }
         let radius = CGSize(width: 0.9, height: 1.4)
         ZStack {
-            isDark ? Color(rgb: 0x1A1C24) : Color.white
+            // The rows' own colour, so the preview sits among them.
+            Color(.secondarySystemGroupedBackground)
             SoftSpot(rgb: colors.first, center: UnitPoint(x: 0, y: 0), radius: radius, stops: stops)
             SoftSpot(rgb: colors.second, center: UnitPoint(x: 1, y: 0), radius: radius, stops: stops)
         }

@@ -13,12 +13,11 @@ struct AppearanceSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    FolderPreviewRow(
-                        palette: model.selection,
-                        name: model.folder.name,
-                        learningLanguage: model.folder.resolvedLearningLanguage,
-                        backLanguage: model.folder.resolvedBackLanguage
-                    )
+                    Label {
+                        Text(model.folder.name)
+                    } icon: {
+                        FolderTile(palette: model.selection)
+                    }
                 }
                 if let parent = model.folder.parent {
                     Section {

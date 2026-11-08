@@ -66,6 +66,7 @@ final class ReviewUITests: XCTestCase {
             showAnswer.tap()
             let button = app.buttons["review.rating.\(rating)"]
             XCTAssertTrue(button.waitForExistence(timeout: 5))
+            XCTAssertTrue(app.staticTexts["review.back"].exists)
             XCTAssertFalse(showAnswer.exists)
             button.tap()
         }

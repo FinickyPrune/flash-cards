@@ -10,7 +10,9 @@ struct FillingScrollView<Content: View>: View {
         GeometryReader { proxy in
             ScrollView {
                 MinHeightLayout(minHeight: proxy.size.height) {
-                    content
+                    VStack(spacing: 0) {
+                        content
+                    }
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
@@ -18,7 +20,7 @@ struct FillingScrollView<Content: View>: View {
     }
 }
 
-/// Gives its content its own height or `minHeight`, whichever is taller. A scroll view proposes
+/// Gives its one subview its own height or `minHeight`, whichever is taller. A scroll view proposes
 /// no height, and `.frame(minHeight:)` passes that on, so flexible content wouldn't stretch.
 private struct MinHeightLayout: Layout {
     let minHeight: CGFloat

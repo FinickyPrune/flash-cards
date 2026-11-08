@@ -4,11 +4,14 @@ import Testing
 @Suite("ContextHighlight")
 struct ContextHighlightTests {
     // Catches: a case- or diacritic-sensitive search (no highlight for "Cook" or "café"), a later
-    // occurrence picked over the first, or an empty front matching at the start.
+    // occurrence picked over the first, the front highlighted inside a longer word when it also
+    // stands alone, no fallback when it only appears inside one, or an empty front matching.
     @Test(arguments: [
         ("cook", "He says he can Cook it, cook it well.", "Cook" as String?, 15),
         ("cafe", "Un café noir", "café", 3),
         ("Café", "a cafe", "cafe", 2),
+        ("cook", "Cookies? I can cook.", "cook", 15),
+        ("cook", "Cookies, please.", "Cook", 0),
         ("reckon", "I guess so.", nil, 0),
         ("", "Anything", nil, 0),
     ])

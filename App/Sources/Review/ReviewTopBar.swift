@@ -9,25 +9,27 @@ struct ReviewTopBar: View {
     let cardCount: Int
     let accent: Color
     let close: () -> Void
+    /// Close's glyph area, and the room kept for Close's whole button beside the chip.
+    @ScaledMetric private var glyphSize = 30
+    @ScaledMetric private var buttonSize = 44
 
     var body: some View {
         VStack(spacing: 14) {
-            HStack {
-                Button(action: close) {
-                    Label("Close", systemImage: "xmark")
-                        .labelStyle(.iconOnly)
-                        .font(.body.weight(.semibold))
-                        .frame(width: 30, height: 30)
+            // The chip is centred on the whole bar, clear of Close on either side.
+            chip
+                .padding(.horizontal, buttonSize + 8)
+                .frame(maxWidth: .infinity, minHeight: buttonSize)
+                .overlay(alignment: .leading) {
+                    Button(action: close) {
+                        Label("Close", systemImage: "xmark")
+                            .labelStyle(.iconOnly)
+                            .font(.body.weight(.semibold))
+                            .frame(width: glyphSize, height: glyphSize)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.circle)
+                    .accessibilityIdentifier(AccessibilityID.Review.close)
                 }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.circle)
-                .accessibilityIdentifier(AccessibilityID.Review.close)
-                chip
-                    .frame(maxWidth: .infinity)
-                // Balances Close, so the chip sits in the middle.
-                Color.clear
-                    .frame(width: 44, height: 44)
-            }
             ProgressBar(
                 fraction: Double(position) / Double(max(cardCount, 1)),
                 color: accent,
@@ -48,6 +50,7 @@ struct ReviewTopBar: View {
             if isPractice {
                 Text("Practice")
                     .foregroundStyle(.secondary)
+                    .fixedSize()
             }
             Text("\(position) / \(cardCount)")
                 .fontDesign(.rounded)

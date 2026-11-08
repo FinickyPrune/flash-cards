@@ -15,13 +15,18 @@ SIM_UDID ?= $(eval SIM_UDID := $$(or $$(shell scripts/sim.sh),$$(error No simula
 
 # Compact output: only warnings, errors and test results. CI overrides with --renderer github-actions.
 XCBEAUTIFY_FLAGS ?= --quiet --is-ci --disable-colored-output --disable-logging
+# Locally xcodebuild runs at background priority (efficiency cores, throttled I/O): slower, but the
+# Mac stays cool. Off on CI (GitHub sets CI=true) and with LOW_PRIORITY=0.
+LOW_PRIORITY ?= $(if $(CI),0,1)
+NICE := $(if $(filter 1,$(LOW_PRIORITY)),taskpolicy -b)
 # pipefail keeps xcodebuild's exit code through the xcbeautify pipe
 # (set inline: macOS ships GNU Make 3.81, which ignores .SHELLFLAGS).
-XCODEBUILD = set -o pipefail && xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
+XCODEBUILD = set -o pipefail && $(NICE) xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
 	-destination "platform=iOS Simulator,id=$(SIM_UDID)" \
 	-derivedDataPath $(DERIVED) -skipPackagePluginValidation -skipMacroValidation
 
-# ONLY=FlashCardsTests/SmokeTests runs a single suite or test (xcodebuild -only-testing syntax).
+# ONLY=FlashCardsTests/SmokeTests runs a single suite or test (xcodebuild -only-testing syntax);
+# several, space-separated, run in one invocation: one build, one test runner.
 ONLY ?=
 UNIT_TARGETS := FlashCardsTests FlashCoreTests
 
@@ -52,9 +57,9 @@ test: generate ## Run unit tests, app and FlashCore (ONLY=Target/Suite[/test] to
 		-resultBundlePath $(RESULTS)/unit.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
 
 .PHONY: test-ui
-test-ui: generate ## Run UI tests
+test-ui: generate ## Run UI tests, without coverage (ONLY= to narrow, as for test)
 	@rm -rf $(RESULTS)/ui.xcresult
-	$(XCODEBUILD) test -only-testing:$(or $(ONLY),FlashCardsUITests) \
+	$(XCODEBUILD) test $(addprefix -only-testing:,$(or $(ONLY),FlashCardsUITests)) -enableCodeCoverage NO \
 		-resultBundlePath $(RESULTS)/ui.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
 
 .PHONY: lint
@@ -93,6 +98,7 @@ screenshots: generate ## Screenshot tour in light and dark -> build/screenshots/
 	@rm -rf $(RESULTS)/screenshots.xcresult
 	@rm -f $(SCREENSHOTS)/*-light.png $(SCREENSHOTS)/*-dark.png
 	export TEST_RUNNER_SCREENSHOT_TOUR=1 && $(XCODEBUILD) test -only-testing:FlashCardsUITests/ScreenshotTour \
+		-enableCodeCoverage NO \
 		-resultBundlePath $(RESULTS)/screenshots.xcresult 2>&1 | xcbeautify $(XCBEAUTIFY_FLAGS)
 	@scripts/export-screenshots.sh $(RESULTS)/screenshots.xcresult $(SCREENSHOTS)
 

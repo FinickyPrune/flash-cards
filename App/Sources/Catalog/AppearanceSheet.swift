@@ -13,11 +13,12 @@ struct AppearanceSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Label {
-                        Text(model.folder.name)
-                    } icon: {
-                        FolderTile(palette: model.selection)
-                    }
+                    FolderPreviewRow(
+                        palette: model.selection,
+                        name: model.folder.name,
+                        learningLanguage: model.folder.resolvedLearningLanguage,
+                        backLanguage: model.folder.resolvedBackLanguage
+                    )
                 }
                 if let parent = model.folder.parent {
                     Section {
@@ -28,26 +29,29 @@ struct AppearanceSheet: View {
                         .accessibilityIdentifier(AccessibilityID.Appearance.sameAsParent)
                     }
                 }
-                Section("Gradient") {
+                Section {
                     PalettePicker(selection: Binding(get: { model.selection }, set: { model.pick($0) }))
+                } header: {
+                    SectionLabel("Gradient")
                 }
             }
+            .formSheetStyle(accent: model.selection.accent)
             .navigationTitle("Appearance")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                SheetToolbar(
+                    confirmTitle: "Done",
+                    accent: model.selection.accent,
+                    cancelID: AccessibilityID.Appearance.cancel,
+                    confirmID: AccessibilityID.Appearance.done,
+                    cancel: { dismiss() },
+                    confirm: {
                         if model.save() {
                             dismiss()
                         }
                     }
-                    .accessibilityIdentifier(AccessibilityID.Appearance.done)
-                }
+                )
             }
-            .tint(model.selection.accent)
             .saveErrorAlert($model.saveError)
         }
     }

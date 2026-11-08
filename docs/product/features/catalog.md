@@ -12,6 +12,9 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
 - Creating a root folder asks for the learning language and the back language; both default
   to the system language. Any language the system knows can be picked, from a searchable list.
   Subfolders inherit the pair from their root folder and don't store one. (#14)
+- The New Folder sheet starts with a preview of the folder's catalog row (gradient tile, name,
+  language pair) that follows the name, languages and gradient as they change; the Appearance
+  sheet shows the same preview. Folder sheets share the card editor's look. (#45)
 - A root folder's language pair can't be changed after it is created. (#14)
 - Every folder has a **palette**: two gradient hues and an accent, one of 8 cool sets (Lagoon,
   Indigo, Mint, Arctic, Glacier, Aurora, Lilac, Rose), each with a light and a dark variant.

@@ -89,6 +89,19 @@ final class CatalogUITests: XCTestCase {
         XCTAssertTrue(app.buttons["palette.rose"].isSelected)
     }
 
+    @MainActor
+    func testNewFolderPreviewShowsName() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launch()
+
+        app.buttons["home.newFolder"].tap()
+        let name = app.textFields["folderForm.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.typeText("Serbian")
+        XCTAssertEqual(app.staticTexts["folderForm.previewName"].label, "Serbian")
+    }
+
     /// The folder screen's More menu acts on the folder itself; deleting it leaves the screen.
     @MainActor
     func testFolderMoreMenu() {

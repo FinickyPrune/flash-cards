@@ -52,6 +52,7 @@ final class ScreenshotTour: XCTestCase {
 
         let english = app.buttons["row.folder.English"]
         XCTAssertTrue(english.waitForExistence(timeout: 5))
+        assertAppearance(of: app)
         stop("home", in: app)
         newFolderSheet(in: app)
         english.tap()
@@ -165,5 +166,32 @@ final class ScreenshotTour: XCTestCase {
         attachment.name = "\(name)-\(appearance)"
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    /// Home is mostly background, so its mean brightness tells a light pass from a dark one; a
+    /// dark pass that came out light once went unnoticed (#51).
+    @MainActor
+    private func assertAppearance(of app: XCUIApplication) {
+        guard let image = app.screenshot().image.cgImage else {
+            return XCTFail("No screenshot")
+        }
+        var pixel = [UInt8](repeating: 0, count: 4)
+        let context = CGContext(
+            data: &pixel,
+            width: 1,
+            height: 1,
+            bitsPerComponent: 8,
+            bytesPerRow: 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )
+        context?.interpolationQuality = .high
+        context?.draw(image, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        let brightness = (Int(pixel[0]) + Int(pixel[1]) + Int(pixel[2])) / 3
+        XCTAssertEqual(
+            brightness < 128,
+            appearance == "dark",
+            "Mean brightness \(brightness) in the \(appearance) pass"
+        )
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Launch arguments UI tests and screenshots use to start from a known state; Debug builds only.
 enum LaunchOptions {
@@ -14,7 +15,7 @@ enum LaunchOptions {
 
     /// `-uitest-light` / `-uitest-dark`: the app's appearance whatever the simulator's setting,
     /// for the screenshot tour; `XCUIDevice.appearance` no longer reaches the app (#51).
-    static var appearance: Appearance? {
+    static let colorScheme: ColorScheme? = {
         guard isDebug else {
             return nil
         }
@@ -23,11 +24,7 @@ enum LaunchOptions {
             return .dark
         }
         return arguments.contains("-uitest-light") ? .light : nil
-    }
-
-    enum Appearance {
-        case light, dark
-    }
+    }()
 
     private static var isDebug: Bool {
         #if DEBUG

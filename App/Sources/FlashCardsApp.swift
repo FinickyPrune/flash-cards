@@ -22,7 +22,7 @@ struct FlashCardsApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView(model: homeModel)
-                .preferredColorScheme(LaunchOptions.appearance.map { $0 == .dark ? .dark : .light })
+                .preferredColorScheme(LaunchOptions.colorScheme)
         }
         .modelContainer(container)
     }

@@ -42,10 +42,12 @@ enum AccessibilityID {
         static let position = "review.position"
         static let card = "review.card"
         static let back = "review.back"
+        static let showAnswer = "review.showAnswer"
         static let empty = "review.empty"
         static let allCaughtUp = "review.allCaughtUp"
         static let practice = "review.practice"
         static let reviewed = "review.reviewed"
+        static let goodOrEasy = "review.goodOrEasy"
         static let done = "review.done"
         static let more = "review.more"
 

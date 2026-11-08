@@ -2,8 +2,8 @@ import FlashCore
 import SwiftData
 import SwiftUI
 
-/// Review of a folder's subtree, shown full screen (`review.md` → Flow). Close dismisses at once;
-/// ratings given so far are already saved.
+/// Review of a folder's subtree, shown full screen over the folder's wash (`review.md` → Flow).
+/// Close dismisses at once; ratings given so far are already saved.
 struct ReviewView: View {
     @State private var model: ReviewViewModel
     @Environment(\.dismiss) private var dismiss
@@ -13,18 +13,18 @@ struct ReviewView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            content
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar { toolbar }
-        }
-        // Play starts the session before presenting; this covers a model built without it.
-        .task { model.start() }
-        .saveErrorAlert($model.saveError)
+        let palette = model.folder.resolvedPalette
+        content(palette)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background { ScreenWash(palette: palette) }
+            .tint(palette.accent)
+            // Play starts the session before presenting; this covers a model built without it.
+            .task { model.start() }
+            .saveErrorAlert($model.saveError)
     }
 
     @ViewBuilder
-    private var content: some View {
+    private func content(_ palette: FolderPalette) -> some View {
         switch model.phase {
         case .loading:
             Color.clear
@@ -38,6 +38,8 @@ struct ReviewView: View {
             } actions: {
                 Button("Close") { dismiss() }
             }
+            .reviewCardStyle(palette)
+            .padding(16)
         case let .allCaughtUp(nextDue):
             ContentUnavailableView {
                 Label("All Caught Up", systemImage: "checkmark.circle")
@@ -45,31 +47,40 @@ struct ReviewView: View {
             } description: {
                 Text("Next card: \(Self.relativeDay(of: nextDue))")
             } actions: {
-                Button("Practice 20 Random Cards") { model.startPractice() }
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityIdentifier(AccessibilityID.Review.practice)
+                Button { model.startPractice() } label: {
+                    Text("Practice 20 Random Cards")
+                        .foregroundStyle(CatalogStyle.onAccent)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier(AccessibilityID.Review.practice)
                 Button("Close") { dismiss() }
             }
+            .reviewCardStyle(palette)
+            .padding(16)
         case .card:
             if let card = model.currentCard {
-                cardFlow(card)
+                cardFlow(card, palette: palette)
+                    .safeAreaInset(edge: .top, spacing: 0) { topBar(palette) }
             }
         case let .summary(summary):
             ReviewSummaryView(
                 summary: summary,
+                folderName: model.folder.name,
+                palette: palette,
                 canContinue: model.nextSession != nil,
                 onDone: { dismiss() },
                 onMore: { model.continueReviewing() }
             )
+            .safeAreaInset(edge: .top, spacing: 0) { topBar(palette) }
         }
     }
 
-    private func cardFlow(_ card: Card) -> some View {
-        ScrollView {
+    private func cardFlow(_ card: Card, palette: FolderPalette) -> some View {
+        FillingScrollView {
             // Tapping anywhere on the card flips it; a button so VoiceOver can flip it too.
             Button { model.flip() } label: {
-                ReviewCardView(card: card, isFlipped: model.isFlipped)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                ReviewCardView(card: card, palette: palette, isFlipped: model.isFlipped)
+                    .reviewCardStyle(palette)
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -77,54 +88,41 @@ struct ReviewView: View {
             // Flipped, it is only the card's content; VoiceOver moves on to the ratings.
             .accessibilityRemoveTraits(model.isFlipped ? .isButton : [])
             .accessibilityIdentifier(AccessibilityID.Review.card)
+            .padding(16)
         }
         // A new card starts at the top, not at the previous card's scroll offset.
         .id(card.id)
         .safeAreaInset(edge: .bottom) {
-            if model.isFlipped {
-                ratingButtons
-            }
-        }
-    }
-
-    private var ratingButtons: some View {
-        HStack(spacing: 8) {
-            ForEach(Rating.allCases, id: \.self) { rating in
-                Button { model.rate(rating) } label: {
-                    Text(rating.title)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .tint(rating.tint)
-                .accessibilityIdentifier(AccessibilityID.Review.rating(rating))
-            }
-        }
-        .padding()
-    }
-
-    @ToolbarContentBuilder
-    private var toolbar: some ToolbarContent {
-        // The other states have their own Close or Done.
-        if model.phase == .card {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Close", systemImage: "xmark") { dismiss() }
-                    .accessibilityIdentifier(AccessibilityID.Review.close)
-            }
-            ToolbarItem(placement: .principal) {
-                VStack {
-                    if model.session.isPractice {
-                        Text("Practice")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+            Group {
+                if model.isFlipped {
+                    RatingButtons { model.rate($0) }
+                } else {
+                    Button { model.flip() } label: {
+                        Text("Show answer")
+                            .font(.headline)
+                            .foregroundStyle(palette.accent)
+                            .frame(maxWidth: .infinity, minHeight: 44)
                     }
-                    Text("\(model.session.position) / \(model.session.cardCount)")
-                        .font(.headline)
-                        .monospacedDigit()
-                        .accessibilityIdentifier(AccessibilityID.Review.position)
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                    .accessibilityIdentifier(AccessibilityID.Review.showAnswer)
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
+    }
+
+    private func topBar(_ palette: FolderPalette) -> some View {
+        ReviewTopBar(
+            folderName: model.folder.name,
+            isPractice: model.session.isPractice,
+            position: model.session.position,
+            cardCount: model.session.cardCount,
+            accent: palette.accent,
+            close: { dismiss() }
+        )
     }
 
     /// "today", "tomorrow", "in 3 days": whole review days, since cards are due at the start of one.

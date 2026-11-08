@@ -70,24 +70,35 @@ final class ScreenshotTour: XCTestCase {
         playEmptyFolderFromContextMenu(in: app)
     }
 
-    /// Season 1 holds three cards; the first has a context and a screenshot.
+    /// Season 1 holds three cards; the first has a context and a screenshot, the third is new.
+    /// Again on the new one brings it back at the end and leaves it due today, so the summary
+    /// offers More; the second session has no More.
     @MainActor
     private func reviewSeason1(in app: XCUIApplication) {
         let play = app.buttons["folder.play"]
         let card = app.buttons["review.card"]
-        let good = app.buttons["review.rating.good"]
         play.tap()
         XCTAssertTrue(card.waitForExistence(timeout: 5))
         stop("review-front", in: app)
-        for index in 0 ..< 3 {
+        for (index, rating) in ["good", "good", "again", "good"].enumerated() {
             XCTAssertTrue(card.waitForExistence(timeout: 5))
             card.tap()
-            XCTAssertTrue(good.waitForExistence(timeout: 5))
+            let button = app.buttons["review.rating.\(rating)"]
+            XCTAssertTrue(button.waitForExistence(timeout: 5))
             if index == 0 {
                 stop("review-flipped", in: app)
             }
-            good.tap()
+            button.tap()
         }
+        let more = app.buttons["review.more"]
+        XCTAssertTrue(more.waitForExistence(timeout: 5))
+        stop("review-summary-more", in: app)
+        more.tap()
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.tap()
+        let good = app.buttons["review.rating.good"]
+        XCTAssertTrue(good.waitForExistence(timeout: 5))
+        good.tap()
         let done = app.buttons["review.done"]
         XCTAssertTrue(done.waitForExistence(timeout: 5))
         stop("review-summary", in: app)

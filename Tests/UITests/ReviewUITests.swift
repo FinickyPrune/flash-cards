@@ -45,6 +45,37 @@ final class ReviewUITests: XCTestCase {
     }
 
     @MainActor
+    func testShowAnswerAndMoreAfterAgain() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-seed"]
+        app.launch()
+
+        for folder in ["English", "Breaking Bad", "Season 1"] {
+            let row = app.buttons["row.folder.\(folder)"]
+            XCTAssertTrue(row.waitForExistence(timeout: 5))
+            row.tap()
+        }
+        app.buttons["folder.play"].tap()
+
+        // Two due cards, then a new one. Again on the new card brings it back at the end and
+        // leaves it due today, so More is offered. (Again on a due card is a lapse: tomorrow.)
+        let showAnswer = app.buttons["review.showAnswer"]
+        for rating in ["good", "good", "again", "good"] {
+            XCTAssertTrue(showAnswer.waitForExistence(timeout: 5))
+            XCTAssertFalse(app.buttons["review.rating.good"].exists)
+            showAnswer.tap()
+            let button = app.buttons["review.rating.\(rating)"]
+            XCTAssertTrue(button.waitForExistence(timeout: 5))
+            XCTAssertTrue(app.staticTexts["review.back"].exists)
+            XCTAssertFalse(showAnswer.exists)
+            button.tap()
+        }
+
+        XCTAssertTrue(app.buttons["review.more"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["review.done"].exists)
+    }
+
+    @MainActor
     func testPlayFromFolderRowContextMenu() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-seed"]

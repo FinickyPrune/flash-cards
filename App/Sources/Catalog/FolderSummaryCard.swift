@@ -46,22 +46,3 @@ struct FolderSummaryCard: View {
         .shadow(color: Color(rgb: 0x1E2350, opacity: 0.08), radius: 15, y: 12)
     }
 }
-
-private struct ProgressBar: View {
-    let fraction: Double
-    let color: Color
-
-    var body: some View {
-        Capsule()
-            .fill(Color.primary.opacity(0.07))
-            .overlay(alignment: .leading) {
-                GeometryReader { proxy in
-                    Capsule()
-                        .fill(color)
-                        .frame(width: proxy.size.width * fraction)
-                }
-            }
-            .frame(height: 6)
-            .accessibilityHidden(true)
-    }
-}

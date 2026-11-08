@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Add or edit a card: front, context, four tiles, folder (`card-editor.md`).
+/// Add or edit a card: front, context, the back sources as a list, folder (`card-editor.md`).
 struct CardEditorSheet: View {
     @State private var model: CardEditorViewModel
     @State private var isPickingFolder = false
@@ -25,64 +25,78 @@ struct CardEditorSheet: View {
     }
 
     var body: some View {
+        let palette = model.folder.resolvedPalette
         NavigationStack {
             Form {
-                Section("Front") {
+                Section {
                     TextField("Word or phrase", text: $model.front)
+                        .font(.title2.bold())
                         .focused($focus, equals: .front)
                         .accessibilityIdentifier(AccessibilityID.CardEditor.front)
+                } header: {
+                    SectionLabel("Front")
                 }
-                Section("Context") {
+                Section {
                     TextField("The line where it appeared", text: $model.context, axis: .vertical)
                         .lineLimit(1 ... 4)
                         .accessibilityIdentifier(AccessibilityID.CardEditor.context)
-                }
-                Section {
-                    ForEach(BackSource.tileOrder, id: \.self) { tile($0) }
                 } header: {
-                    Text("Back")
-                } footer: {
-                    Text("Pick one tile; its text is shown in review.")
+                    SectionLabel("Context")
                 }
                 Section {
-                    Button { isPickingFolder = true } label: {
-                        LabeledContent("Folder") {
-                            Text(FolderTree.path(of: model.folder))
-                                .multilineTextAlignment(.trailing)
+                    ForEach(BackSource.tileOrder, id: \.self) { row($0, palette: palette) }
+                } header: {
+                    // The note goes under the label when both don't fit on one line.
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .firstTextBaseline) {
+                            SectionLabel("Back")
+                            Spacer(minLength: 8)
+                            backNote
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            SectionLabel("Back")
+                            backNote
                         }
                     }
-                    .foregroundStyle(Color.primary)
-                    .accessibilityIdentifier(AccessibilityID.CardEditor.folder)
+                }
+                Section {
+                    folderRow
                 }
                 if isEditing {
-                    Section {
-                        Button("Delete Card", role: .destructive) { model.isConfirmingDelete = true }
-                            .accessibilityIdentifier(AccessibilityID.CardEditor.delete)
-                            .confirmationDialog(
-                                "Delete This Card?",
-                                isPresented: $model.isConfirmingDelete,
-                                titleVisibility: .visible
-                            ) {
-                                Button("Delete Card", role: .destructive) { close(if: model.delete()) }
-                                    .accessibilityIdentifier(AccessibilityID.CardEditor.confirmDelete)
-                            } message: {
-                                Text("Its review history will be deleted too. This can't be undone.")
-                            }
-                    }
+                    deleteSection
                 }
             }
+            .formSheetStyle(accent: palette.accent)
             // On short screens the keyboard pushes the navigation bar (Cancel, Save) off screen;
             // dragging the form or Done gets it back.
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isEditing ? "Edit Card" : "New Card")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbar }
+            .toolbar {
+                SheetToolbar(
+                    confirmTitle: "Save",
+                    accent: palette.accent,
+                    canConfirm: model.canSave,
+                    cancelID: AccessibilityID.CardEditor.cancel,
+                    confirmID: AccessibilityID.CardEditor.save,
+                    cancel: cancel,
+                    confirm: { close(if: model.save()) }
+                )
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { focus = nil }
+                        .accessibilityIdentifier(AccessibilityID.CardEditor.keyboardDone)
+                }
+            }
+            .confirmationDialog("Discard Changes?", isPresented: $model.isConfirmingDiscard) {
+                Button("Discard Changes", role: .destructive) { dismiss() }
+            }
             .onAppear {
                 if !isEditing {
                     focus = .front
                 }
             }
-            // The selected tile's field is inserted by this very update; focusing it in the same
+            // The selected row's field is inserted by this very update; focusing it in the same
             // pass is ignored, so focus it on the next main-actor turn.
             .onChange(of: model.selectedSource) {
                 Task { focus = .back }
@@ -104,44 +118,20 @@ struct CardEditorSheet: View {
         .interactiveDismissDisabled(model.hasChanges)
     }
 
-    @ToolbarContentBuilder
-    private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") {
-                if model.hasChanges {
-                    model.isConfirmingDiscard = true
-                } else {
-                    dismiss()
-                }
-            }
-            .confirmationDialog("Discard Changes?", isPresented: $model.isConfirmingDiscard) {
-                Button("Discard Changes", role: .destructive) { dismiss() }
-            }
-        }
-        ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            Button("Done") { focus = nil }
-                .accessibilityIdentifier(AccessibilityID.CardEditor.keyboardDone)
-        }
-        ToolbarItem(placement: .confirmationAction) {
-            Button("Save") { close(if: model.save()) }
-                .disabled(!model.canSave)
-                .accessibilityIdentifier(AccessibilityID.CardEditor.save)
-        }
-    }
-
-    /// One back option. Only the selected tile is editable; another one is a button that selects it.
+    /// One back source. Only the selected row is editable; another one is a button that selects it.
     @ViewBuilder
-    private func tile(_ source: BackSource) -> some View {
+    private func row(_ source: BackSource, palette: FolderPalette) -> some View {
         if source == model.selectedSource {
-            VStack(alignment: .leading, spacing: 6) {
-                tileTitle(source, isSelected: true)
+            BackSourceRow(source: source, isSelected: true, accent: palette.accent) {
                 TextField("Back text", text: $model.back, axis: .vertical)
+                    .font(.headline)
+                    .foregroundStyle(Color.primary)
                     .lineLimit(1 ... 6)
                     .focused($focus, equals: .back)
                     .accessibilityIdentifier(AccessibilityID.CardEditor.backText)
             }
-            .padding(.vertical, 4)
+            .listRowBackground(SelectedRowBackground(palette: palette))
+            .listRowSeparator(.hidden)
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isSelected)
             .accessibilityIdentifier(AccessibilityID.CardEditor.tile(source.rawValue))
@@ -149,26 +139,68 @@ struct CardEditorSheet: View {
             Button {
                 model.selectedSource = source
             } label: {
-                VStack(alignment: .leading, spacing: 6) {
-                    tileTitle(source, isSelected: false)
+                BackSourceRow(source: source, isSelected: false, accent: palette.accent) {
                     let text = model.text(of: source)
-                    // Explicit colours: inside a button `.secondary` would take the tint.
                     Text(text.isEmpty ? String(localized: "Empty") : text)
-                        .foregroundStyle(Color.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                 }
-                .padding(.vertical, 4)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .accessibilityIdentifier(AccessibilityID.CardEditor.tile(source.rawValue))
         }
     }
 
-    private func tileTitle(_ source: BackSource, isSelected: Bool) -> some View {
-        Label(source.title, systemImage: isSelected ? "checkmark.circle.fill" : "circle")
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(isSelected ? AnyShapeStyle(.tint) : AnyShapeStyle(Color.secondary))
+    private var backNote: some View {
+        Text("Pick one; it's shown in review")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    private var folderRow: some View {
+        Button { isPickingFolder = true } label: {
+            HStack(spacing: 8) {
+                Text("Folder")
+                    .foregroundStyle(Color.primary)
+                Spacer(minLength: 8)
+                Label(FolderTree.path(of: model.folder), systemImage: "folder.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.tint)
+                    .multilineTextAlignment(.trailing)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+        }
+        .accessibilityIdentifier(AccessibilityID.CardEditor.folder)
+    }
+
+    private var deleteSection: some View {
+        Section {
+            Button("Delete Card", role: .destructive) { model.isConfirmingDelete = true }
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier(AccessibilityID.CardEditor.delete)
+                .confirmationDialog(
+                    "Delete This Card?",
+                    isPresented: $model.isConfirmingDelete,
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete Card", role: .destructive) { close(if: model.delete()) }
+                        .accessibilityIdentifier(AccessibilityID.CardEditor.confirmDelete)
+                } message: {
+                    Text("Its review history will be deleted too. This can't be undone.")
+                }
+        }
+        // A plain red text button under the form, not a row.
+        .listRowBackground(Color.clear)
+    }
+
+    private func cancel() {
+        if model.hasChanges {
+            model.isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
     }
 
     private func close(if done: Bool) {

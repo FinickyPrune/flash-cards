@@ -60,6 +60,7 @@ enum AccessibilityID {
         static let name = "folderForm.name"
         static let save = "folderForm.save"
         static let cancel = "folderForm.cancel"
+        static let previewName = "folderForm.previewName"
         static let learningLanguage = "folderForm.learningLanguage"
         static let backLanguage = "folderForm.backLanguage"
     }
@@ -67,6 +68,7 @@ enum AccessibilityID {
     enum Appearance {
         static let sameAsParent = "appearance.sameAsParent"
         static let done = "appearance.done"
+        static let cancel = "appearance.cancel"
     }
 
     enum Palette {
@@ -81,6 +83,7 @@ enum AccessibilityID {
         static let backText = "cardEditor.backText"
         static let folder = "cardEditor.folder"
         static let save = "cardEditor.save"
+        static let cancel = "cardEditor.cancel"
         static let keyboardDone = "cardEditor.keyboardDone"
         static let saveAnyway = "cardEditor.saveAnyway"
         static let delete = "cardEditor.delete"

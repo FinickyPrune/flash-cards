@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Creates a root folder: name, language pair (both defaulting to the system language) and palette.
+/// Creates a root folder: a preview of its catalog row, name, language pair (both defaulting to
+/// the system language) and palette.
 struct NewRootFolderSheet: View {
     @State private var model: NewRootFolderViewModel
     @Environment(\.dismiss) private var dismiss
@@ -13,34 +14,50 @@ struct NewRootFolderSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Name", text: $model.name)
-                    .focused($isNameFocused)
-                    .accessibilityIdentifier(AccessibilityID.FolderForm.name)
+                Section {
+                    FolderPreviewRow(
+                        palette: model.palette,
+                        name: model.name,
+                        learningLanguage: model.learningLanguage,
+                        backLanguage: model.backLanguage
+                    )
+                }
+                Section {
+                    TextField("Name", text: $model.name)
+                        .focused($isNameFocused)
+                        .accessibilityIdentifier(AccessibilityID.FolderForm.name)
+                } header: {
+                    SectionLabel("Name")
+                }
                 Section {
                     languageLink("Learning language", selection: $model.learningLanguage)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.learningLanguage)
                     languageLink("Back language", selection: $model.backLanguage)
                         .accessibilityIdentifier(AccessibilityID.FolderForm.backLanguage)
+                } header: {
+                    SectionLabel("Languages")
                 } footer: {
                     Text("Subfolders use the same languages. They can't be changed later.")
                 }
-                Section("Gradient") {
+                Section {
                     PalettePicker(selection: $model.palette)
+                } header: {
+                    SectionLabel("Gradient")
                 }
             }
-            .tint(model.palette.accent)
+            .formSheetStyle(accent: model.palette.accent)
             .navigationTitle("New Folder")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                        .accessibilityIdentifier(AccessibilityID.FolderForm.cancel)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Create", action: create)
-                        .disabled(!model.canCreate)
-                        .accessibilityIdentifier(AccessibilityID.FolderForm.save)
-                }
+                SheetToolbar(
+                    confirmTitle: "Create",
+                    accent: model.palette.accent,
+                    canConfirm: model.canCreate,
+                    cancelID: AccessibilityID.FolderForm.cancel,
+                    confirmID: AccessibilityID.FolderForm.save,
+                    cancel: { dismiss() },
+                    confirm: create
+                )
             }
             .onAppear { isNameFocused = true }
             .saveErrorAlert($model.saveError)

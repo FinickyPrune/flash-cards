@@ -4,6 +4,8 @@ import SwiftUI
 enum CatalogStyle {
     /// Under the wash.
     static let background = Color(light: 0xF5F6FA, dark: 0x0C0D12)
+    /// Under the rows of the redesigned sheets (card editor, folder sheets).
+    static let sheetBackground = Color(light: 0xF7F8FB, dark: 0x0C0D12)
     /// Lists and cards over the wash.
     static let surface = Color(light: Color.white.opacity(0.86), dark: Color(rgb: 0x1A1C24))
     /// Text and glyphs on an accent fill: dark accents are deep, light ones are pale.

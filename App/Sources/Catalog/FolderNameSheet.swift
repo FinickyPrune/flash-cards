@@ -17,6 +17,14 @@ struct FolderNameSheet: View {
         }
     }
 
+    /// The folder's colours: the renamed folder's, or the parent's for a new subfolder.
+    private var palette: FolderPalette {
+        switch model.mode {
+        case let .newSubfolder(parent): parent.resolvedPalette
+        case let .rename(folder): folder.resolvedPalette
+        }
+    }
+
     private var saveTitle: LocalizedStringKey {
         switch model.mode {
         case .newSubfolder: "Create"
@@ -27,24 +35,29 @@ struct FolderNameSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Name", text: $model.name)
-                    .focused($isNameFocused)
-                    .submitLabel(.done)
-                    .onSubmit(save)
-                    .accessibilityIdentifier(AccessibilityID.FolderForm.name)
+                Section {
+                    TextField("Name", text: $model.name)
+                        .focused($isNameFocused)
+                        .submitLabel(.done)
+                        .onSubmit(save)
+                        .accessibilityIdentifier(AccessibilityID.FolderForm.name)
+                } header: {
+                    SectionLabel("Name")
+                }
             }
+            .formSheetStyle(accent: palette.accent)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                        .accessibilityIdentifier(AccessibilityID.FolderForm.cancel)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(saveTitle, action: save)
-                        .disabled(!model.canSave)
-                        .accessibilityIdentifier(AccessibilityID.FolderForm.save)
-                }
+                SheetToolbar(
+                    confirmTitle: saveTitle,
+                    accent: palette.accent,
+                    canConfirm: model.canSave,
+                    cancelID: AccessibilityID.FolderForm.cancel,
+                    confirmID: AccessibilityID.FolderForm.save,
+                    cancel: { dismiss() },
+                    confirm: save
+                )
             }
             .onAppear { isNameFocused = true }
             .saveErrorAlert($model.saveError)

@@ -41,6 +41,15 @@ final class ScreenshotTour: XCTestCase {
         english.tap()
         XCTAssertTrue(app.buttons["row.folder.Breaking Bad"].waitForExistence(timeout: 5))
         stop("folder-largest-text", in: app)
+        app.buttons["folder.newCard"].tap()
+        XCTAssertTrue(app.textFields["cardEditor.front"].waitForExistence(timeout: 5))
+        // Without the keyboard, so the form itself shows. The newest iOS drops the keyboard's
+        // toolbar (and its Done) at accessibility sizes; the keyboard then stays.
+        let keyboardDone = app.buttons["cardEditor.keyboardDone"]
+        if keyboardDone.waitForExistence(timeout: 3) {
+            keyboardDone.tap()
+        }
+        stop("card-editor-largest-text", in: app)
     }
 
     /// One pass; relaunching resets the in-memory seed, so both passes start from the same data.
@@ -63,6 +72,7 @@ final class ScreenshotTour: XCTestCase {
         XCTAssertTrue(app.buttons["folder.play"].waitForExistence(timeout: 5))
         stop("folder", in: app)
 
+        cardEditor(in: app)
         reviewSeason1(in: app)
         playEmptyFolderFromContextMenu(in: app)
     }
@@ -135,10 +145,38 @@ final class ScreenshotTour: XCTestCase {
         stop("appearance", in: app)
         done.tap()
         season2.press(forDuration: 1)
+        app.buttons["folderAction.rename"].tap()
+        let cancel = app.buttons["folderForm.cancel"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 5))
+        stop("rename", in: app)
+        cancel.tap()
+        season2.press(forDuration: 1)
         XCTAssertTrue(play.waitForExistence(timeout: 5))
         play.tap()
         XCTAssertTrue(app.descendants(matching: .any)["review.empty"].firstMatch.waitForExistence(timeout: 5))
         stop("review-empty", in: app)
+    }
+
+    /// Season 1's card editor: a new card, then editing "cook" scrolled down to Delete Card.
+    @MainActor
+    private func cardEditor(in app: XCUIApplication) {
+        app.buttons["folder.newCard"].tap()
+        let cancel = app.buttons["cardEditor.cancel"]
+        XCTAssertTrue(app.textFields["cardEditor.front"].waitForExistence(timeout: 5))
+        stop("card-editor-new", in: app)
+        cancel.tap()
+
+        let cook = app.buttons["row.card.cook"]
+        XCTAssertTrue(cook.waitForExistence(timeout: 5))
+        cook.tap()
+        let delete = app.buttons["cardEditor.delete"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 5))
+        // Delete Card is the form's last row, below the fold on most screens.
+        app.swipeUp()
+        XCTAssertTrue(delete.waitForExistence(timeout: 5))
+        stop("card-editor-edit", in: app)
+        cancel.tap()
+        XCTAssertTrue(app.buttons["folder.play"].waitForExistence(timeout: 5))
     }
 
     @MainActor

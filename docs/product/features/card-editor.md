@@ -6,19 +6,23 @@ Status: partial (manual cards shipped in milestone 1; screenshot, hints, lemma t
 - Modes: **add** and **edit**, same screen, shown as a full-height sheet with Cancel and Save,
   from a folder and (later) from the import flow. (#15)
 - Top to bottom: front (editable text field), screenshot if present, context (editable),
-  four tiles, folder chip.
-- Tiles: **Definition**, **Synonyms**, **Translation**, **Custom text** (a text field). The user selects
-  exactly one; its text is saved as the back. Only the selected tile is editable: tapping another
-  tile selects it and puts the cursor in it; the other tiles keep their text. Review shows the
-  selected tile's text. (#15)
+  the **Back** list of four tiles, folder row; in edit mode **Delete Card** below them.
+- Looks: white rounded fields on a light grey sheet (near-black in dark mode), uppercase section
+  labels, Cancel as × and Save as ✓ filled with the folder's accent. (#45)
+- Tiles: **Definition**, **Synonyms**, **Translation**, **Custom text** (a text field), shown as
+  rows of one list in that order: a radio circle and the title, the text below on one line
+  ("Empty" when empty). The user selects exactly one; its text is saved as the back. Only the
+  selected tile is editable (up to 6 lines), ringed in the accent with the palette's glow:
+  tapping another tile selects it and puts the cursor in it; the other tiles keep their text.
+  Review shows the selected tile's text. (#15, #45)
 - Definition, Synonyms and Translation tiles are prefilled with hints when a source has one (see `hints.md`).
   An empty hint leaves the tile empty and editable.
 - The selected tile by default is the back source last used in this root folder; for a new
   root folder it is Translation. (assumption) Creating a card sets it; an edit sets it only when
   it picks another tile or moves the card to another root folder. (#15)
 - The back source can be changed only here, never during review.
-- Folder chip: tap opens a folder picker. Default: the folder chosen for the batch, or the
-  folder the editor was opened from.
+- Folder row: the folder path in the accent; tap opens a folder picker. Default: the folder
+  chosen for the batch, or the folder the editor was opened from.
 - In edit mode both sides and the folder can change.
 - In add mode inside the import flow the primary action is **Save and next**.
 - Duplicate check on save: another card with the same front key in the same root folder →

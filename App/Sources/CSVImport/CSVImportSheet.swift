@@ -13,7 +13,7 @@ struct CSVImportSheet: View {
     }
 
     var body: some View {
-        let accent = model.folder.resolvedPalette.accent
+        let accent = model.folder?.resolvedPalette.accent ?? Color.accentColor
         NavigationStack {
             Form {
                 Section {
@@ -48,7 +48,10 @@ struct CSVImportSheet: View {
                     }
                 )
             }
-            .sheet(isPresented: $isPickingFolder) { FolderPickerSheet(selection: $model.folder) }
+            .sheet(isPresented: $isPickingFolder) { FolderPickerSheet(
+                selection: $model.folder,
+                makeNewFolder: model.newRootFolderModel
+            ) }
             .saveErrorAlert($model.saveError)
             .task { await model.load() }
         }

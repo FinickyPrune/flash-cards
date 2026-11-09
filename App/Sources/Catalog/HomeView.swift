@@ -29,18 +29,25 @@ struct HomeView: View {
                     } actions: {
                         Button("New Folder") { model.isCreatingFolder = true }
                             .accessibilityIdentifier(AccessibilityID.Home.emptyNewFolder)
+                        Button("Import CSV") { model.startCSVImport() }
+                            .accessibilityIdentifier(AccessibilityID.Home.emptyImportCSV)
                     }
                 }
             }
             .navigationTitle("Folders")
             .navigationDestination(for: Folder.self) { FolderView(model: model.folderModel(for: $0)) }
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button("Import CSV", systemImage: "square.and.arrow.down") { model.startCSVImport() }
+                        .accessibilityIdentifier(AccessibilityID.Home.importCSV)
                     Button("New Folder", systemImage: "folder.badge.plus") { model.isCreatingFolder = true }
                         .accessibilityIdentifier(AccessibilityID.Home.newFolder)
                 }
             }
             .sheet(isPresented: $model.isCreatingFolder) { NewRootFolderSheet(model: model.newRootFolderModel()) }
+            .csvImportPresentation(isPickingFile: $model.isPickingCSVFile, preview: $model.csvImport) {
+                model.importCSV(from: $0)
+            }
             .folderActionsPresentation(model.rowActions)
         }
     }

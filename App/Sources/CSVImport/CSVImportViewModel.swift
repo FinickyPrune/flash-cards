@@ -3,7 +3,8 @@ import Foundation
 import Observation
 
 /// The import preview (`csv.md` → Import): reads the file, counts what an import would create
-/// in the chosen folder, and imports it. Counts follow the header toggle and the folder.
+/// in the chosen folder, and imports it. Counts follow the header toggle and the folder. From
+/// Home there is no folder until one is picked, or created from the picker.
 @MainActor
 @Observable
 final class CSVImportViewModel: Identifiable {
@@ -16,7 +17,8 @@ final class CSVImportViewModel: Identifiable {
     }
 
     private(set) var phase = Phase.loading
-    var folder: Folder {
+    /// Nil until picked, when the import starts from Home.
+    var folder: Folder? {
         didSet { recount() }
     }
 
@@ -38,16 +40,24 @@ final class CSVImportViewModel: Identifiable {
     private var existingKeys: (root: Folder, keys: Set<String>)?
     /// Nil when the file importer failed.
     private let url: URL?
-    private let service: any CSVImportServicing
+    private let dependencies: AppDependencies
+    private var service: any CSVImportServicing {
+        dependencies.csvImportService
+    }
 
-    init(url: URL?, folder: Folder, service: any CSVImportServicing) {
+    init(url: URL?, folder: Folder?, dependencies: AppDependencies) {
         self.url = url
         self.folder = folder
-        self.service = service
+        self.dependencies = dependencies
     }
 
     var canImport: Bool {
-        phase == .ready && !rowsToImport.isEmpty
+        phase == .ready && folder != nil && !rowsToImport.isEmpty
+    }
+
+    /// New Folder… in the folder picker.
+    func newRootFolderModel() -> NewRootFolderViewModel {
+        NewRootFolderViewModel(service: dependencies.catalogService)
     }
 
     /// Runs once; the sheet's `.task` may start it again when the sheet reappears.
@@ -75,7 +85,7 @@ final class CSVImportViewModel: Identifiable {
 
     /// Returns whether the sheet should close.
     func importCards() -> Bool {
-        guard canImport else {
+        guard canImport, let folder else {
             return false
         }
         do {
@@ -94,7 +104,8 @@ final class CSVImportViewModel: Identifiable {
         }
         let result = document.rows(firstRowIsHeader: firstRowIsHeader)
         skippedCount = result.skippedCount
-        plan = CSVImportPlan(rows: result.rows, existingKeys: keys(for: folder))
+        // Without a folder only repeats within the file count as duplicates.
+        plan = CSVImportPlan(rows: result.rows, existingKeys: folder.map(keys(for:)) ?? [])
         rowsToImport = plan.rows(skippingDuplicates: skipsDuplicates)
     }
 

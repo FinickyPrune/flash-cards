@@ -115,14 +115,17 @@ struct CatalogViewModelTests {
         #expect(model.selection == .lilac)
     }
 
-    // Catches: the form ignoring the service's default, or creating with a fixed palette instead
-    // of the one picked.
-    @Test("The new folder form starts on the offered palette and creates with the picked one")
+    // Catches: the form ignoring the service's default, creating with a fixed palette instead of
+    // the one picked, or not handing the created folder on.
+    @Test("The new folder form starts on the offered palette, creates with the picked one and hands it on")
     func newRootFolderPalette() {
         given(service).paletteForNewRoot().willReturn(.aurora)
+        let english = folder("English")
         given(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .any)
-            .willReturn(folder("English"))
+            .willReturn(english)
         let model = NewRootFolderViewModel(service: service)
+        var created: Folder?
+        model.onCreate = { created = $0 }
         model.name = "English"
 
         #expect(model.palette == .aurora)
@@ -130,5 +133,7 @@ struct CatalogViewModelTests {
         #expect(model.create())
         verify(service).createRootFolder(name: .any, learningLanguage: .any, backLanguage: .any, palette: .value(.rose))
             .called(.once)
+        // The CSV import's folder picker picks the created folder through this.
+        #expect(created === english)
     }
 }

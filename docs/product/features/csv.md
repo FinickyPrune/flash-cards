@@ -10,7 +10,8 @@ Status: partial (import shipped; export #57 planned)
   yet: the Folder row reads **Choose Folder** and Import stays disabled until one is picked;
   until then only repeats within the file count as duplicates. (#56)
 - The import's folder picker starts with **New Folder…**: the New Folder sheet, and the root
-  folder created there becomes the destination. With no folders it is the only row. (#56)
+  folder created there becomes the destination and the picker closes. With no folders it is the
+  only row. A folder created there stays if the import is then cancelled. (#56)
 - Format: UTF-8 with or without a BOM; any other encoding is an error. Line endings `\n`,
   `\r\n` or `\r`. Quoting per RFC 4180 (a quoted field may hold the delimiter, line breaks and
   `""`). A quote that never closes is read as text. Fields are trimmed. (#54)

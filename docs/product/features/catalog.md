@@ -52,7 +52,7 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
   tapping a card opens it in edit mode. (#15)
 
 ## States and edge cases
-- No folders yet: home offers New folder and Import CSV. (#56)
+- No folders yet: home offers New Folder and Import CSV. (#56)
 - Empty folder: no subfolders and no cards; offers New card and New subfolder, later screenshot
   import (milestone 4).
 - Moving a folder under itself or one of its own descendants, or to where it already is, is not

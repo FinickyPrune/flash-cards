@@ -29,7 +29,8 @@ final class CSVImportUITests: XCTestCase {
         XCTAssertTrue(app.buttons["row.card.mačka"].waitForExistence(timeout: 5))
     }
 
-    /// No folders yet: the folder is created from the import's folder picker.
+    /// No folders yet: Import CSV from the empty state, and the folder is created from the
+    /// import's folder picker. The toolbar's Import CSV is on the screenshot tour.
     @MainActor
     func testImportFromHomeIntoNewFolder() {
         let app = XCUIApplication()
@@ -37,7 +38,7 @@ final class CSVImportUITests: XCTestCase {
         app.launchEnvironment["UITEST_CSV"] = "kuća;дом\npas;собака\n"
         app.launch()
 
-        app.buttons["home.importCSV"].tap()
+        app.buttons["home.emptyImportCSV"].tap()
         let confirm = app.buttons["csvImport.confirm"]
         XCTAssertTrue(app.staticTexts["csvImport.count"].waitForExistence(timeout: 5))
         XCTAssertFalse(confirm.isEnabled)

@@ -49,6 +49,8 @@ final class CSVImportUITests: XCTestCase {
         newFolder.tap()
         let name = app.textFields["folderForm.name"]
         XCTAssertTrue(name.waitForExistence(timeout: 5))
+        // Over the picker the sheet's focus can land after the first keystroke on a slow CI runner.
+        name.tap()
         name.typeText("Serbian")
         app.buttons["folderForm.save"].tap()
 

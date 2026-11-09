@@ -46,12 +46,13 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
 - **Play** reviews a folder's subtree (see `review.md`): first on a folder's context menu (home
   and folder screens) for every folder, and on the folder screen's summary card while the
   subtree has cards. (#28, #43)
-- **Import CSV…** on a folder screen's More menu imports cards into that folder (`csv.md`). (#55)
+- **Import CSV…** on a folder screen's More menu imports cards into that folder; **Import CSV**
+  in Home's toolbar imports into a folder picked or created in the preview (`csv.md`). (#55, #56)
 - **New card** on a folder screen opens the card editor in add mode with that folder chosen;
   tapping a card opens it in edit mode. (#15)
 
 ## States and edge cases
-- No folders yet: home offers New folder.
+- No folders yet: home offers New Folder and Import CSV. (#56)
 - Empty folder: no subfolders and no cards; offers New card and New subfolder, later screenshot
   import (milestone 4).
 - Moving a folder under itself or one of its own descendants, or to where it already is, is not

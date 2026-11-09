@@ -5,12 +5,14 @@ import Observation
 /// palette (defaulting to one no root folder uses yet).
 @MainActor
 @Observable
-final class NewRootFolderViewModel {
+final class NewRootFolderViewModel: Identifiable {
     var name = ""
     var learningLanguage = Languages.systemLanguage
     var backLanguage = Languages.systemLanguage
     var palette: FolderPalette
     var saveError: String?
+    /// Called with the created folder; the CSV import's folder picker picks it.
+    var onCreate: ((Folder) -> Void)?
     private let service: any CatalogServicing
 
     init(service: any CatalogServicing) {
@@ -26,12 +28,13 @@ final class NewRootFolderViewModel {
     func create() -> Bool {
         guard canCreate else { return false }
         do {
-            try service.createRootFolder(
+            let folder = try service.createRootFolder(
                 name: name,
                 learningLanguage: learningLanguage,
                 backLanguage: backLanguage,
                 palette: palette
             )
+            onCreate?(folder)
             return true
         } catch {
             saveError = error.localizedDescription

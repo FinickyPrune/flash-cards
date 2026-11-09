@@ -46,7 +46,7 @@ final class FolderViewModel {
 
     /// `url` is nil when the file importer failed.
     func importCSV(from url: URL?) {
-        csvImport = CSVImportViewModel(url: url, folder: folder, service: dependencies.csvImportService)
+        csvImport = CSVImportViewModel(url: url, folder: folder, dependencies: dependencies)
     }
 
     /// Swipe to delete in the folder list; no confirmation there (`card-editor.md`).

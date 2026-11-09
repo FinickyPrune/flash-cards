@@ -5,6 +5,8 @@ enum AccessibilityID {
     enum Home {
         static let newFolder = "home.newFolder"
         static let emptyNewFolder = "home.emptyNewFolder"
+        static let importCSV = "home.importCSV"
+        static let emptyImportCSV = "home.emptyImportCSV"
     }
 
     enum FolderScreen {
@@ -109,6 +111,11 @@ enum AccessibilityID {
         static func folderOption(_ name: String) -> String {
             "cardEditor.folderOption.\(name)"
         }
+    }
+
+    enum FolderPicker {
+        static let newFolder = "folderPicker.newFolder"
+        static let cancel = "folderPicker.cancel"
     }
 
     enum LanguagePicker {

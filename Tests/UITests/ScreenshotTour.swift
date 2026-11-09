@@ -68,6 +68,7 @@ final class ScreenshotTour: XCTestCase {
         assertAppearance(of: app)
         stop("home", in: app)
         newFolderSheet(in: app)
+        csvImportFromHome(in: app)
         csvImport(in: app)
         english.tap()
         open("Breaking Bad", in: app)
@@ -193,6 +194,20 @@ final class ScreenshotTour: XCTestCase {
         stop("csv-import", in: app)
         app.buttons["csvImport.cancel"].tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["row.folder.English"].waitForExistence(timeout: 5))
+    }
+
+    /// From Home the preview starts without a folder; its picker offers New Folder….
+    @MainActor
+    private func csvImportFromHome(in app: XCUIApplication) {
+        app.buttons["home.importCSV"].tap()
+        XCTAssertTrue(app.staticTexts["csvImport.count"].waitForExistence(timeout: 5))
+        stop("csv-import-home", in: app)
+        app.buttons["csvImport.folder"].tap()
+        XCTAssertTrue(app.buttons["folderPicker.newFolder"].waitForExistence(timeout: 5))
+        stop("csv-import-folder-picker", in: app)
+        app.buttons["folderPicker.cancel"].tap()
+        app.buttons["csvImport.cancel"].tap()
         XCTAssertTrue(app.buttons["row.folder.English"].waitForExistence(timeout: 5))
     }
 

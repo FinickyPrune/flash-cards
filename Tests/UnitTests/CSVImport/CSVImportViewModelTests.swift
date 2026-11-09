@@ -28,7 +28,16 @@ struct CSVImportViewModelTests {
 
     private func model(_ text: String) throws -> CSVImportViewModel {
         try given(service).readDocument(at: .any).willReturn(CSVDocument(data: Data(text.utf8)))
-        return CSVImportViewModel(url: url, folder: serbian, service: service)
+        return CSVImportViewModel(url: url, folder: serbian, dependencies: dependencies(service))
+    }
+
+    private func dependencies(_ service: MockCSVImportServicing) -> AppDependencies {
+        AppDependencies(
+            catalogService: MockCatalogServicing(),
+            cardService: MockCardServicing(),
+            reviewService: MockReviewServicing(),
+            csvImportService: service
+        )
     }
 
     /// A fresh mock per document: Mockable answers with the first matching `given`.
@@ -70,24 +79,44 @@ struct CSVImportViewModelTests {
         #expect(counts(model) == Counts(toImport: 3, duplicates: 1, skipped: 1))
     }
 
+    // Catches: importing from Home with no folder picked, or duplicates against the picked root
+    // folder not counted once there is one.
+    @Test("From Home, Import waits for a folder; picking one counts its duplicates")
+    func noFolderYet() async throws {
+        try given(service).readDocument(at: .any)
+            .willReturn(CSVDocument(data: Data("kuća;дом\npas;собака\npas;пёс".utf8)))
+        let model = CSVImportViewModel(url: url, folder: nil, dependencies: dependencies(service))
+        await model.load()
+        #expect(!model.canImport)
+        #expect(counts(model) == Counts(toImport: 2, duplicates: 1, skipped: 0))
+
+        model.folder = serbian
+        #expect(model.canImport)
+        #expect(counts(model) == Counts(toImport: 1, duplicates: 2, skipped: 0))
+    }
+
     // Catches: an empty preview with a disabled Import instead of saying why (a header alone, as
     // an empty folder's export, counts as no cards), a raw error text, or a failed pick doing nothing.
     @Test("A file without cards, a read error or a failed pick shows a message")
     func failures() async throws {
         for text in ["only a front\n\n", "front,back,context\r\n"] {
-            let empty = try CSVImportViewModel(url: url, folder: serbian, service: documentService(text))
+            let empty = try CSVImportViewModel(
+                url: url,
+                folder: serbian,
+                dependencies: dependencies(documentService(text))
+            )
             await empty.load()
             #expect(empty.phase == .failed(CSVImportError.noCards.localizedDescription))
             #expect(!empty.canImport)
         }
 
-        let failedPick = CSVImportViewModel(url: nil, folder: serbian, service: service)
+        let failedPick = CSVImportViewModel(url: nil, folder: serbian, dependencies: dependencies(service))
         await failedPick.load()
         #expect(failedPick.phase == .failed(CSVImportError.unreadable.localizedDescription))
 
         let failing = MockCSVImportServicing()
         given(failing).readDocument(at: .any).willThrow(CSVImportError.notUTF8)
-        let unreadable = CSVImportViewModel(url: url, folder: serbian, service: failing)
+        let unreadable = CSVImportViewModel(url: url, folder: serbian, dependencies: dependencies(failing))
         await unreadable.load()
         #expect(unreadable.phase == .failed(CSVImportError.notUTF8.localizedDescription))
     }
@@ -108,7 +137,7 @@ struct CSVImportViewModelTests {
 
         let failing = try documentService("pas;собака")
         given(failing).importRows(.any, into: .any).willThrow(CocoaError(.fileWriteUnknown))
-        let failed = CSVImportViewModel(url: url, folder: serbian, service: failing)
+        let failed = CSVImportViewModel(url: url, folder: serbian, dependencies: dependencies(failing))
         await failed.load()
         #expect(!failed.importCards())
         #expect(failed.saveError != nil)

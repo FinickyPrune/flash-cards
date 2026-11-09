@@ -101,7 +101,7 @@ struct CardEditorSheet: View {
             .onChange(of: model.selectedSource) {
                 Task { focus = .back }
             }
-            .sheet(isPresented: $isPickingFolder) { FolderPickerSheet(selection: $model.folder) }
+            .sheet(isPresented: $isPickingFolder) { FolderPickerSheet(selection: Binding($model.folder)) }
             .alert(
                 "Duplicate Card",
                 isPresented: Binding(isPresent: $model.duplicate),

@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// One folder (`catalog.md`): a header, a summary card with Play, its subfolders as tiles, then its
 /// cards newest first, over a wash in the folder's palette.
@@ -114,6 +115,14 @@ struct FolderView: View {
         .navigationDestination(item: $openedSubfolder) { FolderView(model: model.subfolderModel(for: $0)) }
         .sheet(isPresented: $model.isCreatingSubfolder) { FolderNameSheet(model: model.newSubfolderModel()) }
         .sheet(item: $model.editor) { CardEditorSheet(model: $0) }
+        .fileImporter(
+            isPresented: $model.isPickingCSVFile,
+            allowedContentTypes: [.commaSeparatedText, .tabSeparatedText, .plainText]
+        ) { result in
+            // A failed pick opens the preview in its "can't be read" state.
+            model.importCSV(from: try? result.get())
+        }
+        .sheet(item: $model.csvImport) { CSVImportSheet(model: $0) }
         .folderDeleteConfirmation($model.deleting) { _ in
             if model.confirmDelete() {
                 dismiss()
@@ -127,6 +136,10 @@ struct FolderView: View {
     /// deleting it also leaves the screen.
     private func moreMenu(for folder: Folder) -> some View {
         Menu("More", systemImage: "ellipsis") {
+            Button("Import CSV…", systemImage: "square.and.arrow.down") { model.startCSVImport() }
+                .accessibilityIdentifier(AccessibilityID.FolderScreen.importCSV)
+            // A divider, not a section: newer iOS drops identifiers of menu items inside a section.
+            Divider()
             FolderActionButtons(folder: folder, actions: model.rowActions, includesPlay: false) {
                 model.deleting = folder
             }

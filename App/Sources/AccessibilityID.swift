@@ -16,6 +16,19 @@ enum AccessibilityID {
         static let play = "folder.play"
         static let more = "folder.more"
         static let title = "folder.title"
+        static let importCSV = "folder.importCSV"
+    }
+
+    enum CSVImport {
+        static let folder = "csvImport.folder"
+        static let count = "csvImport.count"
+        static let duplicates = "csvImport.duplicates"
+        static let skipped = "csvImport.skipped"
+        static let skipDuplicates = "csvImport.skipDuplicates"
+        static let header = "csvImport.header"
+        static let error = "csvImport.error"
+        static let cancel = "csvImport.cancel"
+        static let confirm = "csvImport.confirm"
     }
 
     enum Row {

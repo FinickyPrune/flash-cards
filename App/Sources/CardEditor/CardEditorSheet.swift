@@ -157,22 +157,8 @@ struct CardEditorSheet: View {
     }
 
     private var folderRow: some View {
-        Button { isPickingFolder = true } label: {
-            HStack(spacing: 8) {
-                Text("Folder")
-                    .foregroundStyle(Color.primary)
-                Spacer(minLength: 8)
-                Label(FolderTree.path(of: model.folder), systemImage: "folder.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.tint)
-                    .multilineTextAlignment(.trailing)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-        }
-        .accessibilityIdentifier(AccessibilityID.CardEditor.folder)
+        FolderPathRow(folder: model.folder) { isPickingFolder = true }
+            .accessibilityIdentifier(AccessibilityID.CardEditor.folder)
     }
 
     private var deleteSection: some View {

@@ -21,6 +21,7 @@ final class ScreenshotTour: XCTestCase {
         for name in ["light", "dark"] {
             appearance = name
             tour()
+            csvImportError()
             largestText()
         }
     }
@@ -57,6 +58,9 @@ final class ScreenshotTour: XCTestCase {
     private func tour() {
         let app = XCUIApplication()
         app.launchArguments = ["-uitest-seed", "-uitest-\(appearance)"]
+        // Serbian already has `kuća`, and the last row has no front: a duplicate and a skipped row.
+        app.launchEnvironment["UITEST_CSV"] = "front;back;context\nkuća;дом\nmačka;кошка;Mačka spava na suncu.\n"
+            + "pas;собака\nhvala lepo;большое спасибо\n;prazno\n"
         app.launch()
 
         let english = app.buttons["row.folder.English"]
@@ -64,6 +68,7 @@ final class ScreenshotTour: XCTestCase {
         assertAppearance(of: app)
         stop("home", in: app)
         newFolderSheet(in: app)
+        csvImport(in: app)
         english.tap()
         open("Breaking Bad", in: app)
         XCTAssertTrue(app.buttons["row.folder.Season 1"].waitForExistence(timeout: 5))
@@ -177,6 +182,32 @@ final class ScreenshotTour: XCTestCase {
         stop("card-editor-edit", in: app)
         cancel.tap()
         XCTAssertTrue(app.buttons["folder.play"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func csvImport(in app: XCUIApplication) {
+        open("Serbian", in: app)
+        app.buttons["folder.more"].tap()
+        app.buttons["folder.importCSV"].tap()
+        XCTAssertTrue(app.staticTexts["csvImport.count"].waitForExistence(timeout: 5))
+        stop("csv-import", in: app)
+        app.buttons["csvImport.cancel"].tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["row.folder.English"].waitForExistence(timeout: 5))
+    }
+
+    /// A file with no row that has both a front and a back.
+    @MainActor
+    private func csvImportError() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-seed", "-uitest-\(appearance)"]
+        app.launchEnvironment["UITEST_CSV"] = "kuća\npas\n"
+        app.launch()
+        open("Serbian", in: app)
+        app.buttons["folder.more"].tap()
+        app.buttons["folder.importCSV"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["csvImport.error"].firstMatch.waitForExistence(timeout: 5))
+        stop("csv-import-error", in: app)
     }
 
     @MainActor

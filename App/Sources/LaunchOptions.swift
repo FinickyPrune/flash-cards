@@ -26,6 +26,21 @@ enum LaunchOptions {
         return arguments.contains("-uitest-light") ? .light : nil
     }()
 
+    /// `UITEST_CSV` in the environment: its text is written to a file that Import CSV opens
+    /// instead of showing the file importer, which UI tests can't drive.
+    static let csvFile: URL? = {
+        guard isDebug, let text = ProcessInfo.processInfo.environment["UITEST_CSV"] else {
+            return nil
+        }
+        let url = URL.temporaryDirectory.appending(path: "uitest.csv")
+        do {
+            try Data(text.utf8).write(to: url)
+            return url
+        } catch {
+            return nil
+        }
+    }()
+
     private static var isDebug: Bool {
         #if DEBUG
             true

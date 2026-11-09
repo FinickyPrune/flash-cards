@@ -8,13 +8,15 @@ struct AppDependencies {
     let catalogService: any CatalogServicing
     let cardService: any CardServicing
     let reviewService: any ReviewServicing
+    let csvImportService: any CSVImportServicing
 
     /// The real services, all on one context.
     static func live(context: ModelContext) -> AppDependencies {
         AppDependencies(
             catalogService: CatalogService(context: context),
             cardService: CardService(context: context),
-            reviewService: ReviewService(context: context)
+            reviewService: ReviewService(context: context),
+            csvImportService: CSVImportService(context: context)
         )
     }
 }

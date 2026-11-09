@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 
 /// One folder screen: its subfolders' actions (Play of the folder itself goes through them too),
@@ -9,6 +10,9 @@ final class FolderViewModel {
     var isCreatingSubfolder = false
     /// The open card editor; built once when it opens, so it never re-reads a card it deleted.
     var editor: CardEditorViewModel?
+    var isPickingCSVFile = false
+    /// The open CSV import preview.
+    var csvImport: CSVImportViewModel?
     var saveError: String?
     /// The folder itself, while its delete from the More menu waits for confirmation.
     var deleting: Folder?
@@ -29,6 +33,19 @@ final class FolderViewModel {
 
     func edit(_ card: Card) {
         editor = CardEditorViewModel(editing: card, fallbackFolder: folder, service: dependencies.cardService)
+    }
+
+    /// Import CSV on the More menu: the file importer, or the UI tests' file.
+    func startCSVImport() {
+        if let file = LaunchOptions.csvFile {
+            importCSV(from: file)
+        } else {
+            isPickingCSVFile = true
+        }
+    }
+
+    func importCSV(from url: URL) {
+        csvImport = CSVImportViewModel(url: url, folder: folder, service: dependencies.csvImportService)
     }
 
     /// Swipe to delete in the folder list; no confirmation there (`card-editor.md`).

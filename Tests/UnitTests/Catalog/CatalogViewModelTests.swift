@@ -44,7 +44,8 @@ struct CatalogViewModelTests {
         let actions = FolderRowActionsModel(dependencies: AppDependencies(
             catalogService: service,
             cardService: MockCardServicing(),
-            reviewService: MockReviewServicing()
+            reviewService: MockReviewServicing(),
+            csvImportService: MockCSVImportServicing()
         ))
         actions.deleting = season
 

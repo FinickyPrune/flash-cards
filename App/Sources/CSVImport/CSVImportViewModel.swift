@@ -11,6 +11,8 @@ final class CSVImportViewModel: Identifiable {
         case loading
         case failed(String)
         case ready
+        /// Saved; the sheet is closing and Import must not run again.
+        case imported
     }
 
     private(set) var phase = Phase.loading
@@ -22,39 +24,49 @@ final class CSVImportViewModel: Identifiable {
         didSet { recount() }
     }
 
-    var skipsDuplicates = true
+    var skipsDuplicates = true {
+        didSet { rowsToImport = plan.rows(skippingDuplicates: skipsDuplicates) }
+    }
+
     var saveError: String?
     private(set) var plan = CSVImportPlan(rows: [], existingKeys: [])
+    private(set) var rowsToImport: [CSVRow] = []
     /// Rows left out for an empty front or back.
     private(set) var skippedCount = 0
     private var document: CSVDocument?
-    private let url: URL
+    /// The front keys of the last root folder counted against; a header toggle doesn't refetch them.
+    private var existingKeys: (root: Folder, keys: Set<String>)?
+    /// Nil when the file importer failed.
+    private let url: URL?
     private let service: any CSVImportServicing
 
-    init(url: URL, folder: Folder, service: any CSVImportServicing) {
+    init(url: URL?, folder: Folder, service: any CSVImportServicing) {
         self.url = url
         self.folder = folder
         self.service = service
-    }
-
-    var rowsToImport: [CSVRow] {
-        plan.rows(skippingDuplicates: skipsDuplicates)
     }
 
     var canImport: Bool {
         phase == .ready && !rowsToImport.isEmpty
     }
 
+    /// Runs once; the sheet's `.task` may start it again when the sheet reappears.
     func load() async {
+        guard phase == .loading, document == nil else {
+            return
+        }
         do {
+            guard let url else {
+                throw CSVImportError.unreadable
+            }
             let document = try await service.readDocument(at: url)
-            // Even the first row counted as a card leaves none: nothing to preview.
-            guard !document.rows(firstRowIsHeader: false).rows.isEmpty else {
+            let firstRowIsHeader = document.firstRowLooksLikeHeader
+            guard !document.rows(firstRowIsHeader: firstRowIsHeader).rows.isEmpty else {
                 throw CSVImportError.noCards
             }
-            firstRowIsHeader = document.firstRowLooksLikeHeader
             self.document = document
-            recount()
+            // `didSet` recounts even when the value doesn't change.
+            self.firstRowIsHeader = firstRowIsHeader
             phase = .ready
         } catch {
             phase = .failed(error.localizedDescription)
@@ -63,8 +75,12 @@ final class CSVImportViewModel: Identifiable {
 
     /// Returns whether the sheet should close.
     func importCards() -> Bool {
+        guard canImport else {
+            return false
+        }
         do {
             try service.importRows(rowsToImport, into: folder)
+            phase = .imported
             return true
         } catch {
             saveError = error.localizedDescription
@@ -78,6 +94,16 @@ final class CSVImportViewModel: Identifiable {
         }
         let result = document.rows(firstRowIsHeader: firstRowIsHeader)
         skippedCount = result.skippedCount
-        plan = CSVImportPlan(rows: result.rows, existingKeys: service.existingFrontKeys(in: folder))
+        plan = CSVImportPlan(rows: result.rows, existingKeys: keys(for: folder))
+        rowsToImport = plan.rows(skippingDuplicates: skipsDuplicates)
+    }
+
+    private func keys(for folder: Folder) -> Set<String> {
+        if let existingKeys, existingKeys.root === folder.root {
+            return existingKeys.keys
+        }
+        let keys = service.existingFrontKeys(in: folder)
+        existingKeys = (folder.root, keys)
+        return keys
     }
 }

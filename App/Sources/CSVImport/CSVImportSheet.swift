@@ -26,7 +26,7 @@ struct CSVImportSheet: View {
                         .listRowBackground(Color.clear)
                 case let .failed(message):
                     failure(message)
-                case .ready:
+                case .ready, .imported:
                     CSVImportSummary(model: model)
                 }
             }

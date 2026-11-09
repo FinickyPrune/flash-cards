@@ -119,9 +119,8 @@ struct FolderView: View {
             isPresented: $model.isPickingCSVFile,
             allowedContentTypes: [.commaSeparatedText, .tabSeparatedText, .plainText]
         ) { result in
-            if case let .success(url) = result {
-                model.importCSV(from: url)
-            }
+            // A failed pick opens the preview in its "can't be read" state.
+            model.importCSV(from: try? result.get())
         }
         .sheet(item: $model.csvImport) { CSVImportSheet(model: $0) }
         .folderDeleteConfirmation($model.deleting) { _ in

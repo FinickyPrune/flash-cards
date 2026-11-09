@@ -26,13 +26,15 @@ View → `@Observable` view model → services → SwiftData.
   the one service they use, so their `init` shows what they touch and a test needs one mock.
   A new service is added to `AppDependencies` and `live`, then read by the presenter that needs it.
   `AppDependencies` being `@MainActor` only isolates the struct: an `actor` service for heavy work
-  (e.g. `TextRecognizer`, `CSVImporter`) is stored as is and still runs off the main actor when
+  (e.g. `TextRecognizer`, `CSVFileReader`) is stored as is and still runs off the main actor when
   awaited.
 - A view model's `init` is cheap and has no side effects: SwiftUI may build and drop it on any
   parent render. Start work (fetching, lookups) from `.task`.
 Services: `TextRecognizer` (Vision OCR), `InboxStore`, `DictionaryService` (bundled read-only
 SQLite, decision 0006; backs the definition and synonym providers and the lemma forms),
-`CSVImporter`, `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
+`CSVImportService` (reads and parses files in the `CSVFileReader` actor; inserts and saves on
+the main context, because screens read `folder.cards` there and another context's save leaves
+that array stale), `SessionBuilder`. Review depends on the `Scheduler` protocol and an array of cards, not on folders.
 
 Hint sources are protocols, swappable per language pair. `TranslationProvider` is backed by
 `DictionaryService` (Russian translations, decision 0006). Apple's Translation framework is a

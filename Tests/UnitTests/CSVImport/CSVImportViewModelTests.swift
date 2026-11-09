@@ -31,6 +31,14 @@ struct CSVImportViewModelTests {
         return CSVImportViewModel(url: url, folder: serbian, service: service)
     }
 
+    /// A fresh mock per document: Mockable answers with the first matching `given`.
+    private func documentService(_ text: String) throws -> MockCSVImportServicing {
+        let service = MockCSVImportServicing()
+        try given(service).readDocument(at: .any).willReturn(CSVDocument(data: Data(text.utf8)))
+        given(service).existingFrontKeys(in: .any).willReturn([])
+        return service
+    }
+
     private struct Counts: Equatable {
         var toImport: Int
         var duplicates: Int
@@ -62,15 +70,21 @@ struct CSVImportViewModelTests {
         #expect(counts(model) == Counts(toImport: 3, duplicates: 1, skipped: 1))
     }
 
-    // Catches: an empty preview with a disabled Import instead of saying why, or a raw error text.
-    @Test("A file without cards or a read error shows a message")
+    // Catches: an empty preview with a disabled Import instead of saying why (a header alone, as
+    // an empty folder's export, counts as no cards), a raw error text, or a failed pick doing nothing.
+    @Test("A file without cards, a read error or a failed pick shows a message")
     func failures() async throws {
-        let empty = try model("only a front\n\n")
-        await empty.load()
-        #expect(empty.phase == .failed(CSVImportError.noCards.localizedDescription))
-        #expect(!empty.canImport)
+        for text in ["only a front\n\n", "front,back,context\r\n"] {
+            let empty = try CSVImportViewModel(url: url, folder: serbian, service: documentService(text))
+            await empty.load()
+            #expect(empty.phase == .failed(CSVImportError.noCards.localizedDescription))
+            #expect(!empty.canImport)
+        }
 
-        // A fresh mock: Mockable answers with the first matching `given`.
+        let failedPick = CSVImportViewModel(url: nil, folder: serbian, service: service)
+        await failedPick.load()
+        #expect(failedPick.phase == .failed(CSVImportError.unreadable.localizedDescription))
+
         let failing = MockCSVImportServicing()
         given(failing).readDocument(at: .any).willThrow(CSVImportError.notUTF8)
         let unreadable = CSVImportViewModel(url: url, folder: serbian, service: failing)
@@ -78,21 +92,21 @@ struct CSVImportViewModelTests {
         #expect(unreadable.phase == .failed(CSVImportError.notUTF8.localizedDescription))
     }
 
-    // Catches: importing the duplicates Skip left out, or closing the sheet when the save failed.
-    @Test("Import saves the rows left after skipping; a failed save keeps the sheet open")
+    // Catches: importing the duplicates Skip left out, a double tap importing everything twice, or
+    // closing the sheet when the save failed.
+    @Test("Import saves the rows left after skipping, once; a failed save keeps the sheet open")
     func importCards() async throws {
         let model = try model("kuća;дом\npas;собака")
         await model.load()
         given(service).importRows(.any, into: .any).willReturn()
 
         #expect(model.importCards())
+        #expect(!model.importCards())
         verify(service)
             .importRows(.value([CSVRow(front: "pas", back: "собака")]), into: .matching { $0 === serbian })
             .called(.once)
 
-        let failing = MockCSVImportServicing()
-        try given(failing).readDocument(at: .any).willReturn(CSVDocument(data: Data("pas;собака".utf8)))
-        given(failing).existingFrontKeys(in: .any).willReturn([])
+        let failing = try documentService("pas;собака")
         given(failing).importRows(.any, into: .any).willThrow(CocoaError(.fileWriteUnknown))
         let failed = CSVImportViewModel(url: url, folder: serbian, service: failing)
         await failed.load()

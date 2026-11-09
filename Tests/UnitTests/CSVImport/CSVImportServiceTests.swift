@@ -41,8 +41,21 @@ struct CSVImportServiceTests {
             ["kuća", "дом", "Moja kuća.", "custom", "Words"],
             ["pas", "собака", nil, "custom", "Words"],
         ])
-        #expect(cards.allSatisfy { $0.forwardReviewState == nil })
+        #expect(cards.allSatisfy { $0.screenshot == nil && ($0.reviewStates ?? []).isEmpty })
+        #expect(words.cards?.count == 2)
         #expect(serbian.lastBackSource == "translation")
+    }
+
+    // Catches: dates counted forward from now, which put a large import's last cards in the future,
+    // after (and so listed above) a card the user adds right after the import.
+    @Test("No imported card is dated after the import")
+    func datesInThePast() throws {
+        try service.importRows((0 ..< 1000).map { CSVRow(front: "word \($0)", back: "x") }, into: words)
+        let after = Date.now
+
+        let cards = try container.mainContext.fetch(FetchDescriptor<Card>(sortBy: [SortDescriptor(\.createdAt)]))
+        #expect(cards.allSatisfy { $0.createdAt <= after })
+        #expect(cards.last?.front == "word 999")
     }
 
     // Catches: collecting keys from the folder alone instead of its whole root, or across roots.
@@ -55,8 +68,9 @@ struct CSVImportServiceTests {
         #expect(service.existingFrontKeys(in: words) == ["kuca", "hvala"])
     }
 
-    // Catches: a read failure or non-UTF-8 text surfacing as a raw system error, or the other's message.
-    @Test("Unreadable and non-UTF-8 files fail with their own errors")
+    // Catches: a read failure, non-UTF-8 text or an oversized file surfacing as a raw system error,
+    // as another case's message, or (too large) being read into memory anyway.
+    @Test("Unreadable, non-UTF-8 and too large files fail with their own errors")
     func readErrors() async throws {
         let missing = URL.temporaryDirectory.appending(path: "missing-\(UUID()).csv")
         await #expect(throws: CSVImportError.unreadable) { try await service.readDocument(at: missing) }
@@ -66,5 +80,10 @@ struct CSVImportServiceTests {
         try Data([0xE4, 0xEE, 0xEC, 0x3B, 0x61]).write(to: cp1251)
         defer { try? FileManager.default.removeItem(at: cp1251) }
         await #expect(throws: CSVImportError.notUTF8) { try await service.readDocument(at: cp1251) }
+
+        let large = URL.temporaryDirectory.appending(path: "large-\(UUID()).csv")
+        try Data(repeating: 0x61, count: CSVFileReader.maxBytes + 1).write(to: large)
+        defer { try? FileManager.default.removeItem(at: large) }
+        await #expect(throws: CSVImportError.tooLarge) { try await service.readDocument(at: large) }
     }
 }

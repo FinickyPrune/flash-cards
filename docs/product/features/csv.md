@@ -29,7 +29,7 @@ Status: partial (import into a folder shipped; import from Home #56, export #57 
 - A duplicate is a front key already in the destination's root folder, or on an earlier row of
   the file; the first occurrence in the file is the one kept. (#55)
 - Import creates the cards in the destination folder, new, back source custom, no screenshot,
-  in one save, in file order (the file's last row is the newest). The root folder's last back
+  in one save, in file order (the file's last row is the newest; none is dated in the future). The root folder's last back
   source doesn't change. A failed save creates nothing and shows the error. (#55)
 
 ## Export
@@ -40,9 +40,9 @@ Status: partial (import into a folder shipped; import from Home #56, export #57 
 
 ## States and edge cases
 - Blank rows are ignored. A row with an empty front or back is skipped and counted. (#54)
-- A file with no cards reads as empty, not as an error. (#54)
-- The file can't be read, isn't UTF-8, or has no row with both a front and a back: the preview
-  says so and only Cancel works. (#55)
+- The file can't be read (including a failed pick), isn't UTF-8, is over 10 MB, or has no row
+  with both a front and a back once the guessed header is left out (an empty folder's export):
+  the preview says so and only Cancel works. (#55)
 
 ## Not supported
 - Full backup with screenshots (after MVP).

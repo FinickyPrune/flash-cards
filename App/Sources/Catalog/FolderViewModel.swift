@@ -44,7 +44,8 @@ final class FolderViewModel {
         }
     }
 
-    func importCSV(from url: URL) {
+    /// `url` is nil when the file importer failed.
+    func importCSV(from url: URL?) {
         csvImport = CSVImportViewModel(url: url, folder: folder, service: dependencies.csvImportService)
     }
 

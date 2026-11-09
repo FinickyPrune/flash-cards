@@ -46,6 +46,7 @@ Status: shipped (folder tree in milestone 1, progress and Play in milestone 2)
 - **Play** reviews a folder's subtree (see `review.md`): first on a folder's context menu (home
   and folder screens) for every folder, and on the folder screen's summary card while the
   subtree has cards. (#28, #43)
+- **Import CSV…** on a folder screen's More menu imports cards into that folder (`csv.md`). (#55)
 - **New card** on a folder screen opens the card editor in add mode with that folder chosen;
   tapping a card opens it in edit mode. (#15)
 

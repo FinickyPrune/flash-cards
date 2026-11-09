@@ -136,10 +136,10 @@ struct FolderView: View {
     /// deleting it also leaves the screen.
     private func moreMenu(for folder: Folder) -> some View {
         Menu("More", systemImage: "ellipsis") {
-            Section {
-                Button("Import CSV…", systemImage: "square.and.arrow.down") { model.startCSVImport() }
-                    .accessibilityIdentifier(AccessibilityID.FolderScreen.importCSV)
-            }
+            Button("Import CSV…", systemImage: "square.and.arrow.down") { model.startCSVImport() }
+                .accessibilityIdentifier(AccessibilityID.FolderScreen.importCSV)
+            // A divider, not a section: newer iOS drops identifiers of menu items inside a section.
+            Divider()
             FolderActionButtons(folder: folder, actions: model.rowActions, includesPlay: false) {
                 model.deleting = folder
             }

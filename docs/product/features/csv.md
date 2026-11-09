@@ -1,11 +1,16 @@
 # CSV import and export
 Import cards from a CSV file into a folder, and export a folder to CSV as a simple backup.
 CSV is the main way Serbian cards enter the app (vision).
-Status: partial (import into a folder shipped; import from Home #56, export #57 planned)
+Status: partial (import shipped; export #57 planned)
 
 ## Import
 - **Import CSV…** on a folder screen's **More** menu opens the system file importer (CSV, TSV or
   plain text), then the preview with that folder as the destination. (#55)
+- **Import CSV** on Home (toolbar, and the empty state) opens the same flow with no destination
+  yet: the Folder row reads **Choose Folder** and Import stays disabled until one is picked;
+  until then only repeats within the file count as duplicates. (#56)
+- The import's folder picker starts with **New Folder…**: the New Folder sheet, and the root
+  folder created there becomes the destination. With no folders it is the only row. (#56)
 - Format: UTF-8 with or without a BOM; any other encoding is an error. Line endings `\n`,
   `\r\n` or `\r`. Quoting per RFC 4180 (a quoted field may hold the delimiter, line breaks and
   `""`). A quote that never closes is read as text. Fields are trimmed. (#54)
@@ -19,7 +24,8 @@ Status: partial (import into a folder shipped; import from Home #56, export #57 
   `лицо`, `слово`, `термин`, `вопрос`, `фраза`, `reč` or `pojam` (ignoring case and
   diacritics); the preview can override the guess. (#54)
 - Preview before importing, while the file is read off the main thread (#55):
-  - **Folder** row with the destination's path; tapping it picks another folder at any depth.
+  - **Folder** row with the destination's path; tapping it picks another folder at any depth,
+    or creates a root folder.
   - Cards to import; Duplicates (hidden at 0); Rows skipped for an empty front or back (hidden
     at 0).
   - **Skip duplicates**, on by default, shown while there are duplicates; off imports every row.

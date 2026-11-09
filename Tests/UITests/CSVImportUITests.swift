@@ -28,4 +28,34 @@ final class CSVImportUITests: XCTestCase {
         app.buttons["csvImport.confirm"].tap()
         XCTAssertTrue(app.buttons["row.card.mačka"].waitForExistence(timeout: 5))
     }
+
+    /// No folders yet: the folder is created from the import's folder picker.
+    @MainActor
+    func testImportFromHomeIntoNewFolder() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitest-reset"]
+        app.launchEnvironment["UITEST_CSV"] = "kuća;дом\npas;собака\n"
+        app.launch()
+
+        app.buttons["home.importCSV"].tap()
+        let confirm = app.buttons["csvImport.confirm"]
+        XCTAssertTrue(app.staticTexts["csvImport.count"].waitForExistence(timeout: 5))
+        XCTAssertFalse(confirm.isEnabled)
+
+        app.buttons["csvImport.folder"].tap()
+        let newFolder = app.buttons["folderPicker.newFolder"]
+        XCTAssertTrue(newFolder.waitForExistence(timeout: 5))
+        newFolder.tap()
+        let name = app.textFields["folderForm.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        name.typeText("Serbian")
+        app.buttons["folderForm.save"].tap()
+
+        let enabled = expectation(for: NSPredicate(format: "isEnabled == true"), evaluatedWith: confirm)
+        wait(for: [enabled], timeout: 5)
+        confirm.tap()
+        let serbian = app.buttons["row.folder.Serbian"]
+        XCTAssertTrue(serbian.waitForExistence(timeout: 5))
+        XCTAssertTrue(serbian.label.contains("2 due"), serbian.label)
+    }
 }

@@ -12,7 +12,7 @@ MVP milestones in order, and what comes after. Actionable work for the current m
 4. **Screenshots**: inbox, photo picker, OCR, word/phrase picker, dictionary build script and
    bundled file, hint tiles, duplicate check.
 5. **Share extension**: extension, App Group, inbox banner.
-6. **Release**: en + ru localisation, icon, one-screen onboarding, tip jar (StoreKit 2
+6. **Release**: en + ru localisation, icon (PNGs in place, #60; maybe an Icon Composer file), one-screen onboarding, tip jar (StoreKit 2
    consumables), dictionary attribution and DRM-free dictionary file in the GitHub release (#11), App Store.
 
 ## After MVP
